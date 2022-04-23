@@ -23,13 +23,13 @@ __BEGIN_DECLS
 
 void test_loop_forever();
 void test_signal_handler(int);
-void test_signal_action(int, siginfo_t*, void*);
-int test_level_four(int, int, int, int, void (*)(void*), void*);
-int test_level_three(int, int, int, int, void (*)(void*), void*);
-int test_level_two(int, int, int, int, void (*)(void*), void*);
-int test_level_one(int, int, int, int, void (*)(void*), void*);
-int test_recursive_call(int, void (*)(void*), void*);
-void test_get_context_and_wait(void*, volatile int*);
+void test_signal_action(int, siginfo_t *, void *);
+int test_level_four(int, int, int, int, void (*)(void *), void *);
+int test_level_three(int, int, int, int, void (*)(void *), void *);
+int test_level_two(int, int, int, int, void (*)(void *), void *);
+int test_level_one(int, int, int, int, void (*)(void *), void *);
+int test_recursive_call(int, void (*)(void *), void *);
+void test_get_context_and_wait(void *, volatile int *);
 
 __END_DECLS
 

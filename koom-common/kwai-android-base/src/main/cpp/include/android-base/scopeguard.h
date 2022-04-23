@@ -23,22 +23,25 @@ namespace base {
 
 // ScopeGuard ensures that the specified functor is executed no matter how the
 // current scope exits.
-template <typename F> class ScopeGuard {
-public:
+template<typename F>
+class ScopeGuard {
+ public:
   ScopeGuard(F &&f) : f_(std::forward<F>(f)), active_(true) {}
 
-  ScopeGuard(ScopeGuard &&that) noexcept : f_(std::move(that.f_)), active_(that.active_) {
-    that.active_ = false;
+  ScopeGuard(ScopeGuard &&that)
+  noexcept : f_(std::move(that.f_)), active_(that
+  .active_) {
+	that.active_ = false;
   }
 
-  template <typename Functor>
+  template<typename Functor>
   ScopeGuard(ScopeGuard<Functor> &&that) : f_(std::move(that.f_)), active_(that.active_) {
-    that.active_ = false;
+	that.active_ = false;
   }
 
   ~ScopeGuard() {
-    if (active_)
-      f_();
+	if (active_)
+	  f_();
   }
 
   ScopeGuard() = delete;
@@ -50,14 +53,16 @@ public:
 
   bool active() const { return active_; }
 
-private:
-  template <typename Functor> friend class ScopeGuard;
+ private:
+  template<typename Functor> friend
+  class ScopeGuard;
 
   F f_;
   bool active_;
 };
 
-template <typename F> ScopeGuard<F> make_scope_guard(F &&f) {
+template<typename F>
+ScopeGuard<F> make_scope_guard(F &&f) {
   return ScopeGuard<F>(std::forward<F>(f));
 }
 

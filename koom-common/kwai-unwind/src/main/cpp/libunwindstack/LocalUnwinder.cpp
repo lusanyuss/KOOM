@@ -49,8 +49,8 @@ bool LocalUnwinder::Init() {
   // Create the maps.
   maps_.reset(new unwindstack::LocalUpdatableMaps());
   if (!maps_->Parse()) {
-    maps_.reset();
-    return false;
+	maps_.reset();
+	return false;
   }
 
   process_memory_ = unwindstack::Memory::CreateProcessMemory(getpid());
@@ -58,34 +58,34 @@ bool LocalUnwinder::Init() {
   return true;
 }
 
-bool LocalUnwinder::ShouldSkipLibrary(const std::string& map_name) {
-  for (const std::string& skip_library : skip_libraries_) {
-    if (skip_library == map_name) {
-      return true;
-    }
+bool LocalUnwinder::ShouldSkipLibrary(const std::string &map_name) {
+  for (const std::string &skip_library : skip_libraries_) {
+	if (skip_library == map_name) {
+	  return true;
+	}
   }
   return false;
 }
 
-MapInfo* LocalUnwinder::GetMapInfo(uint64_t pc) {
+MapInfo *LocalUnwinder::GetMapInfo(uint64_t pc) {
   pthread_rwlock_rdlock(&maps_rwlock_);
-  MapInfo* map_info = maps_->Find(pc);
+  MapInfo *map_info = maps_->Find(pc);
   pthread_rwlock_unlock(&maps_rwlock_);
 
   if (map_info == nullptr) {
-    pthread_rwlock_wrlock(&maps_rwlock_);
-    // This is guaranteed not to invalidate any previous MapInfo objects so
-    // we don't need to worry about any MapInfo* values already in use.
-    if (maps_->Reparse()) {
-      map_info = maps_->Find(pc);
-    }
-    pthread_rwlock_unlock(&maps_rwlock_);
+	pthread_rwlock_wrlock(&maps_rwlock_);
+	// This is guaranteed not to invalidate any previous MapInfo objects so
+	// we don't need to worry about any MapInfo* values already in use.
+	if (maps_->Reparse()) {
+	  map_info = maps_->Find(pc);
+	}
+	pthread_rwlock_unlock(&maps_rwlock_);
   }
 
   return map_info;
 }
 
-bool LocalUnwinder::Unwind(std::vector<LocalFrameData>* frame_info, size_t max_frames) {
+bool LocalUnwinder::Unwind(std::vector<LocalFrameData> *frame_info, size_t max_frames) {
   std::unique_ptr<unwindstack::Regs> regs(unwindstack::Regs::CreateFromLocal());
   unwindstack::RegsGetLocal(regs.get());
   ArchEnum arch = regs->Arch();
@@ -93,53 +93,53 @@ bool LocalUnwinder::Unwind(std::vector<LocalFrameData>* frame_info, size_t max_f
   size_t num_frames = 0;
   bool adjust_pc = false;
   while (true) {
-    uint64_t cur_pc = regs->pc();
-    uint64_t cur_sp = regs->sp();
+	uint64_t cur_pc = regs->pc();
+	uint64_t cur_sp = regs->sp();
 
-    MapInfo* map_info = GetMapInfo(cur_pc);
-    if (map_info == nullptr) {
-      break;
-    }
+	MapInfo *map_info = GetMapInfo(cur_pc);
+	if (map_info == nullptr) {
+	  break;
+	}
 
-    Elf* elf = map_info->GetElf(process_memory_, arch);
-    uint64_t rel_pc = elf->GetRelPc(cur_pc, map_info);
-    uint64_t step_pc = rel_pc;
-    uint64_t pc_adjustment;
-    if (adjust_pc) {
-      pc_adjustment = GetPcAdjustment(rel_pc, elf, arch);
-    } else {
-      pc_adjustment = 0;
-    }
-    step_pc -= pc_adjustment;
+	Elf *elf = map_info->GetElf(process_memory_, arch);
+	uint64_t rel_pc = elf->GetRelPc(cur_pc, map_info);
+	uint64_t step_pc = rel_pc;
+	uint64_t pc_adjustment;
+	if (adjust_pc) {
+	  pc_adjustment = GetPcAdjustment(rel_pc, elf, arch);
+	} else {
+	  pc_adjustment = 0;
+	}
+	step_pc -= pc_adjustment;
 
-    bool finished = false;
-    bool is_signal_frame = false;
-    if (elf->StepIfSignalHandler(rel_pc, regs.get(), process_memory_.get())) {
-      step_pc = rel_pc;
-    } else if (!elf->Step(step_pc, regs.get(), process_memory_.get(), &finished,
-                          &is_signal_frame)) {
-      finished = true;
-    }
+	bool finished = false;
+	bool is_signal_frame = false;
+	if (elf->StepIfSignalHandler(rel_pc, regs.get(), process_memory_.get())) {
+	  step_pc = rel_pc;
+	} else if (!elf->Step(step_pc, regs.get(), process_memory_.get(), &finished,
+						  &is_signal_frame)) {
+	  finished = true;
+	}
 
-    // Skip any locations that are within this library.
-    if (num_frames != 0 || !ShouldSkipLibrary(map_info->name)) {
-      // Add frame information.
-      std::string func_name;
-      uint64_t func_offset;
-      if (elf->GetFunctionName(rel_pc, &func_name, &func_offset)) {
-        frame_info->emplace_back(map_info, cur_pc - pc_adjustment, rel_pc - pc_adjustment,
-                                 func_name, func_offset);
-      } else {
-        frame_info->emplace_back(map_info, cur_pc - pc_adjustment, rel_pc - pc_adjustment, "", 0);
-      }
-      num_frames++;
-    }
+	// Skip any locations that are within this library.
+	if (num_frames != 0 || !ShouldSkipLibrary(map_info->name)) {
+	  // Add frame information.
+	  std::string func_name;
+	  uint64_t func_offset;
+	  if (elf->GetFunctionName(rel_pc, &func_name, &func_offset)) {
+		frame_info->emplace_back(map_info, cur_pc - pc_adjustment, rel_pc - pc_adjustment,
+								 func_name, func_offset);
+	  } else {
+		frame_info->emplace_back(map_info, cur_pc - pc_adjustment, rel_pc - pc_adjustment, "", 0);
+	  }
+	  num_frames++;
+	}
 
-    if (finished || frame_info->size() == max_frames ||
-        (cur_pc == regs->pc() && cur_sp == regs->sp())) {
-      break;
-    }
-    adjust_pc = true;
+	if (finished || frame_info->size() == max_frames ||
+		(cur_pc == regs->pc() && cur_sp == regs->sp())) {
+	  break;
+	}
+	adjust_pc = true;
   }
   return num_frames != 0;
 }

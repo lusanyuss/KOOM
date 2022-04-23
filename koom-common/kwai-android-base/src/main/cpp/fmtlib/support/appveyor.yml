@@ -26,8 +26,8 @@ matrix:
       platform: Win32
 
 before_build:
- - mkdir build
- - cd build
+  - mkdir build
+  - cd build
 
 build_script:
   - python ../support/appveyor-build.py

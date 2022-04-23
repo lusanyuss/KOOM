@@ -47,9 +47,9 @@
 #if LOG_NDEBUG
 #define SLOGV(...)                                                                                 \
   do {                                                                                             \
-    if (0) {                                                                                       \
-      __SLOGV(__VA_ARGS__);                                                                        \
-    }                                                                                              \
+	if (0) {                                                                                       \
+	  __SLOGV(__VA_ARGS__);                                                                        \
+	}                                                                                              \
   } while (0)
 #else
 #define SLOGV(...) __SLOGV(__VA_ARGS__)

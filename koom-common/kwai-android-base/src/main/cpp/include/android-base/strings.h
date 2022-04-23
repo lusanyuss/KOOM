@@ -35,16 +35,16 @@ std::vector<std::string> Split(const std::string &s, const std::string &delimite
 std::string Trim(const std::string &s);
 
 // Joins a container of things into a single string, using the given separator.
-template <typename ContainerT, typename SeparatorT>
+template<typename ContainerT, typename SeparatorT>
 std::string Join(const ContainerT &things, SeparatorT separator) {
   if (things.empty()) {
-    return "";
+	return "";
   }
 
   std::ostringstream result;
   result << *things.begin();
   for (auto it = std::next(things.begin()); it != things.end(); ++it) {
-    result << separator << *it;
+	result << separator << *it;
   }
   return result.str();
 }
@@ -72,7 +72,7 @@ bool EqualsIgnoreCase(std::string_view lhs, std::string_view rhs);
 // it was present), false otherwise.
 inline bool ConsumePrefix(std::string_view *s, std::string_view prefix) {
   if (!StartsWith(*s, prefix))
-    return false;
+	return false;
   s->remove_prefix(prefix.size());
   return true;
 }
@@ -81,7 +81,7 @@ inline bool ConsumePrefix(std::string_view *s, std::string_view prefix) {
 // it was present), false otherwise.
 inline bool ConsumeSuffix(std::string_view *s, std::string_view suffix) {
   if (!EndsWith(*s, suffix))
-    return false;
+	return false;
   s->remove_suffix(suffix.size());
   return true;
 }
@@ -89,7 +89,7 @@ inline bool ConsumeSuffix(std::string_view *s, std::string_view suffix) {
 // Replaces `from` with `to` in `s`, once if `all == false`, or as many times as
 // there are matches if `all == true`.
 [[nodiscard]] std::string StringReplace(std::string_view s, std::string_view from,
-                                        std::string_view to, bool all);
+										std::string_view to, bool all);
 
 } // namespace base
 } // namespace android

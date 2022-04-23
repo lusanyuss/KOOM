@@ -36,5 +36,5 @@ uint64_t now() {
   timespec ts{};
   clock_gettime(CLOCK_REALTIME, &ts);
   return static_cast<uint64_t>(ts.tv_sec * MILLIS_PER_SEC +
-                               ts.tv_nsec * MILLIS_PER_SEC / NANOS_PER_SEC);
+	  ts.tv_nsec * MILLIS_PER_SEC / NANOS_PER_SEC);
 }

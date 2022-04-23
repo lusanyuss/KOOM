@@ -61,16 +61,14 @@ Return code:
   SZ_ERROR_THREAD     - errors in multithreading functions (only for Mt version)
 */
 
-enum ESzFilterMode
-{
+enum ESzFilterMode {
   SZ_FILTER_NO,
   SZ_FILTER_YES,
   SZ_FILTER_AUTO
 };
 
 SRes Lzma86_Encode(Byte *dest, size_t *destLen, const Byte *src, size_t srcLen,
-    int level, UInt32 dictSize, int filterMode);
-
+				   int level, UInt32 dictSize, int filterMode);
 
 /*
 Lzma86_GetUnpackSize:

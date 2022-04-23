@@ -31,7 +31,7 @@ class UnwindMap : public BacktraceMap {
  public:
   explicit UnwindMap(pid_t pid);
 
-  unw_map_cursor_t* GetMapCursor() { return &map_cursor_; }
+  unw_map_cursor_t *GetMapCursor() { return &map_cursor_; }
 
  protected:
   unw_map_cursor_t map_cursor_;
@@ -55,7 +55,7 @@ class UnwindMapLocal : public UnwindMap {
 
   bool Build() override;
 
-  void FillIn(uint64_t addr, backtrace_map_t* map) override;
+  void FillIn(uint64_t addr, backtrace_map_t *map) override;
 
   void LockIterator() override { pthread_rwlock_rdlock(&map_lock_); }
   void UnlockIterator() override { pthread_rwlock_unlock(&map_lock_); }

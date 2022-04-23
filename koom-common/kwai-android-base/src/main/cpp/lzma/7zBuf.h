@@ -8,8 +8,7 @@
 
 EXTERN_C_BEGIN
 
-typedef struct
-{
+typedef struct {
   Byte *data;
   size_t size;
 } CBuf;
@@ -18,8 +17,7 @@ void Buf_Init(CBuf *p);
 int Buf_Create(CBuf *p, size_t size, ISzAllocPtr alloc);
 void Buf_Free(CBuf *p, ISzAllocPtr alloc);
 
-typedef struct
-{
+typedef struct {
   Byte *data;
   size_t size;
   size_t pos;

@@ -23,30 +23,30 @@ import androidx.annotation.Keep
 
 @Keep
 object NativeHandler {
-  @JvmStatic
-  external fun start()
-
-  @JvmStatic
-  external fun stop()
-
-  @JvmStatic
-  external fun refresh()
-
-  @JvmStatic
-  external fun setThreadLeakDelay(delay: Long)
-
-  @JvmStatic
-  external fun disableJavaStack()
-
-  @JvmStatic
-  external fun disableNativeStack()
-
-  @JvmStatic
-  external fun enableNativeLog()
-
-  @JvmStatic
-  fun nativeReport(resultJson: String) {
-    ThreadMonitor.nativeReport(resultJson)
-  }
-
+    @JvmStatic
+    external fun start()
+    
+    @JvmStatic
+    external fun stop()
+    
+    @JvmStatic
+    external fun refresh()
+    
+    @JvmStatic
+    external fun setThreadLeakDelay(delay: Long)
+    
+    @JvmStatic
+    external fun disableJavaStack()
+    
+    @JvmStatic
+    external fun disableNativeStack()
+    
+    @JvmStatic
+    external fun enableNativeLog()
+    
+    @JvmStatic
+    fun nativeReport(resultJson: String) {
+        ThreadMonitor.nativeReport(resultJson)
+    }
+    
 }

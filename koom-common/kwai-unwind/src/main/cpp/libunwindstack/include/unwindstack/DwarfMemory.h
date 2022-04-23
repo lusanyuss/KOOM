@@ -26,25 +26,25 @@ class Memory;
 
 class DwarfMemory {
  public:
-  DwarfMemory(Memory* memory) : memory_(memory) {}
+  DwarfMemory(Memory *memory) : memory_(memory) {}
   virtual ~DwarfMemory() = default;
 
-  bool ReadBytes(void* dst, size_t num_bytes);
+  bool ReadBytes(void *dst, size_t num_bytes);
 
-  template <typename SignedType>
-  bool ReadSigned(uint64_t* value);
+  template<typename SignedType>
+  bool ReadSigned(uint64_t *value);
 
-  bool ReadULEB128(uint64_t* value);
+  bool ReadULEB128(uint64_t *value);
 
-  bool ReadSLEB128(int64_t* value);
+  bool ReadSLEB128(int64_t *value);
 
-  template <typename AddressType>
+  template<typename AddressType>
   size_t GetEncodedSize(uint8_t encoding);
 
-  bool AdjustEncodedValue(uint8_t encoding, uint64_t* value);
+  bool AdjustEncodedValue(uint8_t encoding, uint64_t *value);
 
-  template <typename AddressType>
-  bool ReadEncodedValue(uint8_t encoding, uint64_t* value);
+  template<typename AddressType>
+  bool ReadEncodedValue(uint8_t encoding, uint64_t *value);
 
   uint64_t cur_offset() { return cur_offset_; }
   void set_cur_offset(uint64_t cur_offset) { cur_offset_ = cur_offset; }
@@ -62,7 +62,7 @@ class DwarfMemory {
   void clear_text_offset() { text_offset_ = static_cast<uint64_t>(-1); }
 
  private:
-  Memory* memory_;
+  Memory *memory_;
   uint64_t cur_offset_ = 0;
 
   int64_t pc_offset_ = INT64_MAX;

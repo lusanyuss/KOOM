@@ -21,12 +21,12 @@
 #include "platform/bionic/macros.h"
 
 class ScopedPthreadMutexLocker {
-public:
+ public:
   explicit ScopedPthreadMutexLocker(pthread_mutex_t *mu) : mu_(mu) { pthread_mutex_lock(mu_); }
 
   ~ScopedPthreadMutexLocker() { pthread_mutex_unlock(mu_); }
 
-private:
+ private:
   pthread_mutex_t *mu_;
 
   BIONIC_DISALLOW_IMPLICIT_CONSTRUCTORS(ScopedPthreadMutexLocker);

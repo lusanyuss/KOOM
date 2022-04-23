@@ -21,16 +21,16 @@ namespace base {
 
 void AllPids::PidIterator::Increment() {
   if (!dir_) {
-    return;
+	return;
   }
 
   dirent *de;
   while ((de = readdir(dir_.get())) != nullptr) {
-    pid_t pid = atoi(de->d_name);
-    if (pid != 0) {
-      pid_ = pid;
-      return;
-    }
+	pid_t pid = atoi(de->d_name);
+	if (pid != 0) {
+	  pid_ = pid;
+	  return;
+	}
   }
   pid_ = -1;
 }

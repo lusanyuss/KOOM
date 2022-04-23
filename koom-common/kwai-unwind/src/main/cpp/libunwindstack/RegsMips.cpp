@@ -30,7 +30,7 @@
 namespace unwindstack {
 
 RegsMips::RegsMips()
-    : RegsImpl<uint32_t>(MIPS_REG_LAST, Location(LOCATION_REGISTER, MIPS_REG_RA)) {}
+	: RegsImpl<uint32_t>(MIPS_REG_LAST, Location(LOCATION_REGISTER, MIPS_REG_RA)) {}
 
 ArchEnum RegsMips::Arch() {
   return ARCH_MIPS;
@@ -52,17 +52,17 @@ void RegsMips::set_sp(uint64_t sp) {
   regs_[MIPS_REG_SP] = static_cast<uint32_t>(sp);
 }
 
-bool RegsMips::SetPcFromReturnAddress(Memory*) {
+bool RegsMips::SetPcFromReturnAddress(Memory *) {
   uint32_t ra = regs_[MIPS_REG_RA];
   if (regs_[MIPS_REG_PC] == ra) {
-    return false;
+	return false;
   }
 
   regs_[MIPS_REG_PC] = ra;
   return true;
 }
 
-void RegsMips::IterateRegisters(std::function<void(const char*, uint64_t)> fn) {
+void RegsMips::IterateRegisters(std::function<void(const char *, uint64_t)> fn) {
   fn("r0", regs_[MIPS_REG_R0]);
   fn("r1", regs_[MIPS_REG_R1]);
   fn("r2", regs_[MIPS_REG_R2]);
@@ -98,10 +98,10 @@ void RegsMips::IterateRegisters(std::function<void(const char*, uint64_t)> fn) {
   fn("pc", regs_[MIPS_REG_PC]);
 }
 
-Regs* RegsMips::Read(void* remote_data) {
-  mips_user_regs* user = reinterpret_cast<mips_user_regs*>(remote_data);
-  RegsMips* regs = new RegsMips();
-  uint32_t* reg_data = reinterpret_cast<uint32_t*>(regs->RawData());
+Regs *RegsMips::Read(void *remote_data) {
+  mips_user_regs *user = reinterpret_cast<mips_user_regs *>(remote_data);
+  RegsMips *regs = new RegsMips();
+  uint32_t *reg_data = reinterpret_cast<uint32_t *>(regs->RawData());
 
   memcpy(regs->RawData(), &user->regs[MIPS32_EF_R0], (MIPS_REG_R31 + 1) * sizeof(uint32_t));
 
@@ -109,26 +109,26 @@ Regs* RegsMips::Read(void* remote_data) {
   return regs;
 }
 
-Regs* RegsMips::CreateFromUcontext(void* ucontext) {
-  mips_ucontext_t* mips_ucontext = reinterpret_cast<mips_ucontext_t*>(ucontext);
+Regs *RegsMips::CreateFromUcontext(void *ucontext) {
+  mips_ucontext_t *mips_ucontext = reinterpret_cast<mips_ucontext_t *>(ucontext);
 
-  RegsMips* regs = new RegsMips();
+  RegsMips *regs = new RegsMips();
   // Copy 64 bit sc_regs over to 32 bit regs
   for (int i = 0; i < 32; i++) {
-      (*regs)[MIPS_REG_R0 + i] = mips_ucontext->uc_mcontext.sc_regs[i];
+	(*regs)[MIPS_REG_R0 + i] = mips_ucontext->uc_mcontext.sc_regs[i];
   }
   (*regs)[MIPS_REG_PC] = mips_ucontext->uc_mcontext.sc_pc;
   return regs;
 }
 
-bool RegsMips::StepIfSignalHandler(uint64_t elf_offset, Elf* elf, Memory* process_memory) {
+bool RegsMips::StepIfSignalHandler(uint64_t elf_offset, Elf *elf, Memory *process_memory) {
   uint64_t data;
   uint64_t offset = 0;
-  Memory* elf_memory = elf->memory();
+  Memory *elf_memory = elf->memory();
   // Read from elf memory since it is usually more expensive to read from
   // process memory.
   if (!elf_memory->ReadFully(elf_offset, &data, sizeof(data))) {
-    return false;
+	return false;
   }
 
   // Look for the kernel sigreturn functions.
@@ -139,21 +139,21 @@ bool RegsMips::StepIfSignalHandler(uint64_t elf_offset, Elf* elf, Memory* proces
   // 0x24021017     li  v0, 0x1017
   // 0x0000000c     syscall
   if (data == 0x0000000c24021061ULL) {
-    // vdso_rt_sigreturn => read rt_sigframe
-    // offset = siginfo offset + sizeof(siginfo) + uc_mcontext offset + sc_pc offset
-    offset = 24 + 128 + 24 + 8;
+	// vdso_rt_sigreturn => read rt_sigframe
+	// offset = siginfo offset + sizeof(siginfo) + uc_mcontext offset + sc_pc offset
+	offset = 24 + 128 + 24 + 8;
   } else if (data == 0x0000000c24021017LL) {
-    // vdso_sigreturn => read sigframe
-    // offset = sigcontext offset + sc_pc offset
-    offset = 24 + 8;
+	// vdso_sigreturn => read sigframe
+	// offset = sigcontext offset + sc_pc offset
+	offset = 24 + 8;
   } else {
-    return false;
+	return false;
   }
 
   // read sc_pc and sc_regs[32] from stack
   uint64_t values[MIPS_REG_LAST];
   if (!process_memory->ReadFully(regs_[MIPS_REG_SP] + offset, values, sizeof(values))) {
-    return false;
+	return false;
   }
 
   // Copy 64 bit sc_pc over to 32 bit regs_[MIPS_REG_PC]
@@ -161,12 +161,12 @@ bool RegsMips::StepIfSignalHandler(uint64_t elf_offset, Elf* elf, Memory* proces
 
   // Copy 64 bit sc_regs over to 32 bit regs
   for (int i = 0; i < 32; i++) {
-      regs_[MIPS_REG_R0 + i] = values[1 + i];
+	regs_[MIPS_REG_R0 + i] = values[1 + i];
   }
   return true;
 }
 
-Regs* RegsMips::Clone() {
+Regs *RegsMips::Clone() {
   return new RegsMips(*this);
 }
 

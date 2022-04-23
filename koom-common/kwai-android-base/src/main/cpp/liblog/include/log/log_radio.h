@@ -50,9 +50,9 @@
 #if LOG_NDEBUG
 #define RLOGV(...)                                                                                 \
   do {                                                                                             \
-    if (0) {                                                                                       \
-      __RLOGV(__VA_ARGS__);                                                                        \
-    }                                                                                              \
+	if (0) {                                                                                       \
+	  __RLOGV(__VA_ARGS__);                                                                        \
+	}                                                                                              \
   } while (0)
 #else
 #define RLOGV(...) __RLOGV(__VA_ARGS__)

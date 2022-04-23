@@ -39,22 +39,22 @@ char *basename(const char *__path) __RENAME(__gnu_basename);
 #endif
 
 ssize_t kwai_process_vm_readv(pid_t pid, const struct iovec *lvec, unsigned long liovcnt,
-                              const struct iovec *rvec, unsigned long riovcnt, unsigned long flags);
+							  const struct iovec *rvec, unsigned long riovcnt, unsigned long flags);
 ssize_t kwai_process_vm_writev(pid_t pid, const struct iovec *lvec, unsigned long liovcnt,
-                               const struct iovec *rvec, unsigned long riovcnt,
-                               unsigned long flags);
+							   const struct iovec *rvec, unsigned long riovcnt,
+							   unsigned long flags);
 
 void kwai_set_abort_message(const char *__msg);
 
 const char *kwai_getprogname(void);
 
 void kwai__system_property_read_callback(const prop_info *info,
-                                         void (*callback)(void *cookie, const char *name,
-                                                          const char *value, uint32_t serial),
-                                         void *cookie);
+										 void (*callback)(void *cookie, const char *name,
+														  const char *value, uint32_t serial),
+										 void *cookie);
 bool kwai__system_property_wait(const prop_info *__pi, uint32_t __old_serial,
-                                uint32_t *__new_serial_ptr,
-                                const struct timespec *__relative_timeout);
+								uint32_t *__new_serial_ptr,
+								const struct timespec *__relative_timeout);
 
 uint32_t kwai__system_property_area_serial(void);
 uint32_t kwai__system_property_serial(const prop_info *__pi);

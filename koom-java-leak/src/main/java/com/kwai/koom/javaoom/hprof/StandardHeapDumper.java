@@ -18,20 +18,20 @@
 
 package com.kwai.koom.javaoom.hprof;
 
-import java.io.IOException;
-
 import android.os.Debug;
+
+import java.io.IOException;
 
 public class StandardHeapDumper extends HeapDumper {
 
-  @Override
-  public boolean dump(String path) {
-    try {
-      Debug.dumpHprofData(path);
-    } catch (IOException e) {
-      e.printStackTrace();
-      return false;
+    @Override
+    public boolean dump(String path) {
+        try {
+            Debug.dumpHprofData(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
-    return true;
-  }
 }

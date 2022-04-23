@@ -23,46 +23,46 @@
 #include <mutex>
 #include <vector>
 
-template <typename K, typename V, typename Hash = std::hash<K>>
+template<typename K, typename V, typename Hash = std::hash<K>>
 class ConcurrentHashMap {
  public:
   ConcurrentHashMap(unsigned bucketNumber = kDefaultBucketNum,
-                    const Hash &hash = Hash())
-      : table_(bucketNumber), hash_(hash) {}
+					const Hash &hash = Hash())
+	  : table_(bucketNumber), hash_(hash) {}
 
-  template <typename Predicate>
+  template<typename Predicate>
   void Dump(Predicate &p) {
-    for (auto &bucket : table_) {
-      bucket.Dump(p);
-    }
+	for (auto &bucket : table_) {
+	  bucket.Dump(p);
+	}
   }
 
   void Insert(const K &key, V &&value) {
-    table_[Hashcode(key)].Insert(key, std::move(value));
+	table_[Hashcode(key)].Insert(key, std::move(value));
   }
 
   void Put(const K &key, V &&value) {
-    table_[Hashcode(key)].Put(key, std::move(value));
+	table_[Hashcode(key)].Put(key, std::move(value));
   }
 
   void Erase(const K &key) { table_[Hashcode(key)].Erase(key); }
 
   std::size_t Size() const {
-    std::size_t size = 0;
-    for (auto &bucket : table_) {
-      size += bucket.Size();
-    }
-    return size;
+	std::size_t size = 0;
+	for (auto &bucket : table_) {
+	  size += bucket.Size();
+	}
+	return size;
   }
 
   std::size_t Count(const K &key) const {
-    return table_[Hashcode(key)].Count(key);
+	return table_[Hashcode(key)].Count(key);
   }
 
   void Clear() {
-    for (auto &bucket : table_) {
-      bucket.Clear();
-    }
+	for (auto &bucket : table_) {
+	  bucket.Clear();
+	}
   }
 
  private:
@@ -70,53 +70,53 @@ class ConcurrentHashMap {
 
   class Bucket {
    public:
-    void Insert(const K &key, V &&value) {
-      std::lock_guard<std::mutex> lock(mutex_);
-      item_.emplace(key, std::move(value));
-    }
+	void Insert(const K &key, V &&value) {
+	  std::lock_guard<std::mutex> lock(mutex_);
+	  item_.emplace(key, std::move(value));
+	}
 
-    void Put(const K &key, V &&value) {
-      std::lock_guard<std::mutex> lock(mutex_);
-      item_.erase(key);
-      item_.emplace(key, std::move(value));
-    }
+	void Put(const K &key, V &&value) {
+	  std::lock_guard<std::mutex> lock(mutex_);
+	  item_.erase(key);
+	  item_.emplace(key, std::move(value));
+	}
 
-    void Erase(const K &key) {
-      std::lock_guard<std::mutex> lock(mutex_);
-      item_.erase(key);
-    }
+	void Erase(const K &key) {
+	  std::lock_guard<std::mutex> lock(mutex_);
+	  item_.erase(key);
+	}
 
-    template <typename Predicate>
-    void Dump(Predicate &p) {
-      std::lock_guard<std::mutex> lock(mutex_);
-      for (auto it = item_.begin(); it != item_.end(); it++) {
-        p(it->second);
-      }
-    }
+	template<typename Predicate>
+	void Dump(Predicate &p) {
+	  std::lock_guard<std::mutex> lock(mutex_);
+	  for (auto it = item_.begin(); it != item_.end(); it++) {
+		p(it->second);
+	  }
+	}
 
-    std::size_t Size() const {
-      std::lock_guard<std::mutex> lock(mutex_);
-      return item_.size();
-    }
+	std::size_t Size() const {
+	  std::lock_guard<std::mutex> lock(mutex_);
+	  return item_.size();
+	}
 
-    std::size_t Count(const K &key) const {
-      std::lock_guard<std::mutex> lock(mutex_);
-      return item_.count(key);
-    }
+	std::size_t Count(const K &key) const {
+	  std::lock_guard<std::mutex> lock(mutex_);
+	  return item_.count(key);
+	}
 
-    void Clear() {
-      std::lock_guard<std::mutex> lock(mutex_);
-      item_.clear();
-    }
+	void Clear() {
+	  std::lock_guard<std::mutex> lock(mutex_);
+	  item_.clear();
+	}
 
    private:
-    using Item = std::map<K, V>;
-    Item item_;
-    mutable std::mutex mutex_;
+	using Item = std::map<K, V>;
+	Item item_;
+	mutable std::mutex mutex_;
   };
 
   inline std::size_t Hashcode(const K &key) {
-    return hash_(key) % table_.size();
+	return hash_(key) % table_.size();
   }
 
   std::vector<Bucket> table_;

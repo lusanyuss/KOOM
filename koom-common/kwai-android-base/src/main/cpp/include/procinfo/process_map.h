@@ -30,7 +30,8 @@
 namespace android {
 namespace procinfo {
 
-template <class CallbackType> bool ReadMapFileContent(char *content, const CallbackType &callback) {
+template<class CallbackType>
+bool ReadMapFileContent(char *content, const CallbackType &callback) {
   uint64_t start_addr;
   uint64_t end_addr;
   uint16_t flags;
@@ -40,119 +41,119 @@ template <class CallbackType> bool ReadMapFileContent(char *content, const Callb
   char *p;
 
   auto pass_space = [&]() {
-    if (*p != ' ') {
-      return false;
-    }
-    while (*p == ' ') {
-      p++;
-    }
-    return true;
+	if (*p != ' ') {
+	  return false;
+	}
+	while (*p == ' ') {
+	  p++;
+	}
+	return true;
   };
 
   auto pass_xdigit = [&]() {
-    if (!isxdigit(*p)) {
-      return false;
-    }
-    do {
-      p++;
-    } while (isxdigit(*p));
-    return true;
+	if (!isxdigit(*p)) {
+	  return false;
+	}
+	do {
+	  p++;
+	} while (isxdigit(*p));
+	return true;
   };
 
   while (next_line != nullptr && *next_line != '\0') {
-    p = next_line;
-    next_line = strchr(next_line, '\n');
-    if (next_line != nullptr) {
-      *next_line = '\0';
-      next_line++;
-    }
-    // Parse line like: 00400000-00409000 r-xp 00000000 fc:00 426998  /usr/lib/gvfs/gvfsd-http
-    char *end;
-    // start_addr
-    start_addr = strtoull(p, &end, 16);
-    if (end == p || *end != '-') {
-      return false;
-    }
-    p = end + 1;
-    // end_addr
-    end_addr = strtoull(p, &end, 16);
-    if (end == p) {
-      return false;
-    }
-    p = end;
-    if (!pass_space()) {
-      return false;
-    }
-    // flags
-    flags = 0;
-    if (*p == 'r') {
-      flags |= PROT_READ;
-    } else if (*p != '-') {
-      return false;
-    }
-    p++;
-    if (*p == 'w') {
-      flags |= PROT_WRITE;
-    } else if (*p != '-') {
-      return false;
-    }
-    p++;
-    if (*p == 'x') {
-      flags |= PROT_EXEC;
-    } else if (*p != '-') {
-      return false;
-    }
-    p++;
-    if (*p != 'p' && *p != 's') {
-      return false;
-    }
-    p++;
-    if (!pass_space()) {
-      return false;
-    }
-    // pgoff
-    pgoff = strtoull(p, &end, 16);
-    if (end == p) {
-      return false;
-    }
-    p = end;
-    if (!pass_space()) {
-      return false;
-    }
-    // major:minor
-    if (!pass_xdigit() || *p++ != ':' || !pass_xdigit() || !pass_space()) {
-      return false;
-    }
-    // inode
-    inode = strtoull(p, &end, 10);
-    if (end == p) {
-      return false;
-    }
-    p = end;
+	p = next_line;
+	next_line = strchr(next_line, '\n');
+	if (next_line != nullptr) {
+	  *next_line = '\0';
+	  next_line++;
+	}
+	// Parse line like: 00400000-00409000 r-xp 00000000 fc:00 426998  /usr/lib/gvfs/gvfsd-http
+	char *end;
+	// start_addr
+	start_addr = strtoull(p, &end, 16);
+	if (end == p || *end != '-') {
+	  return false;
+	}
+	p = end + 1;
+	// end_addr
+	end_addr = strtoull(p, &end, 16);
+	if (end == p) {
+	  return false;
+	}
+	p = end;
+	if (!pass_space()) {
+	  return false;
+	}
+	// flags
+	flags = 0;
+	if (*p == 'r') {
+	  flags |= PROT_READ;
+	} else if (*p != '-') {
+	  return false;
+	}
+	p++;
+	if (*p == 'w') {
+	  flags |= PROT_WRITE;
+	} else if (*p != '-') {
+	  return false;
+	}
+	p++;
+	if (*p == 'x') {
+	  flags |= PROT_EXEC;
+	} else if (*p != '-') {
+	  return false;
+	}
+	p++;
+	if (*p != 'p' && *p != 's') {
+	  return false;
+	}
+	p++;
+	if (!pass_space()) {
+	  return false;
+	}
+	// pgoff
+	pgoff = strtoull(p, &end, 16);
+	if (end == p) {
+	  return false;
+	}
+	p = end;
+	if (!pass_space()) {
+	  return false;
+	}
+	// major:minor
+	if (!pass_xdigit() || *p++ != ':' || !pass_xdigit() || !pass_space()) {
+	  return false;
+	}
+	// inode
+	inode = strtoull(p, &end, 10);
+	if (end == p) {
+	  return false;
+	}
+	p = end;
 
-    if (*p != '\0' && !pass_space()) {
-      return false;
-    }
+	if (*p != '\0' && !pass_space()) {
+	  return false;
+	}
 
-    // filename
-    callback(start_addr, end_addr, flags, pgoff, inode, p);
+	// filename
+	callback(start_addr, end_addr, flags, pgoff, inode, p);
   }
   return true;
 }
 
 inline bool ReadMapFile(const std::string &map_file,
-                        const std::function<void(uint64_t, uint64_t, uint16_t, uint64_t, ino_t,
-                                                 const char *)> &callback) {
+						const std::function<void(uint64_t, uint64_t, uint16_t, uint64_t, ino_t,
+												 const char *)> &callback) {
   std::string content;
   if (!android::base::ReadFileToString(map_file, &content)) {
-    return false;
+	return false;
   }
   return ReadMapFileContent(&content[0], callback);
 }
 
 inline bool ReadProcessMaps(pid_t pid,
-                            const std::function<void(uint64_t, uint64_t, uint16_t, uint64_t, ino_t,
-                                                     const char *)> &callback) {
+							const std::function<void(uint64_t, uint64_t, uint16_t, uint64_t, ino_t,
+													 const char *)> &callback) {
   return ReadMapFile("/proc/" + std::to_string(pid) + "/maps", callback);
 }
 
@@ -165,19 +166,19 @@ struct MapInfo {
   std::string name;
 
   MapInfo(uint64_t start, uint64_t end, uint16_t flags, uint64_t pgoff, ino_t inode,
-          const char *name)
-      : start(start), end(end), flags(flags), pgoff(pgoff), inode(inode), name(name) {}
+		  const char *name)
+	  : start(start), end(end), flags(flags), pgoff(pgoff), inode(inode), name(name) {}
 };
 
 inline bool ReadProcessMaps(pid_t pid, std::vector<MapInfo> *maps) {
   return ReadProcessMaps(
-      pid, [&](uint64_t start, uint64_t end, uint16_t flags, uint64_t pgoff, ino_t inode,
-               const char *name) { maps->emplace_back(start, end, flags, pgoff, inode, name); });
+	  pid, [&](uint64_t start, uint64_t end, uint16_t flags, uint64_t pgoff, ino_t inode,
+			   const char *name) { maps->emplace_back(start, end, flags, pgoff, inode, name); });
 }
 
 bool ReadMapFileAsyncSafe(const char *map_file, void *buffer, size_t buffer_size,
-                          const std::function<void(uint64_t, uint64_t, uint16_t, uint64_t, ino_t,
-                                                   const char *)> &callback);
+						  const std::function<void(uint64_t, uint64_t, uint16_t, uint64_t, ino_t,
+												   const char *)> &callback);
 
 } /* namespace procinfo */
 } /* namespace android */

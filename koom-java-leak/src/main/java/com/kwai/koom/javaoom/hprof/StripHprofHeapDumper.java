@@ -21,52 +21,52 @@
 
 package com.kwai.koom.javaoom.hprof;
 
-import java.io.IOException;
-
 import android.os.Build;
 import android.os.Debug;
 
 import com.kwai.koom.base.MonitorLog;
 
+import java.io.IOException;
+
 public class StripHprofHeapDumper extends HeapDumper {
 
-  private static final String TAG = "OOMMonitor_StripHprofHeapDumper";
+    private static final String TAG = "OOMMonitor_StripHprofHeapDumper";
 
-  public StripHprofHeapDumper() {
-    super();
-    if (soLoaded) {
-      initStripDump();
-    }
-  }
-
-  @Override
-  public boolean dump(String path) {
-    MonitorLog.i(TAG, "dump " + path);
-    if (!soLoaded) {
-      MonitorLog.e(TAG, "dump failed caused by so not loaded!");
-      return false;
+    public StripHprofHeapDumper() {
+        super();
+        if (soLoaded) {
+            initStripDump();
+        }
     }
 
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-      MonitorLog.e(TAG, "dump failed caused by version net permitted!");
-      return false;
+    @Override
+    public boolean dump(String path) {
+        MonitorLog.i(TAG, "dump " + path);
+        if (!soLoaded) {
+            MonitorLog.e(TAG, "dump failed caused by so not loaded!");
+            return false;
+        }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            MonitorLog.e(TAG, "dump failed caused by version net permitted!");
+            return false;
+        }
+
+        boolean dumpRes = false;
+        try {
+            hprofName(path);
+            Debug.dumpHprofData(path);
+            dumpRes = isStripSuccess();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return dumpRes;
     }
 
-    boolean dumpRes = false;
-    try {
-      hprofName(path);
-      Debug.dumpHprofData(path);
-      dumpRes = isStripSuccess();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    public native void initStripDump();
 
-    return dumpRes;
-  }
+    public native void hprofName(String name);
 
-  public native void initStripDump();
-
-  public native void hprofName(String name);
-
-  public native boolean isStripSuccess();
+    public native boolean isStripSuccess();
 }

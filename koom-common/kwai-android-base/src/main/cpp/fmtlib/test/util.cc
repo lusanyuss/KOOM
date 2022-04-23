@@ -9,13 +9,13 @@
 
 #include <cstring>
 
-void increment(char* s) {
+void increment(char *s) {
   for (int i = static_cast<int>(std::strlen(s)) - 1; i >= 0; --i) {
-    if (s[i] != '9') {
-      ++s[i];
-      break;
-    }
-    s[i] = '0';
+	if (s[i] != '9') {
+	  ++s[i];
+	  break;
+	}
+	s[i] = '0';
   }
 }
 
@@ -26,14 +26,14 @@ std::string get_system_error(int error_code) {
   enum { BUFFER_SIZE = 200 };
   char buffer[BUFFER_SIZE];
   if (strerror_s(buffer, BUFFER_SIZE, error_code))
-    throw std::exception("strerror_s failed");
+	throw std::exception("strerror_s failed");
   return buffer;
 #endif
 }
 
-const char* const FILE_CONTENT = "Don't panic!";
+const char *const FILE_CONTENT = "Don't panic!";
 
-fmt::buffered_file open_buffered_file(FILE** fp) {
+fmt::buffered_file open_buffered_file(FILE **fp) {
 #if FMT_USE_FCNTL
   fmt::file read_end, write_end;
   fmt::file::pipe(read_end, write_end);

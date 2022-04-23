@@ -21,7 +21,7 @@
 
 #include <jni.h>
 
-template <typename T>
+template<typename T>
 class ScopedLocalRef {
  public:
   ScopedLocalRef(JNIEnv *env, T local_ref) : env_(env), local_ref_(local_ref) {}
@@ -29,9 +29,9 @@ class ScopedLocalRef {
   ScopedLocalRef(ScopedLocalRef &&s) : env_(s.env_), local_ref_(s.release()) {}
 
   ScopedLocalRef &operator=(ScopedLocalRef &&s) noexcept {
-    reset(s.release());
-    env_ = s.env_;
-    return *this;
+	reset(s.release());
+	env_ = s.env_;
+	return *this;
   }
 
   explicit ScopedLocalRef(JNIEnv *env) : env_(env), local_ref_(nullptr) {}
@@ -39,18 +39,18 @@ class ScopedLocalRef {
   ~ScopedLocalRef() { reset(); }
 
   void reset(T ptr = nullptr) {
-    if (ptr != local_ref_) {
-      if (local_ref_) {
-        env_->DeleteLocalRef(local_ref_);
-      }
-      local_ref_ = ptr;
-    }
+	if (ptr != local_ref_) {
+	  if (local_ref_) {
+		env_->DeleteLocalRef(local_ref_);
+	  }
+	  local_ref_ = ptr;
+	}
   }
 
   T release() __attribute__((warn_unused_result)) {
-    T local_ref = local_ref_;
-    local_ref_ = nullptr;
-    return local_ref;
+	T local_ref = local_ref_;
+	local_ref_ = nullptr;
+	return local_ref;
   }
 
   T get() const { return local_ref_; }

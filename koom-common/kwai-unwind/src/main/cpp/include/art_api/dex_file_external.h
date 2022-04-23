@@ -52,26 +52,26 @@ struct ExtDexFile;
 
 // See art_api::dex::DexFile::OpenFromMemory. Returns true on success.
 int ExtDexFileOpenFromMemory(const void *addr,
-                             /*inout*/ size_t *size, const char *location,
-                             /*out*/ const struct ExtDexFileString **error_msg,
-                             /*out*/ struct ExtDexFile **ext_dex_file);
+	/*inout*/ size_t *size, const char *location,
+	/*out*/ const struct ExtDexFileString **error_msg,
+	/*out*/ struct ExtDexFile **ext_dex_file);
 
 // See art_api::dex::DexFile::OpenFromFd. Returns true on success.
 int ExtDexFileOpenFromFd(int fd, off_t offset, const char *location,
-                         /*out*/ const struct ExtDexFileString **error_msg,
-                         /*out*/ struct ExtDexFile **ext_dex_file);
+	/*out*/ const struct ExtDexFileString **error_msg,
+	/*out*/ struct ExtDexFile **ext_dex_file);
 
 // See art_api::dex::DexFile::GetMethodInfoForOffset. Returns true on success.
 int ExtDexFileGetMethodInfoForOffset(struct ExtDexFile *ext_dex_file, int64_t dex_offset,
-                                     int with_signature,
-                                     /*out*/ struct ExtDexFileMethodInfo *method_info);
+									 int with_signature,
+	/*out*/ struct ExtDexFileMethodInfo *method_info);
 
 typedef void ExtDexFileMethodInfoCallback(const struct ExtDexFileMethodInfo *ext_method_info,
-                                          void *user_data);
+										  void *user_data);
 
 // See art_api::dex::DexFile::GetAllMethodInfos.
 void ExtDexFileGetAllMethodInfos(struct ExtDexFile *ext_dex_file, int with_signature,
-                                 ExtDexFileMethodInfoCallback *method_info_cb, void *user_data);
+								 ExtDexFileMethodInfoCallback *method_info_cb, void *user_data);
 
 // Frees an ExtDexFile.
 void ExtDexFileFree(struct ExtDexFile *ext_dex_file);

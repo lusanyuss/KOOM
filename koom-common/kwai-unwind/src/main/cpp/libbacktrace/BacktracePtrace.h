@@ -26,12 +26,12 @@ class BacktraceMap;
 
 class BacktracePtrace : public Backtrace {
  public:
-  BacktracePtrace(pid_t pid, pid_t tid, BacktraceMap* map) : Backtrace(pid, tid, map) {}
+  BacktracePtrace(pid_t pid, pid_t tid, BacktraceMap *map) : Backtrace(pid, tid, map) {}
   virtual ~BacktracePtrace() {}
 
-  size_t Read(uint64_t addr, uint8_t* buffer, size_t bytes) override;
+  size_t Read(uint64_t addr, uint8_t *buffer, size_t bytes) override;
 
-  bool ReadWord(uint64_t ptr, word_t* out_value) override;
+  bool ReadWord(uint64_t ptr, word_t *out_value) override;
 };
 
 #endif // _LIBBACKTRACE_BACKTRACE_PTRACE_H

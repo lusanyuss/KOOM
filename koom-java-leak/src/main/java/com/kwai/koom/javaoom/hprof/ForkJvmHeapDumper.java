@@ -20,86 +20,86 @@
 
 package com.kwai.koom.javaoom.hprof;
 
-import java.io.IOException;
-
 import android.os.Build;
 import android.os.Debug;
 
 import com.kwai.koom.base.MonitorLog;
 
+import java.io.IOException;
+
 public class ForkJvmHeapDumper extends HeapDumper {
-  private static final String TAG = "OOMMonitor_ForkJvmHeapDumper";
+    private static final String TAG = "OOMMonitor_ForkJvmHeapDumper";
 
-  private static class Holder {
-    private static final ForkJvmHeapDumper INSTANCE = new ForkJvmHeapDumper();
-  }
-
-  public static ForkJvmHeapDumper getInstance() {
-    return ForkJvmHeapDumper.Holder.INSTANCE;
-  }
-
-  private ForkJvmHeapDumper() {
-    super();
-    if (soLoaded) {
-      init();
-    }
-  }
-
-  @Override
-  public boolean dump(String path) {
-    MonitorLog.i(TAG, "dump " + path);
-    if (!soLoaded) {
-      MonitorLog.e(TAG, "dump failed caused by so not loaded!");
-      return false;
+    private ForkJvmHeapDumper() {
+        super();
+        if (soLoaded) {
+            init();
+        }
     }
 
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP
-        || Build.VERSION.SDK_INT > Build.VERSION_CODES.S) {
-      MonitorLog.e(TAG, "dump failed caused by version not supported!");
-      return false;
+    public static ForkJvmHeapDumper getInstance() {
+        return ForkJvmHeapDumper.Holder.INSTANCE;
     }
 
-    boolean dumpRes = false;
-    try {
-      MonitorLog.i(TAG, "before suspend and fork.");
-      int pid = suspendAndFork();
-      if (pid == 0) {
-        // Child process
-        Debug.dumpHprofData(path);
-        exitProcess();
-      } else if (pid > 0) {
-        // Parent process
-        dumpRes = resumeAndWait(pid);
-        MonitorLog.i(TAG, "notify from pid " + pid);
-      }
-    } catch (IOException e) {
-      MonitorLog.e(TAG, "dump failed caused by " + e.toString());
-      e.printStackTrace();
+    @Override
+    public boolean dump(String path) {
+        MonitorLog.i(TAG, "dump " + path);
+        if (!soLoaded) {
+            MonitorLog.e(TAG, "dump failed caused by so not loaded!");
+            return false;
+        }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP
+                || Build.VERSION.SDK_INT > Build.VERSION_CODES.S) {
+            MonitorLog.e(TAG, "dump failed caused by version not supported!");
+            return false;
+        }
+
+        boolean dumpRes = false;
+        try {
+            MonitorLog.i(TAG, "before suspend and fork.");
+            int pid = suspendAndFork();
+            if (pid == 0) {
+                // Child process
+                Debug.dumpHprofData(path);
+                exitProcess();
+            } else if (pid > 0) {
+                // Parent process
+                dumpRes = resumeAndWait(pid);
+                MonitorLog.i(TAG, "notify from pid " + pid);
+            }
+        } catch (IOException e) {
+            MonitorLog.e(TAG, "dump failed caused by " + e.toString());
+            e.printStackTrace();
+        }
+        return dumpRes;
     }
-    return dumpRes;
-  }
 
-  /**
-   * Init before do dump.
-   */
-  private native void init();
+    /**
+     * Init before do dump.
+     */
+    private native void init();
 
-  /**
-   * Suspend the whole ART, and then fork a process for dumping hprof.
-   *
-   * @return return value of fork
-   */
-  private native int suspendAndFork();
+    /**
+     * Suspend the whole ART, and then fork a process for dumping hprof.
+     *
+     * @return return value of fork
+     */
+    private native int suspendAndFork();
 
-  /**
-   * Resume the whole ART, and then wait child process to notify.
-   *
-   * @param pid pid of child process.
-   */
-  private native boolean resumeAndWait(int pid);
+    /**
+     * Resume the whole ART, and then wait child process to notify.
+     *
+     * @param pid pid of child process.
+     */
+    private native boolean resumeAndWait(int pid);
 
-  /**
-   * Exit current process.
-   */
-  private native void exitProcess();
+    /**
+     * Exit current process.
+     */
+    private native void exitProcess();
+
+    private static class Holder {
+        private static final ForkJvmHeapDumper INSTANCE = new ForkJvmHeapDumper();
+    }
 }

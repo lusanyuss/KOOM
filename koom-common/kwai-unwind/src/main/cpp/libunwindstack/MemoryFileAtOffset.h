@@ -28,9 +28,9 @@ class MemoryFileAtOffset : public Memory {
   MemoryFileAtOffset() = default;
   virtual ~MemoryFileAtOffset();
 
-  bool Init(const std::string& file, uint64_t offset, uint64_t size = UINT64_MAX);
+  bool Init(const std::string &file, uint64_t offset, uint64_t size = UINT64_MAX);
 
-  size_t Read(uint64_t addr, void* dst, size_t size) override;
+  size_t Read(uint64_t addr, void *dst, size_t size) override;
 
   size_t Size() { return size_; }
 
@@ -39,7 +39,7 @@ class MemoryFileAtOffset : public Memory {
  protected:
   size_t size_ = 0;
   size_t offset_ = 0;
-  uint8_t* data_ = nullptr;
+  uint8_t *data_ = nullptr;
 };
 
 }  // namespace unwindstack

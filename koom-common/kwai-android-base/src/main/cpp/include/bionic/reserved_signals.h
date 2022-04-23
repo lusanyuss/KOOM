@@ -58,37 +58,53 @@ extern "C" int sigaddset64(sigset64_t *__set, int __signal) __attribute__((weak)
 extern "C" int sigdelset64(sigset64_t *__set, int __signal) __attribute__((weak));
 
 #define __SIGRT_RESERVED 9
-static inline __always_inline sigset64_t filter_reserved_signals(sigset64_t sigset, int how) {
-  if (!(sigaddset64 && sigdelset64)) {
-    abort();
-  }
-  int (*block)(sigset64_t *, int);
-  int (*unblock)(sigset64_t *, int);
-  switch (how) {
-  case SIG_BLOCK:
-    __BIONIC_FALLTHROUGH;
-  case SIG_SETMASK:
-    block = sigaddset64;
-    unblock = sigdelset64;
-    break;
+static inline __always_inline sigset64_t
+filter_reserved_signals(sigset64_t
+sigset,
+int how
+) {
+if (!(
+sigaddset64 &&sigdelset64
+)) {
+abort();
+}
+int (*block)(sigset64_t * , int);
+int (*unblock)(sigset64_t * , int);
+switch (how) {
+case SIG_BLOCK:
+__BIONIC_FALLTHROUGH;
+case SIG_SETMASK:
+block = sigaddset64;
+unblock = sigdelset64;
+break;
 
-  case SIG_UNBLOCK:
-    block = sigdelset64;
-    unblock = sigaddset64;
-    break;
-  }
+case SIG_UNBLOCK:
+block = sigdelset64;
+unblock = sigaddset64;
+break;
+}
 
-  // The POSIX timer signal must be blocked.
-  block(&sigset, __SIGRTMIN + 0);
+// The POSIX timer signal must be blocked.
+block(&sigset, __SIGRTMIN
++ 0);
 
-  // Everything else must remain unblocked.
-  unblock(&sigset, __SIGRTMIN + 1);
-  unblock(&sigset, __SIGRTMIN + 2);
-  unblock(&sigset, __SIGRTMIN + 3);
-  unblock(&sigset, __SIGRTMIN + 4);
-  unblock(&sigset, __SIGRTMIN + 5);
-  unblock(&sigset, __SIGRTMIN + 6);
-  unblock(&sigset, __SIGRTMIN + 7);
-  unblock(&sigset, __SIGRTMIN + 8);
-  return sigset;
+// Everything else must remain unblocked.
+unblock(&sigset, __SIGRTMIN
++ 1);
+unblock(&sigset, __SIGRTMIN
++ 2);
+unblock(&sigset, __SIGRTMIN
++ 3);
+unblock(&sigset, __SIGRTMIN
++ 4);
+unblock(&sigset, __SIGRTMIN
++ 5);
+unblock(&sigset, __SIGRTMIN
++ 6);
+unblock(&sigset, __SIGRTMIN
++ 7);
+unblock(&sigset, __SIGRTMIN
++ 8);
+return
+sigset;
 }

@@ -86,19 +86,19 @@ namespace android {
 namespace base {
 
 struct ResultError {
-  template <typename T>
+  template<typename T>
   ResultError(T &&message, int code) : message_(std::forward<T>(message)), code_(code) {}
 
-  template <typename T>
+  template<typename T>
   // NOLINTNEXTLINE(google-explicit-constructor)
   operator android::base::expected<T, ResultError>() {
-    return android::base::unexpected(ResultError(message_, code_));
+	return android::base::unexpected(ResultError(message_, code_));
   }
 
   std::string message() const { return message_; }
   int code() const { return code_; }
 
-private:
+ private:
   std::string message_;
   int code_;
 };
@@ -115,38 +115,41 @@ inline std::ostream &operator<<(std::ostream &os, const ResultError &t) {
 }
 
 class Error {
-public:
+ public:
   Error() : errno_(0), append_errno_(false) {}
   // NOLINTNEXTLINE(google-explicit-constructor)
   Error(int errno_to_append) : errno_(errno_to_append), append_errno_(true) {}
 
-  template <typename T>
+  template<typename T>
   // NOLINTNEXTLINE(google-explicit-constructor)
   operator android::base::expected<T, ResultError>() {
-    return android::base::unexpected(ResultError(str(), errno_));
+	return android::base::unexpected(ResultError(str(), errno_));
   }
 
-  template <typename T> Error &operator<<(T &&t) {
-    // NOLINTNEXTLINE(bugprone-suspicious-semicolon)
-    if constexpr (std::is_same_v<std::remove_cv_t<std::remove_reference_t<T>>, ResultError>) {
-      errno_ = t.code();
-      return (*this) << t.message();
-    }
-    int saved = errno;
-    ss_ << t;
-    errno = saved;
-    return *this;
+  template<typename T>
+  Error &operator<<(T &&t) {
+	// NOLINTNEXTLINE(bugprone-suspicious-semicolon)
+	if constexpr(std::is_same_v < std::remove_cv_t < std::remove_reference_t < T >> ,
+				 ResultError > )
+	{
+	  errno_ = t.code();
+	  return (*this) << t.message();
+	}
+	int saved = errno;
+	ss_ << t;
+	errno = saved;
+	return *this;
   }
 
   const std::string str() const {
-    std::string str = ss_.str();
-    if (append_errno_) {
-      if (str.empty()) {
-        return strerror(errno_);
-      }
-      return std::move(str) + ": " + strerror(errno_);
-    }
-    return str;
+	std::string str = ss_.str();
+	if (append_errno_) {
+	  if (str.empty()) {
+		return strerror(errno_);
+	  }
+	  return std::move(str) + ": " + strerror(errno_);
+	}
+	return str;
   }
 
   Error(const Error &) = delete;
@@ -154,16 +157,16 @@ public:
   Error &operator=(const Error &) = delete;
   Error &operator=(Error &&) = delete;
 
-  template <typename T, typename... Args>
+  template<typename T, typename... Args>
   friend Error ErrorfImpl(const T &&fmt, const Args &... args);
 
-  template <typename T, typename... Args>
+  template<typename T, typename... Args>
   friend Error ErrnoErrorfImpl(const T &&fmt, const Args &... args);
 
-private:
+ private:
   Error(bool append_errno, int errno_to_append, const std::string &message)
-      : errno_(errno_to_append), append_errno_(append_errno) {
-    (*this) << message;
+	  : errno_(errno_to_append), append_errno_(append_errno) {
+	(*this) << message;
   }
 
   std::stringstream ss_;
@@ -177,20 +180,21 @@ inline int ErrorCode(int code) { return code; }
 
 // Return the error code of the last ResultError object, if any.
 // Otherwise, return `code` as it is.
-template <typename T, typename... Args>
+template<typename T, typename... Args>
 inline int ErrorCode(int code, T &&t, const Args &... args) {
-  if constexpr (std::is_same_v<std::remove_cv_t<std::remove_reference_t<T>>, ResultError>) {
-    return ErrorCode(t.code(), args...);
+  if constexpr(std::is_same_v < std::remove_cv_t < std::remove_reference_t < T >> , ResultError > )
+  {
+	return ErrorCode(t.code(), args...);
   }
   return ErrorCode(code, args...);
 }
 
-template <typename T, typename... Args>
+template<typename T, typename... Args>
 inline Error ErrorfImpl(const T &&fmt, const Args &... args) {
   return Error(false, ErrorCode(0, args...), fmt::format(fmt, args...));
 }
 
-template <typename T, typename... Args>
+template<typename T, typename... Args>
 inline Error ErrnoErrorfImpl(const T &&fmt, const Args &... args) {
   return Error(true, errno, fmt::format(fmt, args...));
 }
@@ -198,7 +202,7 @@ inline Error ErrnoErrorfImpl(const T &&fmt, const Args &... args) {
 #define Errorf(fmt, ...) android::base::ErrorfImpl(FMT_STRING(fmt), ##__VA_ARGS__)
 #define ErrnoErrorf(fmt, ...) android::base::ErrnoErrorfImpl(FMT_STRING(fmt), ##__VA_ARGS__)
 
-template <typename T> using Result = android::base::expected<T, ResultError>;
+template<typename T> using Result = android::base::expected<T, ResultError>;
 
 // Macros for testing the results of functions that return android::base::Result.
 // These also work with base::android::expected.

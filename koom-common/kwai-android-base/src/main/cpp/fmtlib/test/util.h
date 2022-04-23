@@ -19,8 +19,8 @@ enum { BUFFER_SIZE = 256 };
 #  define FMT_VSNPRINTF vsnprintf
 #endif
 
-template <size_t SIZE>
-void safe_sprintf(char (&buffer)[SIZE], const char* format, ...) {
+template<size_t SIZE>
+void safe_sprintf(char (&buffer)[SIZE], const char *format, ...) {
   std::va_list args;
   va_start(args, format);
   FMT_VSNPRINTF(buffer, SIZE, format, args);
@@ -28,16 +28,16 @@ void safe_sprintf(char (&buffer)[SIZE], const char* format, ...) {
 }
 
 // Increment a number in a string.
-void increment(char* s);
+void increment(char *s);
 
 std::string get_system_error(int error_code);
 
-extern const char* const FILE_CONTENT;
+extern const char *const FILE_CONTENT;
 
 // Opens a buffered file for reading.
-fmt::buffered_file open_buffered_file(FILE** fp = nullptr);
+fmt::buffered_file open_buffered_file(FILE **fp = nullptr);
 
-inline FILE* safe_fopen(const char* filename, const char* mode) {
+inline FILE *safe_fopen(const char *filename, const char *mode) {
 #if defined(_WIN32) && !defined(__MINGW32__)
   // Fix MSVC warning about "unsafe" fopen.
   FILE* f = 0;
@@ -48,26 +48,27 @@ inline FILE* safe_fopen(const char* filename, const char* mode) {
 #endif
 }
 
-template <typename Char> class BasicTestString {
+template<typename Char>
+class BasicTestString {
  private:
   std::basic_string<Char> value_;
 
   static const Char EMPTY[];
 
  public:
-  explicit BasicTestString(const Char* value = EMPTY) : value_(value) {}
+  explicit BasicTestString(const Char *value = EMPTY) : value_(value) {}
 
-  const std::basic_string<Char>& value() const { return value_; }
+  const std::basic_string<Char> &value() const { return value_; }
 };
 
-template <typename Char> const Char BasicTestString<Char>::EMPTY[] = {0};
+template<typename Char> const Char BasicTestString<Char>::EMPTY[] = {0};
 
 typedef BasicTestString<char> TestString;
 typedef BasicTestString<wchar_t> TestWString;
 
-template <typename Char>
-std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& os,
-                                     const BasicTestString<Char>& s) {
+template<typename Char>
+std::basic_ostream<Char> &operator<<(std::basic_ostream<Char> &os,
+									 const BasicTestString<Char> &s) {
   os << s.value();
   return os;
 }

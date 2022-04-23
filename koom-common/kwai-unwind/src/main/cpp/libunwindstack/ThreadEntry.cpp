@@ -30,7 +30,7 @@
 namespace unwindstack {
 
 std::mutex ThreadEntry::entries_mutex_;
-std::map<pid_t, ThreadEntry*> ThreadEntry::entries_;
+std::map<pid_t, ThreadEntry *> ThreadEntry::entries_;
 
 // Assumes that ThreadEntry::entries_mutex_ has already been locked before
 // creating a ThreadEntry object.
@@ -39,29 +39,29 @@ ThreadEntry::ThreadEntry(pid_t tid) : tid_(tid), ref_count_(1), wait_value_(0) {
   entries_[tid_] = this;
 }
 
-ThreadEntry* ThreadEntry::Get(pid_t tid, bool create) {
-  ThreadEntry* entry = nullptr;
+ThreadEntry *ThreadEntry::Get(pid_t tid, bool create) {
+  ThreadEntry *entry = nullptr;
 
   std::lock_guard<std::mutex> guard(entries_mutex_);
   auto iter = entries_.find(tid);
   if (iter == entries_.end()) {
-    if (create) {
-      entry = new ThreadEntry(tid);
-    }
+	if (create) {
+	  entry = new ThreadEntry(tid);
+	}
   } else {
-    entry = iter->second;
-    entry->ref_count_++;
+	entry = iter->second;
+	entry->ref_count_++;
   }
 
   return entry;
 }
 
-void ThreadEntry::Remove(ThreadEntry* entry) {
+void ThreadEntry::Remove(ThreadEntry *entry) {
   entry->Unlock();
 
   std::lock_guard<std::mutex> guard(entries_mutex_);
   if (--entry->ref_count_ == 0) {
-    delete entry;
+	delete entry;
   }
 }
 
@@ -70,7 +70,7 @@ void ThreadEntry::Remove(ThreadEntry* entry) {
 ThreadEntry::~ThreadEntry() {
   auto iter = entries_.find(tid_);
   if (iter != entries_.end()) {
-    entries_.erase(iter);
+	entries_.erase(iter);
   }
 }
 
@@ -78,10 +78,10 @@ bool ThreadEntry::Wait(WaitType type) {
   static const std::chrono::duration wait_time(std::chrono::seconds(5));
   std::unique_lock<std::mutex> lock(wait_mutex_);
   if (wait_cond_.wait_for(lock, wait_time, [this, type] { return wait_value_ == type; })) {
-    return true;
+	return true;
   } else {
-    log_async_safe("pthread_cond_timedwait for value %d failed", type);
-    return false;
+	log_async_safe("pthread_cond_timedwait for value %d failed", type);
+	return false;
   }
 }
 
@@ -93,8 +93,8 @@ void ThreadEntry::Wake() {
   wait_cond_.notify_one();
 }
 
-void ThreadEntry::CopyUcontextFromSigcontext(void* sigcontext) {
-  ucontext_t* ucontext = reinterpret_cast<ucontext_t*>(sigcontext);
+void ThreadEntry::CopyUcontextFromSigcontext(void *sigcontext) {
+  ucontext_t *ucontext = reinterpret_cast<ucontext_t *>(sigcontext);
   // The only thing the unwinder cares about is the mcontext data.
   memcpy(&ucontext_.uc_mcontext, &ucontext->uc_mcontext, sizeof(ucontext->uc_mcontext));
 }

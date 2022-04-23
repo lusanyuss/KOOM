@@ -28,9 +28,9 @@
 class HookHelper {
  public:
   static bool HookMethods(
-      std::vector<const std::string> &register_pattern,
-      std::vector<const std::string> &ignore_pattern,
-      std::vector<std::pair<const std::string, void *const>> &methods);
+	  std::vector<const std::string> &register_pattern,
+	  std::vector<const std::string> &ignore_pattern,
+	  std::vector<std::pair<const std::string, void *const>> &methods);
   static void UnHookMethods();
 
  private:

@@ -33,12 +33,10 @@ enum ArchEnum : uint8_t {
 
 static inline bool ArchIs32Bit(ArchEnum arch) {
   switch (arch) {
-    case ARCH_ARM:
-    case ARCH_X86:
-    case ARCH_MIPS:
-      return true;
-    default:
-      return false;
+	case ARCH_ARM:
+	case ARCH_X86:
+	case ARCH_MIPS:return true;
+	default:return false;
   }
 }
 

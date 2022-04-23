@@ -31,24 +31,24 @@ class MemoryBuffer : public Memory {
   MemoryBuffer() = default;
   virtual ~MemoryBuffer() { free(raw_); }
 
-  size_t Read(uint64_t addr, void* dst, size_t size) override;
+  size_t Read(uint64_t addr, void *dst, size_t size) override;
 
-  uint8_t* GetPtr(size_t offset);
+  uint8_t *GetPtr(size_t offset);
 
   bool Resize(size_t size) {
-    raw_ = reinterpret_cast<uint8_t*>(realloc(raw_, size));
-    if (raw_ == nullptr) {
-      size_ = 0;
-      return false;
-    }
-    size_ = size;
-    return true;
+	raw_ = reinterpret_cast<uint8_t *>(realloc(raw_, size));
+	if (raw_ == nullptr) {
+	  size_ = 0;
+	  return false;
+	}
+	size_ = size;
+	return true;
   }
 
   uint64_t Size() { return size_; }
 
  private:
-  uint8_t* raw_ = nullptr;
+  uint8_t *raw_ = nullptr;
   size_t size_ = 0;
 };
 

@@ -29,19 +29,19 @@ namespace linker {
 class DlFcn {
  public:
   struct SoDlInfo {
-    /**
-     * The full path name of so
-     */
-    std::string full_name;
-    /**
-     * The load base address. For example:
-     * phdr0: the PT_LOAD segment
-     * phdr0_load_address: the segment map start address.
-     * phdr0->p_vaddr: the segment virtual address.
-     *
-     * load_base = phdr0_load_address - PAGE_START(phdr0->p_vaddr)
-     */
-    ElfW(Addr) load_base;
+	/**
+	 * The full path name of so
+	 */
+	std::string full_name;
+	/**
+	 * The load base address. For example:
+	 * phdr0: the PT_LOAD segment
+	 * phdr0_load_address: the segment map start address.
+	 * phdr0->p_vaddr: the segment virtual address.
+	 *
+	 * load_base = phdr0_load_address - PAGE_START(phdr0->p_vaddr)
+	 */
+	ElfW(Addr) load_base;
   };
 
   /**
@@ -84,7 +84,7 @@ class DlFcn {
   static int dlclose_elf(void *handle);
 
   struct dl_iterate_data {
-    dl_phdr_info info_;
+	dl_phdr_info info_;
   };
 
   static int android_api_;

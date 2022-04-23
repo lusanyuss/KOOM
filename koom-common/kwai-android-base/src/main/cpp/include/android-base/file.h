@@ -36,7 +36,7 @@
 #endif
 
 class TemporaryFile {
-public:
+ public:
   TemporaryFile();
   explicit TemporaryFile(const std::string &tmp_dir);
   ~TemporaryFile();
@@ -50,7 +50,7 @@ public:
   int fd;
   char path[1024];
 
-private:
+ private:
   void init(const std::string &tmp_dir);
 
   bool remove_file_ = true;
@@ -59,7 +59,7 @@ private:
 };
 
 class TemporaryDir {
-public:
+ public:
   TemporaryDir();
   ~TemporaryDir();
   // Don't remove the temporary dir in the destructor.
@@ -67,7 +67,7 @@ public:
 
   char path[1024];
 
-private:
+ private:
   bool init(const std::string &tmp_dir);
 
   bool remove_dir_and_contents_ = true;
@@ -82,12 +82,12 @@ bool ReadFdToString(borrowed_fd fd, std::string *content);
 bool ReadFileToString(const std::string &path, std::string *content, bool follow_symlinks = false);
 
 bool WriteStringToFile(const std::string &content, const std::string &path,
-                       bool follow_symlinks = false);
+					   bool follow_symlinks = false);
 bool WriteStringToFd(const std::string &content, borrowed_fd fd);
 
 #if !defined(_WIN32)
 bool WriteStringToFile(const std::string &content, const std::string &path, mode_t mode,
-                       uid_t owner, gid_t group, bool follow_symlinks = false);
+					   uid_t owner, gid_t group, bool follow_symlinks = false);
 #endif
 
 bool ReadFully(borrowed_fd fd, void *data, size_t byte_count);

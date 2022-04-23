@@ -37,13 +37,13 @@ class RegsX86_64 : public RegsImpl<uint64_t> {
 
   ArchEnum Arch() override final;
 
-  bool SetPcFromReturnAddress(Memory* process_memory) override;
+  bool SetPcFromReturnAddress(Memory *process_memory) override;
 
-  bool StepIfSignalHandler(uint64_t elf_offset, Elf* elf, Memory* process_memory) override;
+  bool StepIfSignalHandler(uint64_t elf_offset, Elf *elf, Memory *process_memory) override;
 
-  void SetFromUcontext(x86_64_ucontext_t* ucontext);
+  void SetFromUcontext(x86_64_ucontext_t *ucontext);
 
-  void IterateRegisters(std::function<void(const char*, uint64_t)>) override final;
+  void IterateRegisters(std::function<void(const char *, uint64_t)>) override final;
 
   uint64_t pc() override;
   uint64_t sp() override;
@@ -51,11 +51,11 @@ class RegsX86_64 : public RegsImpl<uint64_t> {
   void set_pc(uint64_t pc) override;
   void set_sp(uint64_t sp) override;
 
-  Regs* Clone() override final;
+  Regs *Clone() override final;
 
-  static Regs* Read(void* data);
+  static Regs *Read(void *data);
 
-  static Regs* CreateFromUcontext(void* ucontext);
+  static Regs *CreateFromUcontext(void *ucontext);
 };
 
 }  // namespace unwindstack

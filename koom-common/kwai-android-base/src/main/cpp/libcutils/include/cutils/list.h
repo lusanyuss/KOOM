@@ -24,10 +24,9 @@
 extern "C" {
 #endif /* __cplusplus */
 
-struct listnode
-{
-    struct listnode *next;
-    struct listnode *prev;
+struct listnode {
+  struct listnode *next;
+  struct listnode *prev;
 };
 
 #define node_to_item(node, container, member) \
@@ -50,32 +49,28 @@ struct listnode
          (node) != (list); \
          (node) = (n), (n) = (node)->next)
 
-static inline void list_init(struct listnode *node)
-{
-    node->next = node;
-    node->prev = node;
+static inline void list_init(struct listnode *node) {
+  node->next = node;
+  node->prev = node;
 }
 
-static inline void list_add_tail(struct listnode *head, struct listnode *item)
-{
-    item->next = head;
-    item->prev = head->prev;
-    head->prev->next = item;
-    head->prev = item;
+static inline void list_add_tail(struct listnode *head, struct listnode *item) {
+  item->next = head;
+  item->prev = head->prev;
+  head->prev->next = item;
+  head->prev = item;
 }
 
-static inline void list_add_head(struct listnode *head, struct listnode *item)
-{
-    item->next = head->next;
-    item->prev = head;
-    head->next->prev = item;
-    head->next = item;
+static inline void list_add_head(struct listnode *head, struct listnode *item) {
+  item->next = head->next;
+  item->prev = head;
+  head->next->prev = item;
+  head->next = item;
 }
 
-static inline void list_remove(struct listnode *item)
-{
-    item->next->prev = item->prev;
-    item->prev->next = item->next;
+static inline void list_remove(struct listnode *item) {
+  item->next->prev = item->prev;
+  item->prev->next = item->next;
 }
 
 #define list_empty(list) ((list) == (list)->next)

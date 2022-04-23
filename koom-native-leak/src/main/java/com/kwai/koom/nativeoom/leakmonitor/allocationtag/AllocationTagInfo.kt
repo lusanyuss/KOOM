@@ -24,44 +24,44 @@ import com.kwai.koom.nativeoom.leakmonitor.LeakMonitor
 data class AllocationTagInfo(
     val tag: String
 ) {
-  var allocationStartIndex = 0L
-  var startTime = -1L
-
-  var allocationEndIndex = 0L
-  var endTime = -1L
+    var allocationStartIndex = 0L
+    var startTime = -1L
+    
+    var allocationEndIndex = 0L
+    var endTime = -1L
 }
 
 internal fun AllocationTagInfo.end() {
-  this.allocationEndIndex = LeakMonitor.getAllocationIndex()
-  this.endTime = System.currentTimeMillis()
+    this.allocationEndIndex = LeakMonitor.getAllocationIndex()
+    this.endTime = System.currentTimeMillis()
 }
 
 internal fun String.createAllocationTagInfo(): AllocationTagInfo {
-  return AllocationTagInfo(this).apply {
-    this.allocationStartIndex = LeakMonitor.getAllocationIndex()
-    this.startTime = System.currentTimeMillis()
-
-    this.allocationEndIndex = -1L
-    this.endTime = -1L
-  }
+    return AllocationTagInfo(this).apply {
+        this.allocationStartIndex = LeakMonitor.getAllocationIndex()
+        this.startTime = System.currentTimeMillis()
+        
+        this.allocationEndIndex = -1L
+        this.endTime = -1L
+    }
 }
 
 internal fun AllocationTagInfo.searchTag(allocationIndex: Long): String? {
-  if (allocationIndex < allocationStartIndex) {
-    return null
-  }
-
-  return if (contains(allocationIndex)) tag else null
+    if(allocationIndex < allocationStartIndex) {
+        return null
+    }
+    
+    return if(contains(allocationIndex)) tag else null
 }
 
 private fun AllocationTagInfo.contains(allocationIndex: Long): Boolean {
-  if (allocationIndex < allocationStartIndex) {
-    return false
-  }
-
-  return if (allocationEndIndex == -1L) {
-    true
-  } else {
-    allocationIndex <= allocationEndIndex
-  }
+    if(allocationIndex < allocationStartIndex) {
+        return false
+    }
+    
+    return if(allocationEndIndex == -1L) {
+        true
+    } else {
+        allocationIndex <= allocationEndIndex
+    }
 }

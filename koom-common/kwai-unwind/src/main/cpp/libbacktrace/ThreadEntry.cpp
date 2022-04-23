@@ -29,24 +29,24 @@ ThreadEntry *ThreadEntry::list_ = nullptr;
 pthread_mutex_t ThreadEntry::list_mutex_ = PTHREAD_MUTEX_INITIALIZER;
 
 extern "C" int pthread_condattr_setclock(pthread_condattr_t *__attr, clockid_t __clock)
-    __attribute__((weak));
+__attribute__((weak));
 
 // Assumes that ThreadEntry::list_mutex_ has already been locked before
 // creating a ThreadEntry object.
 ThreadEntry::ThreadEntry(pid_t pid, pid_t tid)
-    : pid_(pid), tid_(tid), ref_count_(1), mutex_(PTHREAD_MUTEX_INITIALIZER),
-      wait_mutex_(PTHREAD_MUTEX_INITIALIZER), wait_value_(0), next_(ThreadEntry::list_),
-      prev_(nullptr) {
+	: pid_(pid), tid_(tid), ref_count_(1), mutex_(PTHREAD_MUTEX_INITIALIZER),
+	  wait_mutex_(PTHREAD_MUTEX_INITIALIZER), wait_value_(0), next_(ThreadEntry::list_),
+	  prev_(nullptr) {
   pthread_condattr_t attr;
   pthread_condattr_init(&attr);
   if (pthread_condattr_setclock) {
-    pthread_condattr_setclock(&attr, CLOCK_MONOTONIC);
+	pthread_condattr_setclock(&attr, CLOCK_MONOTONIC);
   }
   pthread_cond_init(&wait_cond_, &attr);
 
   // Add ourselves to the list.
   if (ThreadEntry::list_) {
-    ThreadEntry::list_->prev_ = this;
+	ThreadEntry::list_->prev_ = this;
   }
   ThreadEntry::list_ = this;
 }
@@ -55,18 +55,18 @@ ThreadEntry *ThreadEntry::Get(pid_t pid, pid_t tid, bool create) {
   pthread_mutex_lock(&ThreadEntry::list_mutex_);
   ThreadEntry *entry = list_;
   while (entry != nullptr) {
-    if (entry->Match(pid, tid)) {
-      break;
-    }
-    entry = entry->next_;
+	if (entry->Match(pid, tid)) {
+	  break;
+	}
+	entry = entry->next_;
   }
 
   if (!entry) {
-    if (create) {
-      entry = new ThreadEntry(pid, tid);
-    }
+	if (create) {
+	  entry = new ThreadEntry(pid, tid);
+	}
   } else {
-    entry->ref_count_++;
+	entry->ref_count_++;
   }
   pthread_mutex_unlock(&ThreadEntry::list_mutex_);
 
@@ -78,7 +78,7 @@ void ThreadEntry::Remove(ThreadEntry *entry) {
 
   pthread_mutex_lock(&ThreadEntry::list_mutex_);
   if (--entry->ref_count_ == 0) {
-    delete entry;
+	delete entry;
   }
   pthread_mutex_unlock(&ThreadEntry::list_mutex_);
 }
@@ -87,12 +87,12 @@ void ThreadEntry::Remove(ThreadEntry *entry) {
 // deleting a ThreadEntry object.
 ThreadEntry::~ThreadEntry() {
   if (list_ == this) {
-    list_ = next_;
+	list_ = next_;
   } else {
-    if (next_) {
-      next_->prev_ = prev_;
-    }
-    prev_->next_ = next_;
+	if (next_) {
+	  next_->prev_ = prev_;
+	}
+	prev_->next_ = next_;
   }
 
   next_ = nullptr;
@@ -109,12 +109,12 @@ bool ThreadEntry::Wait(int value) {
   bool wait_completed = true;
   pthread_mutex_lock(&wait_mutex_);
   while (wait_value_ != value) {
-    int ret = pthread_cond_timedwait(&wait_cond_, &wait_mutex_, &ts);
-    if (ret != 0) {
-      BACK_ASYNC_SAFE_LOGW("pthread_cond_timedwait for value %d failed: %s", value, strerror(ret));
-      wait_completed = false;
-      break;
-    }
+	int ret = pthread_cond_timedwait(&wait_cond_, &wait_mutex_, &ts);
+	if (ret != 0) {
+	  BACK_ASYNC_SAFE_LOGW("pthread_cond_timedwait for value %d failed: %s", value, strerror(ret));
+	  wait_completed = false;
+	  break;
+	}
   }
   pthread_mutex_unlock(&wait_mutex_);
 

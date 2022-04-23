@@ -82,25 +82,25 @@ class OutputRedirect {
 };
 
 #  define FMT_TEST_WRITE_(statement, expected_output, file, fail)              \
-    GTEST_AMBIGUOUS_ELSE_BLOCKER_                                              \
-    if (::testing::AssertionResult gtest_ar = ::testing::AssertionSuccess()) { \
-      std::string gtest_expected_output = expected_output;                     \
-      OutputRedirect gtest_redir(file);                                        \
-      GTEST_SUPPRESS_UNREACHABLE_CODE_WARNING_BELOW_(statement);               \
-      std::string gtest_output = gtest_redir.restore_and_read();               \
-      if (gtest_output != gtest_expected_output) {                             \
-        gtest_ar << #statement " produces different output.\n"                 \
-                 << "Expected: " << gtest_expected_output << "\n"              \
-                 << "  Actual: " << gtest_output;                              \
-        goto GTEST_CONCAT_TOKEN_(gtest_label_testthrow_, __LINE__);            \
-      }                                                                        \
-    } else                                                                     \
-      GTEST_CONCAT_TOKEN_(gtest_label_testthrow_, __LINE__)                    \
-          : fail(gtest_ar.failure_message())
+	GTEST_AMBIGUOUS_ELSE_BLOCKER_                                              \
+	if (::testing::AssertionResult gtest_ar = ::testing::AssertionSuccess()) { \
+	  std::string gtest_expected_output = expected_output;                     \
+	  OutputRedirect gtest_redir(file);                                        \
+	  GTEST_SUPPRESS_UNREACHABLE_CODE_WARNING_BELOW_(statement);               \
+	  std::string gtest_output = gtest_redir.restore_and_read();               \
+	  if (gtest_output != gtest_expected_output) {                             \
+		gtest_ar << #statement " produces different output.\n"                 \
+				 << "Expected: " << gtest_expected_output << "\n"              \
+				 << "  Actual: " << gtest_output;                              \
+		goto GTEST_CONCAT_TOKEN_(gtest_label_testthrow_, __LINE__);            \
+	  }                                                                        \
+	} else                                                                     \
+	  GTEST_CONCAT_TOKEN_(gtest_label_testthrow_, __LINE__)                    \
+		  : fail(gtest_ar.failure_message())
 
 // Tests that the statement writes the expected output to file.
 #  define EXPECT_WRITE(file, statement, expected_output) \
-    FMT_TEST_WRITE_(statement, expected_output, file, GTEST_NONFATAL_FAILURE_)
+	FMT_TEST_WRITE_(statement, expected_output, file, GTEST_NONFATAL_FAILURE_)
 
 #  ifdef _MSC_VER
 
@@ -112,43 +112,44 @@ class SuppressAssert {
   int original_report_mode_;
 
   static void handle_invalid_parameter(const wchar_t*, const wchar_t*,
-                                       const wchar_t*, unsigned, uintptr_t) {}
+									   const wchar_t*, unsigned, uintptr_t) {}
 
  public:
   SuppressAssert()
-      : original_handler_(
-            _set_invalid_parameter_handler(handle_invalid_parameter)),
-        original_report_mode_(_CrtSetReportMode(_CRT_ASSERT, 0)) {}
+	  : original_handler_(
+			_set_invalid_parameter_handler(handle_invalid_parameter)),
+		original_report_mode_(_CrtSetReportMode(_CRT_ASSERT, 0)) {}
   ~SuppressAssert() {
-    _set_invalid_parameter_handler(original_handler_);
-    _CrtSetReportMode(_CRT_ASSERT, original_report_mode_);
+	_set_invalid_parameter_handler(original_handler_);
+	_CrtSetReportMode(_CRT_ASSERT, original_report_mode_);
   }
 };
 
 #    define SUPPRESS_ASSERT(statement) \
-      {                                \
-        SuppressAssert sa;             \
-        statement;                     \
-      }
+	  {                                \
+		SuppressAssert sa;             \
+		statement;                     \
+	  }
 #  else
 #    define SUPPRESS_ASSERT(statement) statement
 #  endif  // _MSC_VER
 
 #  define EXPECT_SYSTEM_ERROR_NOASSERT(statement, error_code, message) \
-    EXPECT_SYSTEM_ERROR(SUPPRESS_ASSERT(statement), error_code, message)
+	EXPECT_SYSTEM_ERROR(SUPPRESS_ASSERT(statement), error_code, message)
 
 // Attempts to read count characters from a file.
 std::string read(fmt::file& f, size_t count);
 
 #  define EXPECT_READ(file, expected_content) \
-    EXPECT_EQ(expected_content, \
-              read(file, fmt::string_view(expected_content).size()))
+	EXPECT_EQ(expected_content, \
+			  read(file, fmt::string_view(expected_content).size()))
 
 #else
 #  define EXPECT_WRITE(file, statement, expected_output) SUCCEED()
 #endif  // FMT_USE_FCNTL
 
-template <typename Mock> struct ScopedMock : testing::StrictMock<Mock> {
+template<typename Mock>
+struct ScopedMock : testing::StrictMock<Mock> {
   ScopedMock() { Mock::instance = this; }
   ~ScopedMock() { Mock::instance = nullptr; }
 };

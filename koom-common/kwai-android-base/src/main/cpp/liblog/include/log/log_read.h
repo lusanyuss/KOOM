@@ -134,12 +134,12 @@ struct logger_entry {
 #define __struct_log_msg_defined
 struct log_msg {
   union {
-    unsigned char buf[LOGGER_ENTRY_MAX_LEN + 1];
-    struct logger_entry entry;
-    struct logger_entry_v4 entry_v4;
-    struct logger_entry_v3 entry_v3;
-    struct logger_entry_v2 entry_v2;
-    struct logger_entry_v1 entry_v1;
+	unsigned char buf[LOGGER_ENTRY_MAX_LEN + 1];
+	struct logger_entry entry;
+	struct logger_entry_v4 entry_v4;
+	struct logger_entry_v3 entry_v3;
+	struct logger_entry_v2 entry_v2;
+	struct logger_entry_v1 entry_v1;
   } __attribute__((aligned(4)));
 #ifdef __cplusplus
   uint64_t nsec() const { return static_cast<uint64_t>(entry.sec) * NS_PER_SEC + entry.nsec; }
@@ -147,17 +147,17 @@ struct log_msg {
   /* packet methods */
   log_id_t id() { return static_cast<log_id_t>(entry.lid); }
   char *msg() {
-    unsigned short hdr_size = entry.hdr_size;
-    if (!hdr_size) {
-      hdr_size = sizeof(entry_v1);
-    }
-    if ((hdr_size < sizeof(entry_v1)) || (hdr_size > sizeof(entry))) {
-      return nullptr;
-    }
-    return reinterpret_cast<char *>(buf) + hdr_size;
+	unsigned short hdr_size = entry.hdr_size;
+	if (!hdr_size) {
+	  hdr_size = sizeof(entry_v1);
+	}
+	if ((hdr_size < sizeof(entry_v1)) || (hdr_size > sizeof(entry))) {
+	  return nullptr;
+	}
+	return reinterpret_cast<char *>(buf) + hdr_size;
   }
   unsigned int len() {
-    return (entry.hdr_size ? entry.hdr_size : static_cast<uint16_t>(sizeof(entry_v1))) + entry.len;
+	return (entry.hdr_size ? entry.hdr_size : static_cast<uint16_t>(sizeof(entry_v1))) + entry.len;
   }
 #endif
 };

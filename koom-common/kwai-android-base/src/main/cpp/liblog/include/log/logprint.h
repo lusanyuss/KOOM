@@ -108,7 +108,7 @@ int android_log_addFilterString(AndroidLogFormat *p_format, const char *filterSt
  * and tag, and 0 if it should not
  */
 int android_log_shouldPrintLine(AndroidLogFormat *p_format, const char *tag,
-                                android_LogPriority pri);
+								android_LogPriority pri);
 
 /**
  * Splits a wire-format buffer into an AndroidLogEntry
@@ -126,7 +126,7 @@ int android_log_processLogBuffer(struct logger_entry *buf, AndroidLogEntry *entr
  * into a string.
  */
 int android_log_processBinaryLogBuffer(struct logger_entry *buf, AndroidLogEntry *entry,
-                                       const EventTagMap *map, char *messageBuf, int messageBufLen);
+									   const EventTagMap *map, char *messageBuf, int messageBufLen);
 
 /**
  * Formats a log message into a buffer
@@ -137,8 +137,8 @@ int android_log_processBinaryLogBuffer(struct logger_entry *buf, AndroidLogEntry
  */
 
 char *android_log_formatLogLine(AndroidLogFormat *p_format, char *defaultBuffer,
-                                size_t defaultBufferSize, const AndroidLogEntry *p_line,
-                                size_t *p_outLength);
+								size_t defaultBufferSize, const AndroidLogEntry *p_line,
+								size_t *p_outLength);
 
 /**
  * Either print or do not print log line, based on filter

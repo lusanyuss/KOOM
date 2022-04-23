@@ -20,8 +20,8 @@
 package com.kwai.koom.nativeoom.leakmonitor
 
 interface LeakListener {
-  /**
-   * Return leak info collection, if no leak, collection is empty
-   */
-  fun onLeak(leaks: MutableCollection<LeakRecord>)
+    /**
+     * Return leak info collection, if no leak, collection is empty
+     */
+    fun onLeak(leaks: MutableCollection<LeakRecord>)
 }

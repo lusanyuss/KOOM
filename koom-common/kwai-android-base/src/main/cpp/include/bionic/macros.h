@@ -36,11 +36,13 @@ static constexpr uintptr_t align_up(uintptr_t p, size_t align) {
   return (p + align - 1) & ~(align - 1);
 }
 
-template <typename T> static inline T *align_down(T *p, size_t align) {
+template<typename T>
+static inline T *align_down(T *p, size_t align) {
   return reinterpret_cast<T *>(align_down(reinterpret_cast<uintptr_t>(p), align));
 }
 
-template <typename T> static inline T *align_up(T *p, size_t align) {
+template<typename T>
+static inline T *align_up(T *p, size_t align) {
   return reinterpret_cast<T *>(align_up(reinterpret_cast<uintptr_t>(p), align));
 }
 
@@ -65,7 +67,7 @@ template <typename T> static inline T *align_up(T *p, size_t align) {
 // This template function declaration is used in defining arraysize.
 // Note that the function doesn't need an implementation, as we only
 // use its type.
-template <typename T, size_t N>
+template<typename T, size_t N>
 char (&ArraySizeHelper(T (&array)[N]))[N]; // NOLINT(readability/casting)
 
 #define arraysize(array) (sizeof(ArraySizeHelper(array)))
@@ -86,6 +88,7 @@ static inline uintptr_t untag_address(uintptr_t p) {
 #endif
 }
 
-template <typename T> static inline T *untag_address(T *p) {
+template<typename T>
+static inline T *untag_address(T *p) {
   return reinterpret_cast<T *>(untag_address(reinterpret_cast<uintptr_t>(p)));
 }

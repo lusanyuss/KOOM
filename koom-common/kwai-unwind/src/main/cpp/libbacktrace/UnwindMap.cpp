@@ -52,17 +52,17 @@ bool UnwindMapRemote::GenerateMap() {
 
   unw_map_t unw_map;
   while (unw_map_cursor_get_next(&map_cursor_, &unw_map)) {
-    backtrace_map_t map;
+	backtrace_map_t map;
 
-    map.start = unw_map.start;
-    map.end = unw_map.end;
-    map.offset = unw_map.offset;
-    map.load_bias = unw_map.load_base;
-    map.flags = unw_map.flags;
-    map.name = unw_map.path;
+	map.start = unw_map.start;
+	map.end = unw_map.end;
+	map.offset = unw_map.offset;
+	map.load_bias = unw_map.load_base;
+	map.flags = unw_map.flags;
+	map.name = unw_map.path;
 
-    // The maps are in descending order, but we want them in ascending order.
-    maps_.push_front(map);
+	// The maps are in descending order, but we want them in ascending order.
+	maps_.push_front(map);
   }
 
   return true;
@@ -78,8 +78,8 @@ UnwindMapLocal::UnwindMapLocal() : UnwindMap(getpid()), map_created_(false) {
 
 UnwindMapLocal::~UnwindMapLocal() {
   if (map_created_) {
-    unw_map_local_destroy();
-    unw_map_cursor_clear(&map_cursor_);
+	unw_map_local_destroy();
+	unw_map_cursor_clear(&map_cursor_);
   }
 }
 
@@ -93,39 +93,39 @@ bool UnwindMapLocal::GenerateMap() {
   // before giving up.
   bool generated = false;
   for (int i = 0; i < 3; i++) {
-    maps_.clear();
+	maps_.clear();
 
-    // Save the map data retrieved so we can tell if it changes.
-    unw_map_local_cursor_get(&map_cursor_);
+	// Save the map data retrieved so we can tell if it changes.
+	unw_map_local_cursor_get(&map_cursor_);
 
-    unw_map_t unw_map;
-    int ret;
-    while ((ret = unw_map_local_cursor_get_next(&map_cursor_, &unw_map)) > 0) {
-      backtrace_map_t map;
+	unw_map_t unw_map;
+	int ret;
+	while ((ret = unw_map_local_cursor_get_next(&map_cursor_, &unw_map)) > 0) {
+	  backtrace_map_t map;
 
-      map.start = unw_map.start;
-      map.end = unw_map.end;
-      map.offset = unw_map.offset;
-      map.load_bias = unw_map.load_base;
-      map.flags = unw_map.flags;
-      map.name = unw_map.path;
+	  map.start = unw_map.start;
+	  map.end = unw_map.end;
+	  map.offset = unw_map.offset;
+	  map.load_bias = unw_map.load_base;
+	  map.flags = unw_map.flags;
+	  map.name = unw_map.path;
 
-      free(unw_map.path);
+	  free(unw_map.path);
 
-      // The maps are in descending order, but we want them in ascending order.
-      maps_.push_front(map);
-    }
-    // Check to see if the map changed while getting the data.
-    if (ret != -UNW_EINVAL) {
-      generated = true;
-      break;
-    }
+	  // The maps are in descending order, but we want them in ascending order.
+	  maps_.push_front(map);
+	}
+	// Check to see if the map changed while getting the data.
+	if (ret != -UNW_EINVAL) {
+	  generated = true;
+	  break;
+	}
   }
 
   pthread_rwlock_unlock(&map_lock_);
 
   if (!generated) {
-    BACK_LOGW("Unable to generate the map.");
+	BACK_LOGW("Unable to generate the map.");
   }
   return generated;
 }
@@ -134,15 +134,15 @@ bool UnwindMapLocal::Build() {
   return (map_created_ = (unw_map_local_create() == 0)) && GenerateMap();;
 }
 
-void UnwindMapLocal::FillIn(uint64_t addr, backtrace_map_t* map) {
+void UnwindMapLocal::FillIn(uint64_t addr, backtrace_map_t *map) {
   BacktraceMap::FillIn(addr, map);
   if (!IsValid(*map)) {
-    // Check to see if the underlying map changed and regenerate the map
-    // if it did.
-    if (unw_map_local_cursor_valid(&map_cursor_) < 0) {
-      if (GenerateMap()) {
-        BacktraceMap::FillIn(addr, map);
-      }
-    }
+	// Check to see if the underlying map changed and regenerate the map
+	// if it did.
+	if (unw_map_local_cursor_valid(&map_cursor_) < 0) {
+	  if (GenerateMap()) {
+		BacktraceMap::FillIn(addr, map);
+	  }
+	}
   }
 }

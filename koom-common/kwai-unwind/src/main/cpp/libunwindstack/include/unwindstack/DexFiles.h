@@ -38,19 +38,19 @@ enum ArchEnum : uint8_t;
 
 class DexFiles : public Global {
  public:
-  explicit DexFiles(std::shared_ptr<Memory>& memory);
-  DexFiles(std::shared_ptr<Memory>& memory, std::vector<std::string>& search_libs);
+  explicit DexFiles(std::shared_ptr<Memory> &memory);
+  DexFiles(std::shared_ptr<Memory> &memory, std::vector<std::string> &search_libs);
   virtual ~DexFiles();
 
-  DexFile* GetDexFile(uint64_t dex_file_offset, MapInfo* info);
+  DexFile *GetDexFile(uint64_t dex_file_offset, MapInfo *info);
 
-  void GetMethodInformation(Maps* maps, MapInfo* info, uint64_t dex_pc, std::string* method_name,
-                            uint64_t* method_offset);
+  void GetMethodInformation(Maps *maps, MapInfo *info, uint64_t dex_pc, std::string *method_name,
+							uint64_t *method_offset);
 
  private:
-  void Init(Maps* maps);
+  void Init(Maps *maps);
 
-  bool GetAddr(size_t index, uint64_t* addr);
+  bool GetAddr(size_t index, uint64_t *addr);
 
   uint64_t ReadEntryPtr32(uint64_t addr);
 

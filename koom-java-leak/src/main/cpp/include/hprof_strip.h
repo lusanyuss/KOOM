@@ -47,7 +47,7 @@ class HprofStrip {
   static int GetByteSizeFromType(unsigned char basic_type);
 
   int ProcessHeap(const void *buf, int first_index, int max_len,
-                  int heap_serial_no, int array_serial_no);
+				  int heap_serial_no, int array_serial_no);
   void reset();
 
   int hprof_fd_;

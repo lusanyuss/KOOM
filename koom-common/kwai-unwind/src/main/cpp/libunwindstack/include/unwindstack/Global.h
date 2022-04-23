@@ -36,8 +36,8 @@ struct MapInfo;
 
 class Global {
  public:
-  explicit Global(std::shared_ptr<Memory>& memory);
-  Global(std::shared_ptr<Memory>& memory, std::vector<std::string>& search_libs);
+  explicit Global(std::shared_ptr<Memory> &memory);
+  Global(std::shared_ptr<Memory> &memory, std::vector<std::string> &search_libs);
   virtual ~Global() = default;
 
   void SetArch(ArchEnum arch);
@@ -45,8 +45,8 @@ class Global {
   ArchEnum arch() { return arch_; }
 
  protected:
-  bool Searchable(const std::string& name);
-  void FindAndReadVariable(Maps* maps, const char* variable);
+  bool Searchable(const std::string &name);
+  void FindAndReadVariable(Maps *maps, const char *variable);
 
   virtual bool ReadVariableData(uint64_t offset) = 0;
 

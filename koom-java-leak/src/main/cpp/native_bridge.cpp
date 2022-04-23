@@ -44,13 +44,13 @@ extern "C" {
  */
 JNIEXPORT void JNICALL
 Java_com_kwai_koom_javaoom_hprof_StripHprofHeapDumper_initStripDump(
-    JNIEnv *env ATTRIBUTE_UNUSED, jobject jobject ATTRIBUTE_UNUSED) {
+	JNIEnv *env ATTRIBUTE_UNUSED, jobject jobject ATTRIBUTE_UNUSED) {
   HprofStrip::HookInit();
 }
 
 JNIEXPORT void JNICALL
 Java_com_kwai_koom_javaoom_hprof_StripHprofHeapDumper_hprofName(
-    JNIEnv *env, jobject jobject ATTRIBUTE_UNUSED, jstring name) {
+	JNIEnv *env, jobject jobject ATTRIBUTE_UNUSED, jstring name) {
   const char *hprofName = env->GetStringUTFChars(name, nullptr);
   HprofStrip::GetInstance().SetHprofName(hprofName);
   env->ReleaseStringUTFChars(name, hprofName);
@@ -58,7 +58,7 @@ Java_com_kwai_koom_javaoom_hprof_StripHprofHeapDumper_hprofName(
 
 JNIEXPORT jboolean JNICALL
 Java_com_kwai_koom_javaoom_hprof_StripHprofHeapDumper_isStripSuccess(
-    JNIEnv *env ATTRIBUTE_UNUSED, jobject jobject ATTRIBUTE_UNUSED) {
+	JNIEnv *env ATTRIBUTE_UNUSED, jobject jobject ATTRIBUTE_UNUSED) {
   return (jboolean)HprofStrip::GetInstance().IsHookSuccess();
 }
 
@@ -66,26 +66,26 @@ Java_com_kwai_koom_javaoom_hprof_StripHprofHeapDumper_isStripSuccess(
  * JNI bridge for hprof dump
  */
 JNIEXPORT void JNICALL Java_com_kwai_koom_javaoom_hprof_ForkJvmHeapDumper_init(
-    JNIEnv *env ATTRIBUTE_UNUSED, jobject jobject ATTRIBUTE_UNUSED) {
+	JNIEnv *env ATTRIBUTE_UNUSED, jobject jobject ATTRIBUTE_UNUSED) {
   HprofDump::GetInstance().Initialize();
 }
 
 JNIEXPORT jint JNICALL
 Java_com_kwai_koom_javaoom_hprof_ForkJvmHeapDumper_suspendAndFork(
-    JNIEnv *env ATTRIBUTE_UNUSED, jobject jobject ATTRIBUTE_UNUSED) {
+	JNIEnv *env ATTRIBUTE_UNUSED, jobject jobject ATTRIBUTE_UNUSED) {
   return HprofDump::GetInstance().SuspendAndFork();
 }
 
 JNIEXPORT void JNICALL
 Java_com_kwai_koom_javaoom_hprof_ForkJvmHeapDumper_exitProcess(
-    JNIEnv *env ATTRIBUTE_UNUSED, jobject jobject ATTRIBUTE_UNUSED) {
+	JNIEnv *env ATTRIBUTE_UNUSED, jobject jobject ATTRIBUTE_UNUSED) {
   ALOGI("process %d will exit!", getpid());
   _exit(0);
 }
 
 JNIEXPORT jboolean JNICALL
 Java_com_kwai_koom_javaoom_hprof_ForkJvmHeapDumper_resumeAndWait(
-    JNIEnv *env ATTRIBUTE_UNUSED, jobject jobject ATTRIBUTE_UNUSED, jint pid) {
+	JNIEnv *env ATTRIBUTE_UNUSED, jobject jobject ATTRIBUTE_UNUSED, jint pid) {
   return HprofDump::GetInstance().ResumeAndWait(pid);
 }
 
@@ -94,7 +94,7 @@ Java_com_kwai_koom_javaoom_hprof_ForkJvmHeapDumper_resumeAndWait(
  */
 JNIEXPORT jboolean JNICALL
 Java_com_kwai_koom_javaoom_hprof_NativeHandler_isARM64(
-    JNIEnv *env ATTRIBUTE_UNUSED, jclass clazz ATTRIBUTE_UNUSED) {
+	JNIEnv *env ATTRIBUTE_UNUSED, jclass clazz ATTRIBUTE_UNUSED) {
 #if defined(__aarch64__) || defined(__x86_64__)
   return JNI_TRUE;
 #elif defined(__arm__) || defined(__i386__)

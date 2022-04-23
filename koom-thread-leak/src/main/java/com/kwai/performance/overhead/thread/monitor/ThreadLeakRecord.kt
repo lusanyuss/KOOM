@@ -23,25 +23,21 @@ import androidx.annotation.Keep
 
 @Keep
 data class ThreadLeakRecord(
-    val tid: Int,
-    val createTime: Long,
-    val startTime: Long,
-    val endTime: Long,
-    val name: String,
-    val createCallStack: String) {
-
-  override fun toString(): String = StringBuilder().apply {
-    append("tid: $tid\n")
-    append("createTime: $createTime Byte\n")
-    append("startTime: $startTime\n")
-    append("endTime: $endTime\n")
-    append("name: $name\n")
-    append("createCallStack:\n")
-    append(createCallStack)
-  }.toString()
+    val tid: Int, val createTime: Long, val startTime: Long, val endTime: Long, val name: String, val createCallStack: String
+) {
+    
+    override fun toString(): String = StringBuilder().apply {
+        append("tid: $tid\n")
+        append("createTime: $createTime Byte\n")
+        append("startTime: $startTime\n")
+        append("endTime: $endTime\n")
+        append("name: $name\n")
+        append("createCallStack:\n")
+        append(createCallStack)
+    }.toString()
 }
 
 @Keep
 data class ThreadLeakContainer(
-    val type: String,
-    val threads: MutableList<ThreadLeakRecord>)
+    val type: String, val threads: MutableList<ThreadLeakRecord>
+)

@@ -24,7 +24,7 @@ namespace android {
 namespace base {
 
 class ErrnoRestorer {
-public:
+ public:
   ErrnoRestorer() : saved_errno_(errno) {}
 
   ~ErrnoRestorer() { errno = saved_errno_; }
@@ -32,7 +32,7 @@ public:
   // Allow this object to be used as part of && operation.
   operator bool() const { return true; }
 
-private:
+ private:
   const int saved_errno_;
 
   DISALLOW_COPY_AND_ASSIGN(ErrnoRestorer);

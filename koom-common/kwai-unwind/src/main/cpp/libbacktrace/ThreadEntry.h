@@ -23,29 +23,29 @@
 
 class ThreadEntry {
  public:
-  static ThreadEntry* Get(pid_t pid, pid_t tid, bool create = true);
+  static ThreadEntry *Get(pid_t pid, pid_t tid, bool create = true);
 
-  static void Remove(ThreadEntry* entry);
+  static void Remove(ThreadEntry *entry);
 
   void Wake();
 
   bool Wait(int);
 
-  void CopyUcontextFromSigcontext(void*);
+  void CopyUcontextFromSigcontext(void *);
 
   inline void Lock() {
-    pthread_mutex_lock(&mutex_);
+	pthread_mutex_lock(&mutex_);
 
-    // Always reset the wait value since this could be the first or nth
-    // time this entry is locked.
-    wait_value_ = 0;
+	// Always reset the wait value since this could be the first or nth
+	// time this entry is locked.
+	wait_value_ = 0;
   }
 
   inline void Unlock() {
-    pthread_mutex_unlock(&mutex_);
+	pthread_mutex_unlock(&mutex_);
   }
 
-  inline ucontext_t* GetUcontext() { return &ucontext_; }
+  inline ucontext_t *GetUcontext() { return &ucontext_; }
 
  private:
   ThreadEntry(pid_t pid, pid_t tid);
@@ -60,11 +60,11 @@ class ThreadEntry {
   pthread_mutex_t wait_mutex_;
   pthread_cond_t wait_cond_;
   int wait_value_;
-  ThreadEntry* next_;
-  ThreadEntry* prev_;
+  ThreadEntry *next_;
+  ThreadEntry *prev_;
   ucontext_t ucontext_;
 
-  static ThreadEntry* list_;
+  static ThreadEntry *list_;
   static pthread_mutex_t list_mutex_;
 };
 

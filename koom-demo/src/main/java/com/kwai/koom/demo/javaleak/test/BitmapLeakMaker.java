@@ -23,9 +23,9 @@ import android.graphics.Bitmap;
 
 public class BitmapLeakMaker extends LeakMaker<Bitmap> {
 
-  @Override
-  public void startLeak(Context context) {
-    Bitmap bitmap = Bitmap.createBitmap(1920, 1080, Bitmap.Config.ARGB_8888);
-    uselessObjectList.add(bitmap);
-  }
+    @Override
+    public void startLeak(Context context) {
+        Bitmap bitmap = Bitmap.createBitmap(1920, 1080, Bitmap.Config.ARGB_8888);
+        uselessObjectList.add(bitmap);
+    }
 }

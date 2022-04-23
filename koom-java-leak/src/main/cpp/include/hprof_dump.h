@@ -152,12 +152,12 @@ class HprofDump {
    */
   // art::ScopedSuspendAll::ScopedSuspendAll()
   void (*ssa_constructor_fnc_)(void *handle, const char *cause,
-                               bool long_suspend);
+							   bool long_suspend);
   // art::ScopedSuspendAll::~ScopedSuspendAll()
   void (*ssa_destructor_fnc_)(void *handle);
   // art::gc::ScopedGCCriticalSection::ScopedGCCriticalSection()
   void (*sgc_constructor_fnc_)(void *handle, void *self, GcCause cause,
-                               CollectorType collector_type);
+							   CollectorType collector_type);
   // art::gc::ScopedGCCriticalSection::~ScopedGCCriticalSection()
   void (*sgc_destructor_fnc_)(void *handle);
   // art::Locks::mutator_lock_

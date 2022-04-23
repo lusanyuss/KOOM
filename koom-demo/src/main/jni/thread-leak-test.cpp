@@ -11,23 +11,23 @@
 
 static NOINLINE void TestThreadLeak(int64_t delay) {
   std::thread test_thread([](int64_t delay) {
-    pthread_setname_np(pthread_self(), "test_thread");
-    LOGI("test_thread run");
-    std::thread *test_thread_1;
-    std::thread *test_thread_2;
-    test_thread_1 = new std::thread([]() {
-      pthread_setname_np(pthread_self(), "test_thread_1");
-      LOGI("test_thread_1 run");
-    });
-    test_thread_2 = new std::thread([]() {
-      pthread_setname_np(pthread_self(), "test_thread_2");
-      LOGI("test_thread_2 run");
-    });
-    std::this_thread::sleep_for(std::chrono::milliseconds(delay));
-    test_thread_1->detach();
-    LOGI("test_thread_1 detach");
-    test_thread_2->join();
-    LOGI("test_thread_2 join");
+	pthread_setname_np(pthread_self(), "test_thread");
+	LOGI("test_thread run");
+	std::thread *test_thread_1;
+	std::thread *test_thread_2;
+	test_thread_1 = new std::thread([]() {
+	  pthread_setname_np(pthread_self(), "test_thread_1");
+	  LOGI("test_thread_1 run");
+	});
+	test_thread_2 = new std::thread([]() {
+	  pthread_setname_np(pthread_self(), "test_thread_2");
+	  LOGI("test_thread_2 run");
+	});
+	std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+	test_thread_1->detach();
+	LOGI("test_thread_1 detach");
+	test_thread_2->join();
+	LOGI("test_thread_2 join");
   }, delay);
   test_thread.detach();
 }
@@ -35,7 +35,7 @@ static NOINLINE void TestThreadLeak(int64_t delay) {
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_kwai_koom_demo_threadleak_ThreadLeakTest_triggerLeak(
-    JNIEnv *env,
-    jclass, jlong delay) {
+	JNIEnv *env,
+	jclass, jlong delay) {
   TestThreadLeak(delay);
 }

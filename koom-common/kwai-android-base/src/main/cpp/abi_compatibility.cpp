@@ -31,12 +31,12 @@ namespace base {
 
 #if !defined(_WIN32)
 ssize_t SendFileDescriptorVector(int sockfd, const void *data, size_t len,
-                                 const std::vector<int> &fds) {
+								 const std::vector<int> &fds) {
   return SendFileDescriptorVector(borrowed_fd(sockfd), data, len, fds);
 }
 
 ssize_t ReceiveFileDescriptorVector(int sockfd, void *data, size_t len, size_t max_fds,
-                                    std::vector<unique_fd> *fds) {
+									std::vector<unique_fd> *fds) {
   return ReceiveFileDescriptorVector(borrowed_fd(sockfd), data, len, max_fds, fds);
 }
 #endif
@@ -69,7 +69,7 @@ bool WriteFully(int fd, const void *data, size_t byte_count) {
 
 #pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
 extern "C" std::unique_ptr<MappedFile> MAPPEDFILE_FROMFD(int fd, off64_t offset, size_t length,
-                                                         int prot) {
+														 int prot) {
   return MappedFile::FromFd(fd, offset, length, prot);
 }
 

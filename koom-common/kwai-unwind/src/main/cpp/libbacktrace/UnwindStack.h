@@ -30,24 +30,24 @@
 
 class UnwindStackCurrent : public BacktraceCurrent {
  public:
-  UnwindStackCurrent(pid_t pid, pid_t tid, BacktraceMap* map);
+  UnwindStackCurrent(pid_t pid, pid_t tid, BacktraceMap *map);
   virtual ~UnwindStackCurrent() = default;
 
-  std::string GetFunctionNameRaw(uint64_t pc, uint64_t* offset) override;
+  std::string GetFunctionNameRaw(uint64_t pc, uint64_t *offset) override;
 
-  bool UnwindFromContext(size_t num_ignore_frames, void* ucontext) override;
+  bool UnwindFromContext(size_t num_ignore_frames, void *ucontext) override;
 };
 
 class UnwindStackPtrace : public BacktracePtrace {
  public:
-  UnwindStackPtrace(pid_t pid, pid_t tid, BacktraceMap* map);
+  UnwindStackPtrace(pid_t pid, pid_t tid, BacktraceMap *map);
   virtual ~UnwindStackPtrace() = default;
 
-  bool Unwind(size_t num_ignore_frames, void* context) override;
+  bool Unwind(size_t num_ignore_frames, void *context) override;
 
-  std::string GetFunctionNameRaw(uint64_t pc, uint64_t* offset) override;
+  std::string GetFunctionNameRaw(uint64_t pc, uint64_t *offset) override;
 
-  size_t Read(uint64_t addr, uint8_t* buffer, size_t bytes) override;
+  size_t Read(uint64_t addr, uint8_t *buffer, size_t bytes) override;
 
  private:
   std::shared_ptr<unwindstack::Memory> memory_;

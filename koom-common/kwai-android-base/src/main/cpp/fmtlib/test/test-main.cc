@@ -20,13 +20,13 @@
 #  define _CrtSetReportMode(a, b)
 #endif
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
 #ifdef _WIN32
   // Don't display any error dialogs. This also suppresses message boxes
   // on assertion failures in MinGW where _set_error_mode/CrtSetReportMode
   // doesn't help.
   SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX |
-               SEM_NOOPENFILEERRORBOX);
+			   SEM_NOOPENFILEERRORBOX);
 #endif
   // Disable message boxes on assertion failures.
   _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG);
@@ -34,10 +34,10 @@ int main(int argc, char** argv) {
   _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG);
   _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
   try {
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+	testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
   } catch (...) {
-    // Catch all exceptions to make Coverity happy.
+	// Catch all exceptions to make Coverity happy.
   }
   return EXIT_FAILURE;
 }

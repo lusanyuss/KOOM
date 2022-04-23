@@ -21,13 +21,14 @@ package com.kwai.koom.base
 import android.os.Build
 
 object MonitorBuildConfig {
-  @JvmStatic
-  val DEBUG by lazy { MonitorManager.commonConfig.debugMode }
-
-  @JvmStatic
-  val VERSION_NAME by lazy { MonitorManager.commonConfig.versionNameInvoker() }
-
-  @JvmStatic
-  val ROM by lazy { Build.MANUFACTURER.toUpperCase()
-    .let { if (it == "HUAWEI") "EMUI" else "OTHER"} }
+    @JvmStatic
+    val DEBUG by lazy { MonitorManager.commonConfig.debugMode }
+    
+    @JvmStatic
+    val VERSION_NAME by lazy { MonitorManager.commonConfig.versionNameInvoker() }
+    
+    @JvmStatic
+    val ROM by lazy {
+        Build.MANUFACTURER.toUpperCase().let { if(it == "HUAWEI") "EMUI" else "OTHER" }
+    }
 }

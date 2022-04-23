@@ -63,30 +63,30 @@ struct FrameData {
 };
 
 class Unwinder {
-public:
+ public:
   Unwinder(size_t max_frames, Maps *maps, Regs *regs, std::shared_ptr<Memory> process_memory)
-      : max_frames_(max_frames), maps_(maps), regs_(regs), process_memory_(process_memory),
-        arch_(regs->Arch()) {
-    frames_.reserve(max_frames);
+	  : max_frames_(max_frames), maps_(maps), regs_(regs), process_memory_(process_memory),
+		arch_(regs->Arch()) {
+	frames_.reserve(max_frames);
   }
   Unwinder(size_t max_frames, Maps *maps, std::shared_ptr<Memory> process_memory)
-      : max_frames_(max_frames), maps_(maps), process_memory_(process_memory) {
-    frames_.reserve(max_frames);
+	  : max_frames_(max_frames), maps_(maps), process_memory_(process_memory) {
+	frames_.reserve(max_frames);
   }
 
   virtual ~Unwinder();
 
   virtual void Unwind(const std::vector<std::string> *initial_map_names_to_skip = nullptr,
-                      const std::vector<std::string> *map_suffixes_to_ignore = nullptr);
+					  const std::vector<std::string> *map_suffixes_to_ignore = nullptr);
 
   size_t NumFrames() const { return frames_.size(); }
 
   const std::vector<FrameData> &frames() { return frames_; }
 
   std::vector<FrameData> ConsumeFrames() {
-    std::vector<FrameData> frames = std::move(frames_);
-    frames_.clear();
-    return frames;
+	std::vector<FrameData> frames = std::move(frames_);
+	frames_.clear();
+	return frames;
   }
 
   std::string FormatFrame(size_t frame_num) const;
@@ -97,8 +97,8 @@ public:
   void SetJitDebug(JitDebug *jit_debug);
 
   void SetRegs(Regs *regs) {
-    regs_ = regs;
-    arch_ = regs_ != nullptr ? regs->Arch() : ARCH_UNKNOWN;
+	regs_ = regs;
+	arch_ = regs_ != nullptr ? regs->Arch() : ARCH_UNKNOWN;
   }
   Maps *GetMaps() { return maps_; }
   std::shared_ptr<Memory> &GetProcessMemory() { return process_memory_; }
@@ -129,17 +129,17 @@ public:
   // libunwindstack. This is used by tombstoned to symbolize frame pointer-based
   // stack traces that are collected by tools such as GWP-ASan and MTE.
   static FrameData BuildFrameFromPcOnly(uint64_t pc, ArchEnum arch, Maps *maps, JitDebug *jit_debug,
-                                        std::shared_ptr<Memory> process_memory, bool resolve_names);
+										std::shared_ptr<Memory> process_memory, bool resolve_names);
   FrameData BuildFrameFromPcOnly(uint64_t pc);
 
-protected:
+ protected:
   Unwinder(size_t max_frames);
   Unwinder(size_t max_frames, ArchEnum arch);
 
   void ClearErrors() {
-    warnings_ = WARNING_NONE;
-    last_error_.code = ERROR_NONE;
-    last_error_.address = 0;
+	warnings_ = WARNING_NONE;
+	last_error_.code = ERROR_NONE;
+	last_error_.address = 0;
   }
 
   void FillInDexFrame();
@@ -164,7 +164,7 @@ protected:
 };
 
 class UnwinderFromPid : public Unwinder {
-public:
+ public:
   UnwinderFromPid(size_t max_frames, pid_t pid);
   UnwinderFromPid(size_t max_frames, pid_t pid, ArchEnum arch);
   virtual ~UnwinderFromPid();
@@ -172,9 +172,9 @@ public:
   bool Init();
 
   void Unwind(const std::vector<std::string> *initial_map_names_to_skip = nullptr,
-              const std::vector<std::string> *map_suffixes_to_ignore = nullptr) override;
+			  const std::vector<std::string> *map_suffixes_to_ignore = nullptr) override;
 
-protected:
+ protected:
   pid_t pid_;
   std::unique_ptr<Maps> maps_ptr_;
   std::unique_ptr<JitDebug> jit_debug_ptr_;
@@ -183,7 +183,7 @@ protected:
 };
 
 class ThreadUnwinder : public UnwinderFromPid {
-public:
+ public:
   explicit ThreadUnwinder(size_t max_frames);
   ThreadUnwinder(size_t max_frames, const ThreadUnwinder *unwinder);
   virtual ~ThreadUnwinder() = default;
@@ -193,10 +193,10 @@ public:
   void Unwind(const std::vector<std::string> *, const std::vector<std::string> *) override {}
 
   void UnwindWithSignal(int signal, pid_t tid,
-                        const std::vector<std::string> *initial_map_names_to_skip = nullptr,
-                        const std::vector<std::string> *map_suffixes_to_ignore = nullptr);
+						const std::vector<std::string> *initial_map_names_to_skip = nullptr,
+						const std::vector<std::string> *map_suffixes_to_ignore = nullptr);
 
-protected:
+ protected:
   ThreadEntry *SendSignalToThread(int signal, pid_t tid);
 };
 

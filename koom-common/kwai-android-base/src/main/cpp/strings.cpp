@@ -38,11 +38,11 @@ std::vector<std::string> Split(const std::string &s, const std::string &delimite
   size_t base = 0;
   size_t found;
   while (true) {
-    found = s.find_first_of(delimiters, base);
-    result.push_back(s.substr(base, found - base));
-    if (found == s.npos)
-      break;
-    base = found + 1;
+	found = s.find_first_of(delimiters, base);
+	result.push_back(s.substr(base, found - base));
+	if (found == s.npos)
+	  break;
+	base = found + 1;
   }
 
   return result;
@@ -52,7 +52,7 @@ std::string Trim(const std::string &s) {
   std::string result;
 
   if (s.size() == 0) {
-    return result;
+	return result;
   }
 
   size_t start_index = 0;
@@ -60,23 +60,23 @@ std::string Trim(const std::string &s) {
 
   // Skip initial whitespace.
   while (start_index < s.size()) {
-    if (!isspace(s[start_index])) {
-      break;
-    }
-    start_index++;
+	if (!isspace(s[start_index])) {
+	  break;
+	}
+	start_index++;
   }
 
   // Skip terminating whitespace.
   while (end_index >= start_index) {
-    if (!isspace(s[end_index])) {
-      break;
-    }
-    end_index--;
+	if (!isspace(s[end_index])) {
+	  break;
+	}
+	end_index--;
   }
 
   // All spaces, no beef.
   if (end_index < start_index) {
-    return "";
+	return "";
   }
   // Start_index is the first non-space, end_index is the last one.
   return s.substr(start_index, end_index - start_index + 1);
@@ -107,7 +107,7 @@ bool EndsWith(std::string_view s, char suffix) { return !s.empty() && s.back() =
 
 bool EndsWithIgnoreCase(std::string_view s, std::string_view suffix) {
   return s.size() >= suffix.size() &&
-         strncasecmp(s.data() + (s.size() - suffix.size()), suffix.data(), suffix.size()) == 0;
+	  strncasecmp(s.data() + (s.size() - suffix.size()), suffix.data(), suffix.size()) == 0;
 }
 
 bool EqualsIgnoreCase(std::string_view lhs, std::string_view rhs) {
@@ -115,21 +115,21 @@ bool EqualsIgnoreCase(std::string_view lhs, std::string_view rhs) {
 }
 
 std::string StringReplace(std::string_view s, std::string_view from, std::string_view to,
-                          bool all) {
+						  bool all) {
   if (from.empty())
-    return std::string(s);
+	return std::string(s);
 
   std::string result;
   std::string_view::size_type start_pos = 0;
   do {
-    std::string_view::size_type pos = s.find(from, start_pos);
-    if (pos == std::string_view::npos)
-      break;
+	std::string_view::size_type pos = s.find(from, start_pos);
+	if (pos == std::string_view::npos)
+	  break;
 
-    result.append(s.data() + start_pos, pos - start_pos);
-    result.append(to.data(), to.size());
+	result.append(s.data() + start_pos, pos - start_pos);
+	result.append(to.data(), to.size());
 
-    start_pos = pos + from.size();
+	start_pos = pos + from.size();
   } while (all);
   result.append(s.data() + start_pos, s.size() - start_pos);
   return result;

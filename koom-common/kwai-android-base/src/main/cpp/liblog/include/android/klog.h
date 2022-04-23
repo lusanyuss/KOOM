@@ -126,8 +126,7 @@ void __android_log_logd_logger(const struct __android_log_message *log_message);
  *
  * Available since API level 30.
  */
-void __android_log_stderr_logger(const struct __android_log_message *log_message)
-   ;
+void __android_log_stderr_logger(const struct __android_log_message *log_message);
 
 /**
  * Sets a user defined aborter function that is called for __android_log_assert() failures.  This

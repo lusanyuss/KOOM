@@ -62,19 +62,19 @@ bool TryLoadLibdexfileExternal([[maybe_unused]] std::string *err_msg) {
   std::lock_guard<std::mutex> lock(load_mutex);
 
   if (!is_loaded) {
-    // Check which version is already loaded to avoid loading both debug and
-    // release builds. We might also be backtracing from separate process, in
-    // which case neither is loaded.
-    const char *so_name = "libdexfiled_external.so";
-    void *handle = kwai::linker::DlFcn::dlopen(so_name, RTLD_NOLOAD | RTLD_NOW | RTLD_NODELETE);
-    if (handle == nullptr) {
-      so_name = "libdexfile_external.so";
-      handle = kwai::linker::DlFcn::dlopen(so_name, RTLD_NOW | RTLD_GLOBAL | RTLD_NODELETE);
-    }
-    if (handle == nullptr) {
-      *err_msg = dlerror();
-      return false;
-    }
+	// Check which version is already loaded to avoid loading both debug and
+	// release builds. We might also be backtracing from separate process, in
+	// which case neither is loaded.
+	const char *so_name = "libdexfiled_external.so";
+	void *handle = kwai::linker::DlFcn::dlopen(so_name, RTLD_NOLOAD | RTLD_NOW | RTLD_NODELETE);
+	if (handle == nullptr) {
+	  so_name = "libdexfile_external.so";
+	  handle = kwai::linker::DlFcn::dlopen(so_name, RTLD_NOW | RTLD_GLOBAL | RTLD_NODELETE);
+	}
+	if (handle == nullptr) {
+	  *err_msg = dlerror();
+	  return false;
+	}
 
 #define RESOLVE_DLFUNC_PTR(CLASS, DLFUNC)                                                          \
   decltype(DLFUNC) *DLFUNC##_ptr =                                                                 \
@@ -83,15 +83,15 @@ bool TryLoadLibdexfileExternal([[maybe_unused]] std::string *err_msg) {
     *err_msg = dlerror();                                                                          \
     return false;                                                                                  \
   }
-    FOR_ALL_DLFUNCS(RESOLVE_DLFUNC_PTR);
+	FOR_ALL_DLFUNCS(RESOLVE_DLFUNC_PTR);
 #undef RESOLVE_DLFUNC_PTR
 
 #define SET_DLFUNC_PTR(CLASS, DLFUNC) CLASS::g_##DLFUNC = DLFUNC##_ptr;
-    FOR_ALL_DLFUNCS(SET_DLFUNC_PTR);
+	FOR_ALL_DLFUNCS(SET_DLFUNC_PTR);
 #undef SET_DLFUNC_PTR
 
-    is_loaded = true;
-    kwai::linker::DlFcn::dlclose(handle);
+	is_loaded = true;
+	kwai::linker::DlFcn::dlclose(handle);
   }
 
   return is_loaded;
@@ -101,7 +101,7 @@ bool TryLoadLibdexfileExternal([[maybe_unused]] std::string *err_msg) {
 void LoadLibdexfileExternal() {
 #ifndef STATIC_LIB
   if (std::string err_msg; !TryLoadLibdexfileExternal(&err_msg)) {
-    LOG_ALWAYS_FATAL("%s", err_msg.c_str());
+	LOG_ALWAYS_FATAL("%s", err_msg.c_str());
   }
 #endif
 }

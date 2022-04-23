@@ -34,31 +34,31 @@ namespace unwindstack {
 // Forward declarations.
 class DwarfMemory;
 class Memory;
-template <typename AddressType>
+template<typename AddressType>
 class RegsImpl;
 
-template <typename AddressType>
+template<typename AddressType>
 class DwarfOp {
   // Signed version of AddressType
   typedef typename std::make_signed<AddressType>::type SignedType;
 
  public:
-  DwarfOp(DwarfMemory* memory, Memory* regular_memory)
-      : memory_(memory), regular_memory_(regular_memory) {}
+  DwarfOp(DwarfMemory *memory, Memory *regular_memory)
+	  : memory_(memory), regular_memory_(regular_memory) {}
   virtual ~DwarfOp() = default;
 
   bool Decode();
 
   bool Eval(uint64_t start, uint64_t end);
 
-  void GetLogInfo(uint64_t start, uint64_t end, std::vector<std::string>* lines);
+  void GetLogInfo(uint64_t start, uint64_t end, std::vector<std::string> *lines);
 
   AddressType StackAt(size_t index) { return stack_[index]; }
   size_t StackSize() { return stack_.size(); }
 
-  void set_regs_info(RegsInfo<AddressType>* regs_info) { regs_info_ = regs_info; }
+  void set_regs_info(RegsInfo<AddressType> *regs_info) { regs_info_ = regs_info; }
 
-  const DwarfErrorData& last_error() { return last_error_; }
+  const DwarfErrorData &last_error() { return last_error_; }
   DwarfErrorCode LastErrorCode() { return last_error_.code; }
   uint64_t LastErrorAddress() { return last_error_.address; }
 
@@ -68,23 +68,23 @@ class DwarfOp {
 
   uint8_t cur_op() { return cur_op_; }
 
-  Memory* regular_memory() { return regular_memory_; }
+  Memory *regular_memory() { return regular_memory_; }
 
  protected:
   AddressType OperandAt(size_t index) { return operands_[index]; }
   size_t OperandsSize() { return operands_.size(); }
 
   AddressType StackPop() {
-    AddressType value = stack_.front();
-    stack_.pop_front();
-    return value;
+	AddressType value = stack_.front();
+	stack_.pop_front();
+	return value;
   }
 
  private:
-  DwarfMemory* memory_;
-  Memory* regular_memory_;
+  DwarfMemory *memory_;
+  Memory *regular_memory_;
 
-  RegsInfo<AddressType>* regs_info_;
+  RegsInfo<AddressType> *regs_info_;
   bool dex_pc_set_ = false;
   bool is_register_ = false;
   DwarfErrorData last_error_{DWARF_ERROR_NONE, 0};

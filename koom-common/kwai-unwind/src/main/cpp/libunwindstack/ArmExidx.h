@@ -53,8 +53,8 @@ enum ArmLogType : uint8_t {
 
 class ArmExidx {
  public:
-  ArmExidx(RegsArm* regs, Memory* elf_memory, Memory* process_memory)
-      : regs_(regs), elf_memory_(elf_memory), process_memory_(process_memory) {}
+  ArmExidx(RegsArm *regs, Memory *elf_memory, Memory *process_memory)
+	  : regs_(regs), elf_memory_(elf_memory), process_memory_(process_memory) {}
   virtual ~ArmExidx() {}
 
   void LogRawData();
@@ -67,12 +67,12 @@ class ArmExidx {
 
   bool Decode();
 
-  std::deque<uint8_t>* data() { return &data_; }
+  std::deque<uint8_t> *data() { return &data_; }
 
   ArmStatus status() { return status_; }
   uint64_t status_address() { return status_address_; }
 
-  RegsArm* regs() { return regs_; }
+  RegsArm *regs() { return regs_; }
 
   uint32_t cfa() { return cfa_; }
   void set_cfa(uint32_t cfa) { cfa_ = cfa; }
@@ -85,7 +85,7 @@ class ArmExidx {
   void set_log_indent(uint8_t indent) { log_indent_ = indent; }
 
  private:
-  bool GetByte(uint8_t* byte);
+  bool GetByte(uint8_t *byte);
   void AdjustRegisters(int32_t offset);
 
   bool DecodePrefix_10_00(uint8_t byte);
@@ -104,14 +104,14 @@ class ArmExidx {
   bool DecodePrefix_11_010(uint8_t byte);
   bool DecodePrefix_11(uint8_t byte);
 
-  RegsArm* regs_ = nullptr;
+  RegsArm *regs_ = nullptr;
   uint32_t cfa_ = 0;
   std::deque<uint8_t> data_;
   ArmStatus status_ = ARM_STATUS_NONE;
   uint64_t status_address_ = 0;
 
-  Memory* elf_memory_;
-  Memory* process_memory_;
+  Memory *elf_memory_;
+  Memory *process_memory_;
 
   ArmLogType log_type_ = ARM_LOG_NONE;
   uint8_t log_indent_ = 0;

@@ -36,24 +36,24 @@ enum ArchEnum : uint8_t;
 
 class JitDebug : public Global {
  public:
-  explicit JitDebug(std::shared_ptr<Memory>& memory);
-  JitDebug(std::shared_ptr<Memory>& memory, std::vector<std::string>& search_libs);
+  explicit JitDebug(std::shared_ptr<Memory> &memory);
+  JitDebug(std::shared_ptr<Memory> &memory, std::vector<std::string> &search_libs);
   virtual ~JitDebug();
 
-  Elf* GetElf(Maps* maps, uint64_t pc);
+  Elf *GetElf(Maps *maps, uint64_t pc);
 
  private:
-  void Init(Maps* maps);
+  void Init(Maps *maps);
 
   uint64_t (JitDebug::*read_descriptor_func_)(uint64_t) = nullptr;
-  uint64_t (JitDebug::*read_entry_func_)(uint64_t*, uint64_t*) = nullptr;
+  uint64_t (JitDebug::*read_entry_func_)(uint64_t *, uint64_t *) = nullptr;
 
   uint64_t ReadDescriptor32(uint64_t);
   uint64_t ReadDescriptor64(uint64_t);
 
-  uint64_t ReadEntry32Pack(uint64_t* start, uint64_t* size);
-  uint64_t ReadEntry32Pad(uint64_t* start, uint64_t* size);
-  uint64_t ReadEntry64(uint64_t* start, uint64_t* size);
+  uint64_t ReadEntry32Pack(uint64_t *start, uint64_t *size);
+  uint64_t ReadEntry32Pad(uint64_t *start, uint64_t *size);
+  uint64_t ReadEntry64(uint64_t *start, uint64_t *size);
 
   bool ReadVariableData(uint64_t ptr_offset) override;
 
@@ -61,7 +61,7 @@ class JitDebug : public Global {
 
   uint64_t entry_addr_ = 0;
   bool initialized_ = false;
-  std::vector<Elf*> elf_list_;
+  std::vector<Elf *> elf_list_;
 
   std::mutex lock_;
 };

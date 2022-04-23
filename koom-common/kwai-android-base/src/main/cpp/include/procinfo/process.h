@@ -64,55 +64,55 @@ bool GetProcessInfoFromProcPidFd(int fd, ProcessInfo *process_info, std::string 
 
 // Fetch the list of threads from a given process's /proc/<pid> directory.
 // |fd| should be an fd pointing at a /proc/<pid> directory.
-template <typename Collection>
+template<typename Collection>
 auto GetProcessTidsFromProcPidFd(int fd, Collection *out, std::string *error = nullptr) ->
-    typename std::enable_if<sizeof(typename Collection::value_type) >= sizeof(pid_t), bool>::type {
+typename std::enable_if<sizeof(typename Collection::value_type) >= sizeof(pid_t), bool>::type {
   out->clear();
 
   int task_fd = openat(fd, "task", O_DIRECTORY | O_RDONLY | O_CLOEXEC);
   std::unique_ptr<DIR, int (*)(DIR *)> dir(fdopendir(task_fd), closedir);
   if (!dir) {
-    if (error != nullptr) {
-      *error = "failed to open task directory";
-    }
-    return false;
+	if (error != nullptr) {
+	  *error = "failed to open task directory";
+	}
+	return false;
   }
 
   struct dirent *dent;
   while ((dent = readdir(dir.get()))) {
-    if (strcmp(dent->d_name, ".") != 0 && strcmp(dent->d_name, "..") != 0) {
-      pid_t tid;
-      if (!android::base::ParseInt(dent->d_name, &tid, 1, std::numeric_limits<pid_t>::max())) {
-        if (error != nullptr) {
-          *error = std::string("failed to parse task id: ") + dent->d_name;
-        }
-        return false;
-      }
+	if (strcmp(dent->d_name, ".") != 0 && strcmp(dent->d_name, "..") != 0) {
+	  pid_t tid;
+	  if (!android::base::ParseInt(dent->d_name, &tid, 1, std::numeric_limits<pid_t>::max())) {
+		if (error != nullptr) {
+		  *error = std::string("failed to parse task id: ") + dent->d_name;
+		}
+		return false;
+	  }
 
-      out->insert(out->end(), tid);
-    }
+	  out->insert(out->end(), tid);
+	}
   }
 
   return true;
 }
 
-template <typename Collection>
+template<typename Collection>
 auto GetProcessTids(pid_t pid, Collection *out, std::string *error = nullptr) ->
-    typename std::enable_if<sizeof(typename Collection::value_type) >= sizeof(pid_t), bool>::type {
+typename std::enable_if<sizeof(typename Collection::value_type) >= sizeof(pid_t), bool>::type {
   char task_path[PATH_MAX];
   if (snprintf(task_path, PATH_MAX, "/proc/%d", pid) >= PATH_MAX) {
-    if (error != nullptr) {
-      *error = "task path overflow (pid = " + std::to_string(pid) + ")";
-    }
-    return false;
+	if (error != nullptr) {
+	  *error = "task path overflow (pid = " + std::to_string(pid) + ")";
+	}
+	return false;
   }
 
   android::base::unique_fd fd(open(task_path, O_DIRECTORY | O_RDONLY | O_CLOEXEC));
   if (fd == -1) {
-    if (error != nullptr) {
-      *error = std::string("failed to open ") + task_path;
-    }
-    return false;
+	if (error != nullptr) {
+	  *error = std::string("failed to open ") + task_path;
+	}
+	return false;
   }
 
   return GetProcessTidsFromProcPidFd(fd.get(), out, error);

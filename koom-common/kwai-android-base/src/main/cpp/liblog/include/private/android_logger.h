@@ -123,17 +123,17 @@ typedef struct __attribute__((__packed__)) {
 #define ANDROID_LOG_PMSG_FILE_SEQUENCE 1000
 
 ssize_t __android_log_pmsg_file_write(log_id_t logId, char prio, const char *filename,
-                                      const char *buf, size_t len);
+									  const char *buf, size_t len);
 
 #define LOG_ID_ANY ((log_id_t)-1)
 #define ANDROID_LOG_ANY ANDROID_LOG_UNKNOWN
 
 /* first 5 arguments match __android_log_msg_file_write, a cast is safe */
 typedef ssize_t (*__android_log_pmsg_file_read_fn)(log_id_t logId, char prio, const char *filename,
-                                                   const char *buf, size_t len, void *arg);
+												   const char *buf, size_t len, void *arg);
 
 ssize_t __android_log_pmsg_file_read(log_id_t logId, char prio, const char *prefix,
-                                     __android_log_pmsg_file_read_fn fn, void *arg);
+									 __android_log_pmsg_file_read_fn fn, void *arg);
 
 int __android_log_security_bwrite(int32_t tag, const void *payload, size_t len);
 int __android_log_security_bswrite(int32_t tag, const char *payload);

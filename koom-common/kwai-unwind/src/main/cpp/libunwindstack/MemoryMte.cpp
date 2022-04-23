@@ -32,8 +32,8 @@ long MemoryRemote::ReadTag(uint64_t addr) {
   char tag;
   iovec iov = {&tag, 1};
   if (ptrace(PTRACE_PEEKMTETAGS, pid_, reinterpret_cast<void*>(addr), &iov) != 0 ||
-      iov.iov_len != 1) {
-    return -1;
+	  iov.iov_len != 1) {
+	return -1;
   }
   return tag;
 #else
@@ -48,7 +48,7 @@ long MemoryLocal::ReadTag(uint64_t addr) {
   // we can do about it.
   char data;
   if (!mte_supported() || !Read(addr, &data, 1)) {
-    return -1;
+	return -1;
   }
 
   __asm__ __volatile__(".arch_extension mte; ldg %0, [%0]" : "+r"(addr) : : "memory");

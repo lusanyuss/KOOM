@@ -25,21 +25,21 @@
 
 namespace unwindstack {
 
-template <typename AddressType>
+template<typename AddressType>
 class DwarfDebugFrame : public DwarfSectionImpl<AddressType> {
  public:
-  DwarfDebugFrame(Memory* memory) : DwarfSectionImpl<AddressType>(memory) {
-    this->cie32_value_ = static_cast<uint32_t>(-1);
-    this->cie64_value_ = static_cast<uint64_t>(-1);
+  DwarfDebugFrame(Memory *memory) : DwarfSectionImpl<AddressType>(memory) {
+	this->cie32_value_ = static_cast<uint32_t>(-1);
+	this->cie64_value_ = static_cast<uint64_t>(-1);
   }
   virtual ~DwarfDebugFrame() = default;
 
   uint64_t GetCieOffsetFromFde32(uint32_t pointer) override {
-    return this->entries_offset_ + pointer;
+	return this->entries_offset_ + pointer;
   }
 
   uint64_t GetCieOffsetFromFde64(uint64_t pointer) override {
-    return this->entries_offset_ + pointer;
+	return this->entries_offset_ + pointer;
   }
 
   uint64_t AdjustPcFromFde(uint64_t pc) override { return pc; }

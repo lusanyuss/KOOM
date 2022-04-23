@@ -30,54 +30,66 @@ namespace unwindstack {
 
 class ElfInterfaceArm : public ElfInterface32 {
  public:
-  ElfInterfaceArm(Memory* memory) : ElfInterface32(memory) {}
+  ElfInterfaceArm(Memory *memory) : ElfInterface32(memory) {}
   virtual ~ElfInterfaceArm() = default;
 
   class iterator : public std::iterator<std::bidirectional_iterator_tag, uint32_t> {
    public:
-    iterator(ElfInterfaceArm* interface, size_t index) : interface_(interface), index_(index) { }
+	iterator(ElfInterfaceArm *interface, size_t index) : interface_(interface), index_(index) {}
 
-    iterator& operator++() { index_++; return *this; }
-    iterator& operator++(int increment) { index_ += increment; return *this; }
-    iterator& operator--() { index_--; return *this; }
-    iterator& operator--(int decrement) { index_ -= decrement; return *this; }
+	iterator &operator++() {
+	  index_++;
+	  return *this;
+	}
+	iterator &operator++(int increment) {
+	  index_ += increment;
+	  return *this;
+	}
+	iterator &operator--() {
+	  index_--;
+	  return *this;
+	}
+	iterator &operator--(int decrement) {
+	  index_ -= decrement;
+	  return *this;
+	}
 
-    bool operator==(const iterator& rhs) { return this->index_ == rhs.index_; }
-    bool operator!=(const iterator& rhs) { return this->index_ != rhs.index_; }
+	bool operator==(const iterator &rhs) { return this->index_ == rhs.index_; }
+	bool operator!=(const iterator &rhs) { return this->index_ != rhs.index_; }
 
-    uint32_t operator*() {
-      uint32_t addr = interface_->addrs_[index_];
-      if (addr == 0) {
-        if (!interface_->GetPrel31Addr(interface_->start_offset_ + index_ * 8, &addr)) {
-          return 0;
-        }
-        interface_->addrs_[index_] = addr;
-      }
-      return addr;
-    }
+	uint32_t operator*() {
+	  uint32_t addr = interface_->addrs_[index_];
+	  if (addr == 0) {
+		if (!interface_->GetPrel31Addr(interface_->start_offset_ + index_ * 8, &addr)) {
+		  return 0;
+		}
+		interface_->addrs_[index_] = addr;
+	  }
+	  return addr;
+	}
 
    private:
-    ElfInterfaceArm* interface_ = nullptr;
-    size_t index_ = 0;
+	ElfInterfaceArm *interface_ = nullptr;
+	size_t index_ = 0;
   };
 
   iterator begin() { return iterator(this, 0); }
   iterator end() { return iterator(this, total_entries_); }
 
-  bool Init(int64_t* section_bias) override;
+  bool Init(int64_t *section_bias) override;
 
-  bool GetPrel31Addr(uint32_t offset, uint32_t* addr);
+  bool GetPrel31Addr(uint32_t offset, uint32_t *addr);
 
-  bool FindEntry(uint32_t pc, uint64_t* entry_offset);
+  bool FindEntry(uint32_t pc, uint64_t *entry_offset);
 
   void HandleUnknownType(uint32_t type, uint64_t ph_offset, uint64_t ph_filesz) override;
 
-  bool Step(uint64_t pc, Regs* regs, Memory* process_memory, bool* finished,
-            bool* is_signal_frame) override;
+  bool Step(uint64_t pc, Regs *regs, Memory *process_memory, bool *finished,
+			bool *is_signal_frame) override;
 
-  bool StepExidx(uint64_t pc, Regs* regs, Memory* process_memory, bool* finished);
+  bool StepExidx(uint64_t pc, Regs *regs, Memory *process_memory, bool *finished);
 
-  bool GetFunctionName(uint64_t addr, std::string* name, uint64_t* offset) override;
+  bool GetFunctionName(uint64_t addr, std::string *name, uint64_t *offset) override;
 
   uint64_t start_offset() { return start_offset_; }
 

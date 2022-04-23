@@ -39,7 +39,7 @@ TEST(GrisuTest, Zero) { EXPECT_EQ("0.0", fmt::format("{}", 0.0)); }
 
 TEST(GrisuTest, Round) {
   EXPECT_EQ("1.9156918820264798e-56",
-            fmt::format("{}", 1.9156918820264798e-56));
+			fmt::format("{}", 1.9156918820264798e-56));
   EXPECT_EQ("0.0000", fmt::format("{:.4f}", 7.2809479766055470e-15));
 }
 
@@ -62,14 +62,14 @@ TEST(GrisuTest, Fallback) {
   EXPECT_EQ("1e+23", fmt::format("{}", 1e23));
   EXPECT_EQ("9e-265", fmt::format("{}", 9e-265));
   EXPECT_EQ("5.423717798060526e+125",
-            fmt::format("{}", 5.423717798060526e+125));
+			fmt::format("{}", 5.423717798060526e+125));
   EXPECT_EQ("1.372371880954233e-288",
-            fmt::format("{}", 1.372371880954233e-288));
+			fmt::format("{}", 1.372371880954233e-288));
   EXPECT_EQ("55388492.622190244", fmt::format("{}", 55388492.622190244));
   EXPECT_EQ("2.2506787569811123e-253",
-            fmt::format("{}", 2.2506787569811123e-253));
+			fmt::format("{}", 2.2506787569811123e-253));
   EXPECT_EQ("1103618912042992.8", fmt::format("{}", 1103618912042992.8));
   // pow(2, -25) - assymetric boundaries:
   EXPECT_EQ("2.9802322387695312e-08",
-            fmt::format("{}", 2.9802322387695312e-08));
+			fmt::format("{}", 2.9802322387695312e-08));
 }

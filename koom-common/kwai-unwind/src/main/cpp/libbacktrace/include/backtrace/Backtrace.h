@@ -72,10 +72,10 @@ struct BacktraceUnwindError {
   enum BacktraceUnwindErrorCode error_code;
 
   union {
-    // for BACKTRACE_UNWIND_ERROR_ACCESS_MEM_FAILED
-    uint64_t addr;
-    // for BACKTRACE_UNWIND_ERROR_ACCESS_REG_FAILED
-    uint64_t regno;
+	// for BACKTRACE_UNWIND_ERROR_ACCESS_MEM_FAILED
+	uint64_t addr;
+	// for BACKTRACE_UNWIND_ERROR_ACCESS_REG_FAILED
+	uint64_t regno;
   } error_info;
 
   BacktraceUnwindError() : error_code(BACKTRACE_UNWIND_NO_ERROR) {}
@@ -96,12 +96,12 @@ class Regs;
 }
 
 class Backtrace {
-public:
+ public:
   enum ArchEnum : uint8_t {
-    ARCH_ARM,
-    ARCH_ARM64,
-    ARCH_X86,
-    ARCH_X86_64,
+	ARCH_ARM,
+	ARCH_ARM64,
+	ARCH_X86,
+	ARCH_X86_64,
   };
 
   static void SetGlobalElfCache(bool enable);
@@ -124,14 +124,14 @@ public:
   virtual bool Unwind(size_t num_ignore_frames, void *context = nullptr) = 0;
 
   static bool Unwind(unwindstack::Regs *regs, BacktraceMap *back_map,
-                     std::vector<backtrace_frame_data_t> *frames, size_t num_ignore_frames,
-                     std::vector<std::string> *skip_names, BacktraceUnwindError *error = nullptr);
+					 std::vector<backtrace_frame_data_t> *frames, size_t num_ignore_frames,
+					 std::vector<std::string> *skip_names, BacktraceUnwindError *error = nullptr);
 
   // Get the function name and offset into the function given the pc.
   // If the string is empty, then no valid function name was found,
   // or the pc is not in any valid map.
   virtual std::string GetFunctionName(uint64_t pc, uint64_t *offset,
-                                      const backtrace_map_t *map = nullptr);
+									  const backtrace_map_t *map = nullptr);
 
   // Fill in the map data associated with the given pc.
   virtual void FillInMap(uint64_t pc, backtrace_map_t *map);
@@ -155,10 +155,10 @@ public:
   size_t NumFrames() const { return frames_.size(); }
 
   const backtrace_frame_data_t *GetFrame(size_t frame_num) {
-    if (frame_num >= frames_.size()) {
-      return nullptr;
-    }
-    return &frames_[frame_num];
+	if (frame_num >= frames_.size()) {
+	  return nullptr;
+	}
+	return &frames_[frame_num];
   }
 
   typedef std::vector<backtrace_frame_data_t>::iterator iterator;
@@ -178,7 +178,7 @@ public:
   // Set whether to skip frames in libbacktrace/libunwindstack when doing a local unwind.
   void SetSkipFrames(bool skip_frames) { skip_frames_ = skip_frames; }
 
-protected:
+ protected:
   Backtrace(pid_t pid, pid_t tid, BacktraceMap *map);
 
   // The name returned is not demangled, GetFunctionName() takes care of

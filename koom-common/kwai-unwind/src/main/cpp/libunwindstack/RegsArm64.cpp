@@ -34,7 +34,7 @@
 namespace unwindstack {
 
 RegsArm64::RegsArm64()
-    : RegsImpl<uint64_t>(ARM64_REG_LAST, Location(LOCATION_REGISTER, ARM64_REG_LR)) {
+	: RegsImpl<uint64_t>(ARM64_REG_LAST, Location(LOCATION_REGISTER, ARM64_REG_LR)) {
   ResetPseudoRegisters();
   pac_mask_ = 0;
 }
@@ -58,13 +58,13 @@ void RegsArm64::set_pc(uint64_t pc) {
   // authentication code using a mask or xpaclri. xpaclri is a NOP on
   // pre-Armv8.3-A architectures.
   if ((0 != pc) && IsRASigned()) {
-    if (pac_mask_) {
-      pc &= ~pac_mask_;
-    } else {
+	if (pac_mask_) {
+	  pc &= ~pac_mask_;
+	} else {
 #if defined(__BIONIC__)
-      pc = __bionic_clear_pac_bits(pc);
+	  pc = __bionic_clear_pac_bits(pc);
 #endif
-    }
+	}
   }
   regs_[ARM64_REG_PC] = pc;
 }
@@ -73,17 +73,17 @@ void RegsArm64::set_sp(uint64_t sp) {
   regs_[ARM64_REG_SP] = sp;
 }
 
-bool RegsArm64::SetPcFromReturnAddress(Memory*) {
+bool RegsArm64::SetPcFromReturnAddress(Memory *) {
   uint64_t lr = regs_[ARM64_REG_LR];
   if (regs_[ARM64_REG_PC] == lr) {
-    return false;
+	return false;
   }
 
   regs_[ARM64_REG_PC] = lr;
   return true;
 }
 
-void RegsArm64::IterateRegisters(std::function<void(const char*, uint64_t)> fn) {
+void RegsArm64::IterateRegisters(std::function<void(const char *, uint64_t)> fn) {
   fn("x0", regs_[ARM64_REG_R0]);
   fn("x1", regs_[ARM64_REG_R1]);
   fn("x2", regs_[ARM64_REG_R2]);
@@ -120,33 +120,33 @@ void RegsArm64::IterateRegisters(std::function<void(const char*, uint64_t)> fn) 
   fn("pst", regs_[ARM64_REG_PSTATE]);
 }
 
-Regs* RegsArm64::Read(void* remote_data) {
-  arm64_user_regs* user = reinterpret_cast<arm64_user_regs*>(remote_data);
+Regs *RegsArm64::Read(void *remote_data) {
+  arm64_user_regs *user = reinterpret_cast<arm64_user_regs *>(remote_data);
 
-  RegsArm64* regs = new RegsArm64();
+  RegsArm64 *regs = new RegsArm64();
   memcpy(regs->RawData(), &user->regs[0], (ARM64_REG_R30 + 1) * sizeof(uint64_t));
-  uint64_t* reg_data = reinterpret_cast<uint64_t*>(regs->RawData());
+  uint64_t *reg_data = reinterpret_cast<uint64_t *>(regs->RawData());
   reg_data[ARM64_REG_SP] = user->sp;
   reg_data[ARM64_REG_PC] = user->pc;
   reg_data[ARM64_REG_PSTATE] = user->pstate;
   return regs;
 }
 
-Regs* RegsArm64::CreateFromUcontext(void* ucontext) {
-  arm64_ucontext_t* arm64_ucontext = reinterpret_cast<arm64_ucontext_t*>(ucontext);
+Regs *RegsArm64::CreateFromUcontext(void *ucontext) {
+  arm64_ucontext_t *arm64_ucontext = reinterpret_cast<arm64_ucontext_t *>(ucontext);
 
-  RegsArm64* regs = new RegsArm64();
+  RegsArm64 *regs = new RegsArm64();
   memcpy(regs->RawData(), &arm64_ucontext->uc_mcontext.regs[0], ARM64_REG_LAST * sizeof(uint64_t));
   return regs;
 }
 
-bool RegsArm64::StepIfSignalHandler(uint64_t elf_offset, Elf* elf, Memory* process_memory) {
+bool RegsArm64::StepIfSignalHandler(uint64_t elf_offset, Elf *elf, Memory *process_memory) {
   uint64_t data;
-  Memory* elf_memory = elf->memory();
+  Memory *elf_memory = elf->memory();
   // Read from elf memory since it is usually more expensive to read from
   // process memory.
   if (!elf_memory->ReadFully(elf_offset, &data, sizeof(data))) {
-    return false;
+	return false;
   }
 
   // Look for the kernel sigreturn function.
@@ -154,13 +154,13 @@ bool RegsArm64::StepIfSignalHandler(uint64_t elf_offset, Elf* elf, Memory* proce
   // 0xd2801168     mov x8, #0x8b
   // 0xd4000001     svc #0x0
   if (data != 0xd4000001d2801168ULL) {
-    return false;
+	return false;
   }
 
   // SP + sizeof(siginfo_t) + uc_mcontext offset + X0 offset.
   if (!process_memory->ReadFully(regs_[ARM64_REG_SP] + 0x80 + 0xb0 + 0x08, regs_.data(),
-                                 sizeof(uint64_t) * ARM64_REG_LAST)) {
-    return false;
+								 sizeof(uint64_t) * ARM64_REG_LAST)) {
+	return false;
   }
   return true;
 }
@@ -172,16 +172,16 @@ void RegsArm64::ResetPseudoRegisters(void) {
 
 bool RegsArm64::SetPseudoRegister(uint16_t id, uint64_t value) {
   if ((id >= Arm64Reg::ARM64_PREG_FIRST) && (id < Arm64Reg::ARM64_PREG_LAST)) {
-    pseudo_regs_[id - Arm64Reg::ARM64_PREG_FIRST] = value;
-    return true;
+	pseudo_regs_[id - Arm64Reg::ARM64_PREG_FIRST] = value;
+	return true;
   }
   return false;
 }
 
-bool RegsArm64::GetPseudoRegister(uint16_t id, uint64_t* value) {
+bool RegsArm64::GetPseudoRegister(uint16_t id, uint64_t *value) {
   if ((id >= Arm64Reg::ARM64_PREG_FIRST) && (id < Arm64Reg::ARM64_PREG_LAST)) {
-    *value = pseudo_regs_[id - Arm64Reg::ARM64_PREG_FIRST];
-    return true;
+	*value = pseudo_regs_[id - Arm64Reg::ARM64_PREG_FIRST];
+	return true;
   }
   return false;
 }
@@ -196,7 +196,7 @@ void RegsArm64::SetPACMask(uint64_t mask) {
   pac_mask_ = mask;
 }
 
-Regs* RegsArm64::Clone() {
+Regs *RegsArm64::Clone() {
   return new RegsArm64(*this);
 }
 

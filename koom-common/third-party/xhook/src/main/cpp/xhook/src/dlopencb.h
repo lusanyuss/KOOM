@@ -47,6 +47,6 @@ class __attribute__((visibility("default"))) DlopenCb {
   static pthread_mutex_t hook_mutex;
   void AddCallback(void(*callback)(std::set<std::string> &, int, std::string &));
   void RemoveCallback(void(*callback)(std::set<std::string> &, int, std::string &));
-  void GetLoadedLibs(std::set<std::string>& libs, bool refresh = false);
+  void GetLoadedLibs(std::set<std::string> &libs, bool refresh = false);
   static void SetDebug(bool debug);
 };

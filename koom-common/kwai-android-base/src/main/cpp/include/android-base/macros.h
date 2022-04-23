@@ -25,11 +25,11 @@
 #ifndef TEMP_FAILURE_RETRY
 #define TEMP_FAILURE_RETRY(exp)                                                                    \
   ({                                                                                               \
-    decltype(exp) _rc;                                                                             \
-    do {                                                                                           \
-      _rc = (exp);                                                                                 \
-    } while (_rc == -1 && errno == EINTR);                                                         \
-    _rc;                                                                                           \
+	decltype(exp) _rc;                                                                             \
+	do {                                                                                           \
+	  _rc = (exp);                                                                                 \
+	} while (_rc == -1 && errno == EINTR);                                                         \
+	_rc;                                                                                           \
   })
 #endif
 
@@ -70,7 +70,7 @@
 // This template function declaration is used in defining arraysize.
 // Note that the function doesn't need an implementation, as we only
 // use its type.
-template <typename T, size_t N>
+template<typename T, size_t N>
 char (&ArraySizeHelper(T (&array)[N]))[N]; // NOLINT(readability/casting)
 
 #define arraysize(array) (sizeof(ArraySizeHelper(array)))
@@ -89,7 +89,8 @@ char (&ArraySizeHelper(T (&array)[N]))[N]; // NOLINT(readability/casting)
 // example:
 //   int foo(int x) { UNUSED(x); return 10; }
 // to avoid compiler warnings. Going forward we prefer ATTRIBUTE_UNUSED.
-template <typename... T> void UNUSED(const T &...) {}
+template<typename... T>
+void UNUSED(const T &...) {}
 
 // An attribute to place on a parameter to a function, for example:
 //   int foo(int x ATTRIBUTE_UNUSED) { return 10; }

@@ -32,33 +32,33 @@ namespace base {
 
 const std::optional<LibLogFunctions> &GetLibLogFunctions() {
   static std::optional<LibLogFunctions> liblog_functions = []() -> std::optional<LibLogFunctions> {
-    void *liblog_handle = dlopen("liblog.so", RTLD_NOW);
-    if (liblog_handle == nullptr) {
-      return {};
-    }
+	void *liblog_handle = dlopen("liblog.so", RTLD_NOW);
+	if (liblog_handle == nullptr) {
+	  return {};
+	}
 
-    LibLogFunctions real_liblog_functions = {};
+	LibLogFunctions real_liblog_functions = {};
 
 #define DLSYM(name)                                                                                \
   real_liblog_functions.name =                                                                     \
-      reinterpret_cast<decltype(LibLogFunctions::name)>(dlsym(liblog_handle, #name));              \
+	  reinterpret_cast<decltype(LibLogFunctions::name)>(dlsym(liblog_handle, #name));              \
   if (real_liblog_functions.name == nullptr) {                                                     \
-    return {};                                                                                     \
+	return {};                                                                                     \
   }
 
-    DLSYM(__android_log_set_logger)
-    DLSYM(__android_log_write_log_message)
-    DLSYM(__android_log_logd_logger)
-    DLSYM(__android_log_stderr_logger)
-    DLSYM(__android_log_set_aborter)
-    DLSYM(__android_log_call_aborter)
-    DLSYM(__android_log_default_aborter)
-    DLSYM(__android_log_set_minimum_priority);
-    DLSYM(__android_log_get_minimum_priority);
-    DLSYM(__android_log_set_default_tag);
+	DLSYM(__android_log_set_logger)
+	DLSYM(__android_log_write_log_message)
+	DLSYM(__android_log_logd_logger)
+	DLSYM(__android_log_stderr_logger)
+	DLSYM(__android_log_set_aborter)
+	DLSYM(__android_log_call_aborter)
+	DLSYM(__android_log_default_aborter)
+	DLSYM(__android_log_set_minimum_priority);
+	DLSYM(__android_log_get_minimum_priority);
+	DLSYM(__android_log_set_default_tag);
 #undef DLSYM
 
-    return real_liblog_functions;
+	return real_liblog_functions;
   }();
 
   return liblog_functions;
@@ -68,18 +68,18 @@ const std::optional<LibLogFunctions> &GetLibLogFunctions() {
 
 const std::optional<LibLogFunctions> &GetLibLogFunctions() {
   static std::optional<LibLogFunctions> liblog_functions = []() -> std::optional<LibLogFunctions> {
-    return LibLogFunctions {
-      .__android_log_set_logger = __android_log_set_logger,
-      .__android_log_write_log_message = __android_log_write_log_message,
-      .__android_log_logd_logger = __android_log_logd_logger,
-      .__android_log_stderr_logger = __android_log_stderr_logger,
-      .__android_log_set_aborter = __android_log_set_aborter,
-      .__android_log_call_aborter = __android_log_call_aborter,
-      .__android_log_default_aborter = __android_log_default_aborter,
-      .__android_log_set_minimum_priority = __android_log_set_minimum_priority,
-      .__android_log_get_minimum_priority = __android_log_get_minimum_priority,
-      .__android_log_set_default_tag = __android_log_set_default_tag,
-    };
+	return LibLogFunctions{
+		.__android_log_set_logger = __android_log_set_logger,
+		.__android_log_write_log_message = __android_log_write_log_message,
+		.__android_log_logd_logger = __android_log_logd_logger,
+		.__android_log_stderr_logger = __android_log_stderr_logger,
+		.__android_log_set_aborter = __android_log_set_aborter,
+		.__android_log_call_aborter = __android_log_call_aborter,
+		.__android_log_default_aborter = __android_log_default_aborter,
+		.__android_log_set_minimum_priority = __android_log_set_minimum_priority,
+		.__android_log_get_minimum_priority = __android_log_get_minimum_priority,
+		.__android_log_set_default_tag = __android_log_set_default_tag,
+	};
   }();
   return liblog_functions;
 }

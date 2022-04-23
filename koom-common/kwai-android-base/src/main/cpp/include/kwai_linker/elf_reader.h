@@ -26,39 +26,39 @@ namespace linker {
 class ElfReader {
  public:
   struct ElfHash {
-    ElfW(Word) nbucket;
-    ElfW(Word) nchain;
-    ElfW(Word)* bucket;
-    ElfW(Word)* chain;
-    uint32_t Hash(const uint8_t *name) {
-      uint32_t h = 0, g;
+	ElfW(Word) nbucket;
+	ElfW(Word) nchain;
+	ElfW(Word) *bucket;
+	ElfW(Word) *chain;
+	uint32_t Hash(const uint8_t *name) {
+	  uint32_t h = 0, g;
 
-      while (*name) {
-        h = (h << 4) + *name++;
-        g = h & 0xf0000000;
-        h ^= g;
-        h ^= g >> 24;
-      }
+	  while (*name) {
+		h = (h << 4) + *name++;
+		g = h & 0xf0000000;
+		h ^= g;
+		h ^= g >> 24;
+	  }
 
-      return h;
-    }
+	  return h;
+	}
   };
 
   struct GnuHash {
-    ElfW(Word) gnu_nbucket;
-    ElfW(Word) gnu_maskwords;
-    ElfW(Word) gnu_shift2;
-    ElfW(Addr)* gnu_bloom_filter;
-    ElfW(Word)* gnu_bucket;
-    ElfW(Word)* gnu_chain;
-    uint32_t Hash(const uint8_t *name) {
-      uint32_t h = 5381;
+	ElfW(Word) gnu_nbucket;
+	ElfW(Word) gnu_maskwords;
+	ElfW(Word) gnu_shift2;
+	ElfW(Addr) *gnu_bloom_filter;
+	ElfW(Word) *gnu_bucket;
+	ElfW(Word) *gnu_chain;
+	uint32_t Hash(const uint8_t *name) {
+	  uint32_t h = 5381;
 
-      while (*name != 0) {
-        h += (h << 5) + *name++; // h*33 + c = h + h * 32 + c = h + h << 5 + c
-      }
-      return h;
-    }
+	  while (*name != 0) {
+		h += (h << 5) + *name++; // h*33 + c = h + h * 32 + c = h + h << 5 + c
+	  }
+	  return h;
+	}
   };
 
   explicit ElfReader(std::shared_ptr<ElfWrapper> elf_wrapper);
@@ -75,7 +75,8 @@ class ElfReader {
   ~ElfReader() = default;
 
  private:
-  template<class T>T *CheckedOffset(off_t offset, size_t size);
+  template<class T>
+  T *CheckedOffset(off_t offset, size_t size);
   bool IsValidRange(off_t offset);
   void BuildHash(ElfW(Word) *hash_section);
   void BuildGnuHash(ElfW(Word) *gnu_hash_section);
@@ -83,10 +84,10 @@ class ElfReader {
   ElfW(Addr) LookupByGnuHash(const char *symbol);
   bool DecGnuDebugdata(std::string &decompressed_data);
   std::shared_ptr<ElfWrapper> elf_wrapper_;
-  const ElfW(Shdr)* shdr_table_;
-  const ElfW(Sym)* dynsym_;
+  const ElfW(Shdr) *shdr_table_;
+  const ElfW(Sym) *dynsym_;
   const char *dynstr_;
-  const ElfW(Sym)* symtab_;
+  const ElfW(Sym) *symtab_;
   ElfW(Word) symtab_ent_count_;
   const char *strtab_;
   const char *gnu_debugdata_;

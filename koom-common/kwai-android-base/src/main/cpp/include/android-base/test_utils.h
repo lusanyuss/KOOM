@@ -23,7 +23,7 @@
 #include <android-base/macros.h>
 
 class CapturedStdFd {
-public:
+ public:
   CapturedStdFd(int std_fd);
   ~CapturedStdFd();
 
@@ -33,7 +33,7 @@ public:
   void Stop();
   void Reset();
 
-private:
+ private:
   int fd() const;
 
   TemporaryFile temp_file_;
@@ -44,12 +44,12 @@ private:
 };
 
 class CapturedStderr : public CapturedStdFd {
-public:
+ public:
   CapturedStderr() : CapturedStdFd(STDERR_FILENO) {}
 };
 
 class CapturedStdout : public CapturedStdFd {
-public:
+ public:
   CapturedStdout() : CapturedStdFd(STDOUT_FILENO) {}
 };
 

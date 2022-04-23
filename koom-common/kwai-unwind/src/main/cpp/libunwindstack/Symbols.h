@@ -30,36 +30,36 @@ class Memory;
 
 class Symbols {
   struct Info {
-    uint64_t addr;  // Symbol address.
-    uint32_t size;  // Symbol size in bytes. Zero if not a function.
-    uint32_t name;  // Offset in .strtab.
+	uint64_t addr;  // Symbol address.
+	uint32_t size;  // Symbol size in bytes. Zero if not a function.
+	uint32_t name;  // Offset in .strtab.
   };
 
  public:
   Symbols(uint64_t offset, uint64_t size, uint64_t entry_size, uint64_t str_offset,
-          uint64_t str_size);
+		  uint64_t str_size);
   virtual ~Symbols() = default;
 
-  template <typename SymType>
-  bool GetName(uint64_t addr, Memory* elf_memory, std::string* name, uint64_t* func_offset);
+  template<typename SymType>
+  bool GetName(uint64_t addr, Memory *elf_memory, std::string *name, uint64_t *func_offset);
 
-  template <typename SymType>
-  bool GetGlobal(Memory* elf_memory, const std::string& name, uint64_t* memory_address);
+  template<typename SymType>
+  bool GetGlobal(Memory *elf_memory, const std::string &name, uint64_t *memory_address);
 
   void ClearCache() {
-    symbols_.clear();
-    remap_.reset();
+	symbols_.clear();
+	remap_.reset();
   }
 
  private:
-  template <typename SymType>
-  const Info* ReadFuncInfo(uint32_t symbol_index, Memory* elf_memory);
+  template<typename SymType>
+  const Info *ReadFuncInfo(uint32_t symbol_index, Memory *elf_memory);
 
-  template <typename SymType, bool RemapIndices>
-  const Info* BinarySearch(uint64_t addr, Memory* elf_memory);
+  template<typename SymType, bool RemapIndices>
+  const Info *BinarySearch(uint64_t addr, Memory *elf_memory);
 
-  template <typename SymType>
-  void BuildRemapTable(Memory* elf_memory);
+  template<typename SymType>
+  void BuildRemapTable(Memory *elf_memory);
 
   const uint64_t offset_;
   const uint64_t count_;

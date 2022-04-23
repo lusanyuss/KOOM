@@ -24,30 +24,30 @@ import android.os.Bundle
 import android.os.ResultReceiver
 
 class AnalysisReceiver : ResultReceiver(null) {
-  private var mResultCallBack: ResultCallBack? = null
-
-  fun setResultCallBack(resultCallBack: ResultCallBack?) {
-    mResultCallBack = resultCallBack
-  }
-
-  override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
-    super.onReceiveResult(resultCode, resultData)
-    if (mResultCallBack != null) {
-      if (resultCode == RESULT_CODE_OK) {
-        mResultCallBack!!.onSuccess()
-      } else {
-        mResultCallBack!!.onError()
-      }
+    private var mResultCallBack: ResultCallBack? = null
+    
+    fun setResultCallBack(resultCallBack: ResultCallBack?) {
+        mResultCallBack = resultCallBack
     }
-  }
-
-  interface ResultCallBack {
-    fun onSuccess()
-    fun onError()
-  }
-
-  companion object {
-    const val RESULT_CODE_OK = 1001
-    const val RESULT_CODE_FAIL = 1002
-  }
+    
+    override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
+        super.onReceiveResult(resultCode, resultData)
+        if(mResultCallBack != null) {
+            if(resultCode == RESULT_CODE_OK) {
+                mResultCallBack!!.onSuccess()
+            } else {
+                mResultCallBack!!.onError()
+            }
+        }
+    }
+    
+    interface ResultCallBack {
+        fun onSuccess()
+        fun onError()
+    }
+    
+    companion object {
+        const val RESULT_CODE_OK = 1001
+        const val RESULT_CODE_FAIL = 1002
+    }
 }

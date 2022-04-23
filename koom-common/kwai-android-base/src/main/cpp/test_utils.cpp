@@ -31,7 +31,7 @@ CapturedStdFd::CapturedStdFd(int std_fd) : std_fd_(std_fd), old_fd_(-1) { Start(
 
 CapturedStdFd::~CapturedStdFd() {
   if (old_fd_ != -1) {
-    Stop();
+	Stop();
   }
 }
 
@@ -56,7 +56,7 @@ void CapturedStdFd::Start() {
   // On Windows, stderr is often buffered, so make sure it is unbuffered so
   // that we can immediately read back what was written to stderr.
   if (std_fd_ == STDERR_FILENO)
-    CHECK_EQ(0, setvbuf(stderr, nullptr, _IONBF, 0));
+	CHECK_EQ(0, setvbuf(stderr, nullptr, _IONBF, 0));
 #endif
   old_fd_ = dup(std_fd_);
   CHECK_NE(-1, old_fd_);

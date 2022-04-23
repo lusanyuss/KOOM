@@ -37,16 +37,16 @@ void StringAppendV(std::string *dst, const char *format, va_list ap) {
   va_end(backup_ap);
 
   if (result < static_cast<int>(sizeof(space))) {
-    if (result >= 0) {
-      // Normal case -- everything fit.
-      dst->append(space, result);
-      return;
-    }
+	if (result >= 0) {
+	  // Normal case -- everything fit.
+	  dst->append(space, result);
+	  return;
+	}
 
-    if (result < 0) {
-      // Just an error.
-      return;
-    }
+	if (result < 0) {
+	  // Just an error.
+	  return;
+	}
   }
 
   // Increase the buffer size to the size requested by vsnprintf,
@@ -60,8 +60,8 @@ void StringAppendV(std::string *dst, const char *format, va_list ap) {
   va_end(backup_ap);
 
   if (result >= 0 && result < length) {
-    // It fit
-    dst->append(buf, result);
+	// It fit
+	dst->append(buf, result);
   }
   delete[] buf;
 }

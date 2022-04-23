@@ -41,20 +41,20 @@ namespace base {
  * A region of a file mapped into memory (for grepping: also known as MmapFile or file mapping).
  */
 class MappedFile {
-public:
+ public:
   /**
    * Creates a new mapping of the file pointed to by `fd`. Unlike the underlying OS primitives,
    * `offset` does not need to be page-aligned. If `PROT_WRITE` is set in `prot`, the mapping
    * will be writable, otherwise it will be read-only. Mappings are always `MAP_SHARED`.
    */
   static std::unique_ptr<MappedFile> FromFd(borrowed_fd fd, off64_t offset, size_t length,
-                                            int prot);
+											int prot);
 
   /**
    * Same thing, but using the raw OS file handle instead of a CRT wrapper.
    */
   static std::unique_ptr<MappedFile> FromOsHandle(os_handle h, off64_t offset, size_t length,
-                                                  int prot);
+												  int prot);
 
   /**
    * Removes the mapping.
@@ -70,7 +70,7 @@ public:
   char *data() const { return base_ + offset_; }
   size_t size() const { return size_; }
 
-private:
+ private:
   DISALLOW_IMPLICIT_CONSTRUCTORS(MappedFile);
 
   void Close();
@@ -82,7 +82,7 @@ private:
 
 #if defined(_WIN32)
   MappedFile(char *base, size_t size, size_t offset, HANDLE handle)
-      : base_(base), size_(size), offset_(offset), handle_(handle) {}
+	  : base_(base), size_(size), offset_(offset), handle_(handle) {}
   HANDLE handle_;
 #else
   MappedFile(char *base, size_t size, size_t offset) : base_(base), size_(size), offset_(offset) {}

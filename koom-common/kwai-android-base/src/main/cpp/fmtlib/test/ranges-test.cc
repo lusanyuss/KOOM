@@ -46,7 +46,7 @@ TEST(RangesTest, FormatPair) {
 
 TEST(RangesTest, FormatTuple) {
   std::tuple<int64_t, float, std::string, char> t{42, 1.5f, "this is tuple",
-                                                  'i'};
+												  'i'};
   EXPECT_EQ("(42, 1.5, \"this is tuple\", 'i')", fmt::format("{}", t));
   EXPECT_EQ("()", fmt::format("{}", std::tuple<>()));
 }
@@ -73,17 +73,17 @@ TEST(RangesTest, JoinTuple) {
 TEST(RangesTest, JoinInitializerList) {
   EXPECT_EQ("1, 2, 3", fmt::format("{}", fmt::join({1, 2, 3}, ", ")));
   EXPECT_EQ("fmt rocks !",
-            fmt::format("{}", fmt::join({"fmt", "rocks", "!"}, " ")));
+			fmt::format("{}", fmt::join({"fmt", "rocks", "!"}, " ")));
 }
 
 struct my_struct {
   int32_t i;
   std::string str;  // can throw
   template <size_t N> decltype(auto) get() const noexcept {
-    if constexpr (N == 0)
-      return i;
-    else if constexpr (N == 1)
-      return fmt::string_view{str};
+	if constexpr (N == 0)
+	  return i;
+	else if constexpr (N == 1)
+	  return fmt::string_view{str};
   }
 };
 
@@ -125,7 +125,7 @@ TEST(RangesTest, PathLike) {
 }
 
 #endif  // (__cplusplus > 201402L) || (defined(_MSVC_LANG) && _MSVC_LANG >
-        // 201402L && _MSC_VER >= 1910)
+// 201402L && _MSC_VER >= 1910)
 
 #ifdef FMT_USE_STRING_VIEW
 struct string_like {
@@ -141,15 +141,18 @@ TEST(RangesTest, FormatStringLike) {
 #endif  // FMT_USE_STRING_VIEW
 
 struct zstring_sentinel {};
-bool operator==(const char* p, zstring_sentinel) { return *p == '\0'; }
-bool operator!=(const char* p, zstring_sentinel) { return *p != '\0'; }
+bool operator==(const char *p, zstring_sentinel) { return *p == '\0'; }
+bool operator!=(const char *p, zstring_sentinel) { return *p != '\0'; }
 struct zstring {
-  const char* p;
-  const char* begin() const { return p; }
+  const char *p;
+  const char *begin() const { return p; }
   zstring_sentinel end() const { return {}; }
 };
-TEST(RangesTest, JoinSentinel) {
-  zstring hello{"hello"};
-  EXPECT_EQ("{'h', 'e', 'l', 'l', 'o'}", fmt::format("{}", hello));
-  EXPECT_EQ("h_e_l_l_o", fmt::format("{}", fmt::join(hello, "_")));
+TEST(RangesTest, JoinSentinel
+) {
+zstring hello{"hello"};
+EXPECT_EQ("{'h', 'e', 'l', 'l', 'o'}", fmt::format("{}", hello));
+EXPECT_EQ("h_e_l_l_o", fmt::format("{}",
+fmt::join(hello,
+"_")));
 }

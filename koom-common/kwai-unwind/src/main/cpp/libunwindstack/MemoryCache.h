@@ -29,10 +29,10 @@ namespace unwindstack {
 
 class MemoryCache : public Memory {
  public:
-  MemoryCache(Memory* memory) : impl_(memory) {}
+  MemoryCache(Memory *memory) : impl_(memory) {}
   virtual ~MemoryCache() = default;
 
-  size_t Read(uint64_t addr, void* dst, size_t size) override;
+  size_t Read(uint64_t addr, void *dst, size_t size) override;
   long ReadTag(uint64_t addr) override { return impl_->ReadTag(addr); }
 
   void Clear() override { cache_.clear(); }

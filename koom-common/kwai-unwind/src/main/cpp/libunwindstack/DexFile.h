@@ -33,35 +33,35 @@ class DexFile : protected art_api::dex::DexFile {
  public:
   virtual ~DexFile() = default;
 
-  bool GetMethodInformation(uint64_t dex_offset, std::string* method_name, uint64_t* method_offset);
+  bool GetMethodInformation(uint64_t dex_offset, std::string *method_name, uint64_t *method_offset);
 
-  static std::unique_ptr<DexFile> Create(uint64_t dex_file_offset_in_memory, Memory* memory,
-                                         MapInfo* info);
+  static std::unique_ptr<DexFile> Create(uint64_t dex_file_offset_in_memory, Memory *memory,
+										 MapInfo *info);
 
  protected:
-  DexFile(std::unique_ptr<art_api::dex::DexFile>& art_dex_file)
-      : art_api::dex::DexFile(art_dex_file) {}
+  DexFile(std::unique_ptr<art_api::dex::DexFile> &art_dex_file)
+	  : art_api::dex::DexFile(art_dex_file) {}
 };
 
 class DexFileFromFile : public DexFile {
  public:
   static std::unique_ptr<DexFileFromFile> Create(uint64_t dex_file_offset_in_file,
-                                                 const std::string& file);
+												 const std::string &file);
 
  private:
-  DexFileFromFile(std::unique_ptr<art_api::dex::DexFile>& art_dex_file) : DexFile(art_dex_file) {}
+  DexFileFromFile(std::unique_ptr<art_api::dex::DexFile> &art_dex_file) : DexFile(art_dex_file) {}
 };
 
 class DexFileFromMemory : public DexFile {
  public:
   static std::unique_ptr<DexFileFromMemory> Create(uint64_t dex_file_offset_in_memory,
-                                                   Memory* memory, const std::string& name,
-                                                   size_t max_size);
+												   Memory *memory, const std::string &name,
+												   size_t max_size);
 
  private:
-  DexFileFromMemory(std::unique_ptr<art_api::dex::DexFile>& art_dex_file,
-                    std::vector<uint8_t>&& memory)
-      : DexFile(art_dex_file), memory_(std::move(memory)) {}
+  DexFileFromMemory(std::unique_ptr<art_api::dex::DexFile> &art_dex_file,
+					std::vector<uint8_t> &&memory)
+	  : DexFile(art_dex_file), memory_(std::move(memory)) {}
 
   std::vector<uint8_t> memory_;
 };

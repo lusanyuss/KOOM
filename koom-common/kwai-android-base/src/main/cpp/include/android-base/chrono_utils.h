@@ -28,7 +28,7 @@ namespace base {
 
 // A std::chrono clock based on CLOCK_BOOTTIME.
 class boot_clock {
-public:
+ public:
   typedef std::chrono::nanoseconds duration;
   typedef std::chrono::time_point<boot_clock, duration> time_point;
 
@@ -36,14 +36,14 @@ public:
 };
 
 class Timer {
-public:
+ public:
   Timer() : start_(boot_clock::now()) {}
 
   std::chrono::milliseconds duration() const {
-    return std::chrono::duration_cast<std::chrono::milliseconds>(boot_clock::now() - start_);
+	return std::chrono::duration_cast<std::chrono::milliseconds>(boot_clock::now() - start_);
   }
 
-private:
+ private:
   boot_clock::time_point start_;
 };
 

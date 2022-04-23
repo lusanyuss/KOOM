@@ -31,84 +31,84 @@ class LeakMonitorConfig(
     val enableLocalSymbolic: Boolean,
     val leakListener: LeakListener
 ) : MonitorConfig<LeakMonitor>() {
-
-  class Builder : MonitorConfig.Builder<LeakMonitorConfig> {
-    /**
-     * List of so to be monitored
-     */
-    private var mSelectedSoList = emptyArray<String>()
-
-    /**
-     * List of so to be NOT monitored
-     */
-    private var mIgnoredSoList = emptyArray<String>()
-
-    /**
-     * Exceed malloc threshold memory allocation will be monitored
-     */
-    private var mMonitorThreshold = 16
-
-    /**
-     * If Native Heap exceed NativeHeapAllocatedThreshold will trigger leak analysis
-     */
-    private var mNativeHeapAllocatedThreshold = 0
-
-    /**
-     * Default is 300s, memory analysis is time consume, NOT below 300s in Production Environment
-     */
-    private var mLoopInterval = 300_000L
-
-    /**
-     * If enable local symbolic, leak backtrace will contain symbol info, or you only get rel_pc.
-     * Then you can use 'address2line' tool analysis rel_pc
-     */
-    private var mEnableLocalSymbolic = false
-
-    /**
-     * You can receive leaks with your custom leak listener, it run in work thread.
-     */
-    private var mLeakListener: LeakListener = object : LeakListener {
-      override fun onLeak(leaks: MutableCollection<LeakRecord>) {
-        leaks.forEach { MonitorLog.i(LeakMonitor.TAG, "$it") }
-      }
+    
+    class Builder : MonitorConfig.Builder<LeakMonitorConfig> {
+        /**
+         * List of so to be monitored
+         */
+        private var mSelectedSoList = emptyArray<String>()
+        
+        /**
+         * List of so to be NOT monitored
+         */
+        private var mIgnoredSoList = emptyArray<String>()
+        
+        /**
+         * Exceed malloc threshold memory allocation will be monitored
+         */
+        private var mMonitorThreshold = 16
+        
+        /**
+         * If Native Heap exceed NativeHeapAllocatedThreshold will trigger leak analysis
+         */
+        private var mNativeHeapAllocatedThreshold = 0
+        
+        /**
+         * Default is 300s, memory analysis is time consume, NOT below 300s in Production Environment
+         */
+        private var mLoopInterval = 300_000L
+        
+        /**
+         * If enable local symbolic, leak backtrace will contain symbol info, or you only get rel_pc.
+         * Then you can use 'address2line' tool analysis rel_pc
+         */
+        private var mEnableLocalSymbolic = false
+        
+        /**
+         * You can receive leaks with your custom leak listener, it run in work thread.
+         */
+        private var mLeakListener: LeakListener = object : LeakListener {
+            override fun onLeak(leaks: MutableCollection<LeakRecord>) {
+                leaks.forEach { MonitorLog.i(LeakMonitor.TAG, "$it") }
+            }
+        }
+        
+        fun setSelectedSoList(selectedSoList: Array<String>) = apply {
+            mSelectedSoList = selectedSoList
+        }
+        
+        fun setIgnoredSoList(ignoredSoList: Array<String>) = apply {
+            mIgnoredSoList = ignoredSoList
+        }
+        
+        fun setNativeHeapAllocatedThreshold(nativeHeapAllocatedThreshold: Int) = apply {
+            mNativeHeapAllocatedThreshold = nativeHeapAllocatedThreshold
+        }
+        
+        fun setMonitorThreshold(mallocThreshold: Int) = apply {
+            mMonitorThreshold = mallocThreshold
+        }
+        
+        fun setLoopInterval(loopInterval: Long) = apply {
+            mLoopInterval = loopInterval
+        }
+        
+        fun setLeakListener(leakListener: LeakListener) = apply {
+            mLeakListener = leakListener
+        }
+        
+        fun setEnableLocalSymbolic(enableLocalSymbolic: Boolean) = apply {
+            mEnableLocalSymbolic = enableLocalSymbolic
+        }
+        
+        override fun build() = LeakMonitorConfig(
+            selectedSoList = mSelectedSoList,
+            ignoredSoList = mIgnoredSoList,
+            nativeHeapAllocatedThreshold = mNativeHeapAllocatedThreshold,
+            monitorThreshold = mMonitorThreshold,
+            loopInterval = mLoopInterval,
+            enableLocalSymbolic = mEnableLocalSymbolic,
+            leakListener = mLeakListener
+        )
     }
-
-    fun setSelectedSoList(selectedSoList: Array<String>) = apply {
-      mSelectedSoList = selectedSoList
-    }
-
-    fun setIgnoredSoList(ignoredSoList: Array<String>) = apply {
-      mIgnoredSoList = ignoredSoList
-    }
-
-    fun setNativeHeapAllocatedThreshold(nativeHeapAllocatedThreshold: Int) = apply {
-      mNativeHeapAllocatedThreshold = nativeHeapAllocatedThreshold
-    }
-
-    fun setMonitorThreshold(mallocThreshold: Int) = apply {
-      mMonitorThreshold = mallocThreshold
-    }
-
-    fun setLoopInterval(loopInterval: Long) = apply {
-      mLoopInterval = loopInterval
-    }
-
-    fun setLeakListener(leakListener: LeakListener) = apply {
-      mLeakListener = leakListener
-    }
-
-    fun setEnableLocalSymbolic(enableLocalSymbolic: Boolean) = apply {
-      mEnableLocalSymbolic = enableLocalSymbolic
-    }
-
-    override fun build() = LeakMonitorConfig(
-        selectedSoList = mSelectedSoList,
-        ignoredSoList = mIgnoredSoList,
-        nativeHeapAllocatedThreshold = mNativeHeapAllocatedThreshold,
-        monitorThreshold = mMonitorThreshold,
-        loopInterval = mLoopInterval,
-        enableLocalSymbolic = mEnableLocalSymbolic,
-        leakListener = mLeakListener
-    )
-  }
 }

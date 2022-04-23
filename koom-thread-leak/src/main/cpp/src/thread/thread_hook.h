@@ -39,14 +39,14 @@ class ThreadHooker {
  private:
   static void HookThreadStart(void *arg);
   static int HookThreadCreate(pthread_t *tidp, const pthread_attr_t *attr,
-                              void *(*start_rtn)(void *), void *arg);
+							  void *(*start_rtn)(void *), void *arg);
   static int HookThreadJoin(pthread_t t, void **return_value);
   static int HookThreadDetach(pthread_t t);
   static void HookThreadExit(void *return_value);
   static bool RegisterSo(const std::string &lib, int source);
   static void InitHook();
   static void DlopenCallback(std::set<std::string> &libs, int source,
-                             std::string &sourcelib);
+							 std::string &sourcelib);
   static void HookLibs(std::set<std::string> &libs, int source);
   static bool hookEnabled();
 };
@@ -58,10 +58,10 @@ class StartRtnArg {
   ThreadCreateArg *thread_create_arg;
 
   StartRtnArg(void *arg, long long time, void *(*start_rtn)(void *)) {
-    this->arg = arg;
-    this->start_rtn = start_rtn;
-    thread_create_arg = new ThreadCreateArg();
-    thread_create_arg->time = time;
+	this->arg = arg;
+	this->start_rtn = start_rtn;
+	thread_create_arg = new ThreadCreateArg();
+	thread_create_arg->time = time;
   }
 };
 }  // namespace koom

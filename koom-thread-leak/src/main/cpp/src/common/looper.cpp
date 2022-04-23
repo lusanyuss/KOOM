@@ -61,10 +61,10 @@ looper::looper() {
 }
 looper::~looper() {
   if (running) {
-    LOGV(
-        "Looper deleted while still running. Some messages will not be "
-        "processed");
-    quit();
+	LOGV(
+		"Looper deleted while still running. Some messages will not be "
+		"processed");
+	quit();
   }
 }
 void looper::post(int what, void *data, bool flush) {
@@ -79,45 +79,45 @@ void looper::addMsg(LooperMessage *msg, bool flush) {
   sem_wait(&headWriteProtect);
   LooperMessage *h = head;
   if (flush) {
-    while (h) {
-      LooperMessage *next = h->next;
-      delete h;
-      h = next;
-    }
-    h = nullptr;
+	while (h) {
+	  LooperMessage *next = h->next;
+	  delete h;
+	  h = next;
+	}
+	h = nullptr;
   }
   if (h != nullptr) {
-    tail->next = msg;
-    tail = msg;
+	tail->next = msg;
+	tail = msg;
   } else {
-    head = msg;
-    tail = msg;
+	head = msg;
+	tail = msg;
   }
   sem_post(&headWriteProtect);
   sem_post(&headDataAvailable);
 }
 void looper::loop() {
   while (true) {
-    // wait for available message
-    sem_wait(&headDataAvailable);
-    // get next available message
-    sem_wait(&headWriteProtect);
-    LooperMessage *msg = head;
-    if (msg == nullptr) {
-      LOGV("no msg");
-      sem_post(&headWriteProtect);
-      continue;
-    }
-    head = msg->next;
-    sem_post(&headWriteProtect);
-    if (msg->quit) {
-      LOGV("quitting");
-      delete msg;
-      return;
-    }
-    LOGV("processing msg %d", msg->what);
-    handle(msg->what, msg->obj);
-    delete msg;
+	// wait for available message
+	sem_wait(&headDataAvailable);
+	// get next available message
+	sem_wait(&headWriteProtect);
+	LooperMessage *msg = head;
+	if (msg == nullptr) {
+	  LOGV("no msg");
+	  sem_post(&headWriteProtect);
+	  continue;
+	}
+	head = msg->next;
+	sem_post(&headWriteProtect);
+	if (msg->quit) {
+	  LOGV("quitting");
+	  delete msg;
+	  return;
+	}
+	LOGV("processing msg %d", msg->what);
+	handle(msg->what, msg->obj);
+	delete msg;
   }
 }
 void looper::quit() {

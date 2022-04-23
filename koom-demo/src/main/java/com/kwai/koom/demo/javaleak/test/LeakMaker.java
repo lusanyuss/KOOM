@@ -18,36 +18,35 @@
 
 package com.kwai.koom.demo.javaleak.test;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.Context;
-
 public abstract class LeakMaker<T> {
-  List<T> uselessObjectList = new ArrayList<>();
+    private static List<LeakMaker> leakMakerList = new ArrayList<>();
+    List<T> uselessObjectList = new ArrayList<>();
 
-  abstract void startLeak(Context context);
-
-  private static List<LeakMaker> leakMakerList = new ArrayList<>();
-
-  public static void makeLeak(Context context) {
-    leakMakerList.add(new ActivityLeakMaker());
-    leakMakerList.add(new BitmapLeakMaker());
-    leakMakerList.add(new ByteArrayLeakMaker());
-    leakMakerList.add(new FragmentLeakMaker());
-    leakMakerList.add(new StringLeakMaker());
-    for (LeakMaker leakMaker : leakMakerList) {
-      leakMaker.startLeak(context);
-    }
-
-    for (int i = 0; i < 700; i++) {
-      new Thread(() -> {
-        try {
-          Thread.sleep(200000);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
+    public static void makeLeak(Context context) {
+        leakMakerList.add(new ActivityLeakMaker());
+        leakMakerList.add(new BitmapLeakMaker());
+        leakMakerList.add(new ByteArrayLeakMaker());
+        leakMakerList.add(new FragmentLeakMaker());
+        leakMakerList.add(new StringLeakMaker());
+        for (LeakMaker leakMaker : leakMakerList) {
+            leakMaker.startLeak(context);
         }
-      }).start();
+
+        for (int i = 0; i < 700; i++) {
+            new Thread(() -> {
+                try {
+                    Thread.sleep(200000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
     }
-  }
+
+    abstract void startLeak(Context context);
 }

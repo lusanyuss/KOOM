@@ -34,20 +34,20 @@ namespace koom {
 class ThreadHolder {
  public:
   void AddThread(int tid, pthread_t pthread, bool isThreadDetached,
-                 int64_t start_time, ThreadCreateArg* create_arg);
+				 int64_t start_time, ThreadCreateArg *create_arg);
   void JoinThread(pthread_t threadId);
-  void ExitThread(pthread_t threadId, std::string& threadName, long long int i);
+  void ExitThread(pthread_t threadId, std::string &threadName, long long int i);
   void DetachThread(pthread_t threadId);
   void ReportThreadLeak(long long time);
 
  private:
   std::map<pthread_t, ThreadItem> leakThreadMap;
   std::map<pthread_t, ThreadItem> threadMap;
-  void WriteThreadJson(rapidjson::Writer<rapidjson::StringBuffer>& writer,
-                       ThreadItem& thread_item);
+  void WriteThreadJson(rapidjson::Writer<rapidjson::StringBuffer> &writer,
+					   ThreadItem &thread_item);
   void Clear() {
-    leakThreadMap.clear();
-    threadMap.clear();
+	leakThreadMap.clear();
+	threadMap.clear();
   }
 };
 }  // namespace koom

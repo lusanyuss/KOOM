@@ -61,7 +61,7 @@ static int __close(int fd) { return syscall(__NR_close, fd); }
 static int __socket(int domain, int type, int protocol) {
 #if defined(__i386__)
   unsigned long args[3] = {static_cast<unsigned long>(domain), static_cast<unsigned long>(type),
-                           static_cast<unsigned long>(protocol)};
+						   static_cast<unsigned long>(protocol)};
   return syscall(__NR_socketcall, SYS_SOCKET, &args);
 #else
   return syscall(__NR_socket, domain, type, protocol);
@@ -78,63 +78,63 @@ enum AndroidEventLogType {
 };
 
 struct BufferOutputStream {
-public:
+ public:
   BufferOutputStream(char *buffer, size_t size) : total(0), pos_(buffer), avail_(size) {
-    if (avail_ > 0)
-      pos_[0] = '\0';
+	if (avail_ > 0)
+	  pos_[0] = '\0';
   }
   ~BufferOutputStream() = default;
 
   void Send(const char *data, int len) {
-    if (len < 0) {
-      len = strlen(data);
-    }
-    total += len;
+	if (len < 0) {
+	  len = strlen(data);
+	}
+	total += len;
 
-    if (avail_ <= 1) {
-      // No space to put anything else.
-      return;
-    }
+	if (avail_ <= 1) {
+	  // No space to put anything else.
+	  return;
+	}
 
-    if (static_cast<size_t>(len) >= avail_) {
-      len = avail_ - 1;
-    }
-    memcpy(pos_, data, len);
-    pos_ += len;
-    pos_[0] = '\0';
-    avail_ -= len;
+	if (static_cast<size_t>(len) >= avail_) {
+	  len = avail_ - 1;
+	}
+	memcpy(pos_, data, len);
+	pos_ += len;
+	pos_[0] = '\0';
+	avail_ -= len;
   }
 
   size_t total;
 
-private:
+ private:
   char *pos_;
   size_t avail_;
 };
 
 struct FdOutputStream {
-public:
+ public:
   explicit FdOutputStream(int fd) : total(0), fd_(fd) {}
 
   void Send(const char *data, int len) {
-    if (len < 0) {
-      len = strlen(data);
-    }
-    total += len;
+	if (len < 0) {
+	  len = strlen(data);
+	}
+	total += len;
 
-    while (len > 0) {
-      ssize_t bytes = TEMP_FAILURE_RETRY(write(fd_, data, len));
-      if (bytes == -1) {
-        return;
-      }
-      data += bytes;
-      len -= bytes;
-    }
+	while (len > 0) {
+	  ssize_t bytes = TEMP_FAILURE_RETRY(write(fd_, data, len));
+	  if (bytes == -1) {
+		return;
+	  }
+	  data += bytes;
+	  len -= bytes;
+	}
   }
 
   size_t total;
 
-private:
+ private:
   int fd_;
 };
 
@@ -152,15 +152,15 @@ static unsigned parse_decimal(const char *format, int *ppos) {
   unsigned result = 0;
 
   for (;;) {
-    int ch = *p;
-    unsigned d = static_cast<unsigned>(ch - '0');
+	int ch = *p;
+	unsigned d = static_cast<unsigned>(ch - '0');
 
-    if (d >= 10U) {
-      break;
-    }
+	if (d >= 10U) {
+	  break;
+	}
 
-    result = result * 10 + d;
-    p++;
+	result = result * 10 + d;
+	p++;
   }
   *ppos = p - format;
   return result;
@@ -174,33 +174,33 @@ static void format_unsigned(char *buf, size_t buf_size, uint64_t value, int base
 
   // Generate digit string in reverse order.
   while (value) {
-    unsigned d = value % base;
-    value /= base;
-    if (p != end) {
-      char ch;
-      if (d < 10) {
-        ch = '0' + d;
-      } else {
-        ch = (caps ? 'A' : 'a') + (d - 10);
-      }
-      *p++ = ch;
-    }
+	unsigned d = value % base;
+	value /= base;
+	if (p != end) {
+	  char ch;
+	  if (d < 10) {
+		ch = '0' + d;
+	  } else {
+		ch = (caps ? 'A' : 'a') + (d - 10);
+	  }
+	  *p++ = ch;
+	}
   }
 
   // Special case for 0.
   if (p == buf) {
-    if (p != end) {
-      *p++ = '0';
-    }
+	if (p != end) {
+	  *p++ = '0';
+	}
   }
   *p = '\0';
 
   // Reverse digit string in-place.
   size_t length = p - buf;
   for (size_t i = 0, j = length - 1; i < j; ++i, --j) {
-    char ch = buf[i];
-    buf[i] = buf[j];
-    buf[j] = ch;
+	char ch = buf[i];
+	buf[i] = buf[j];
+	buf[j] = ch;
   }
 }
 
@@ -209,220 +209,213 @@ static void format_integer(char *buf, size_t buf_size, uint64_t value, char conv
   int is_signed = (conversion == 'd' || conversion == 'i' || conversion == 'o');
   int base = 10;
   if (conversion == 'x' || conversion == 'X') {
-    base = 16;
+	base = 16;
   } else if (conversion == 'o') {
-    base = 8;
+	base = 8;
   }
   bool caps = (conversion == 'X');
 
   if (is_signed && static_cast<int64_t>(value) < 0) {
-    buf[0] = '-';
-    buf += 1;
-    buf_size -= 1;
-    value = static_cast<uint64_t>(-static_cast<int64_t>(value));
+	buf[0] = '-';
+	buf += 1;
+	buf_size -= 1;
+	value = static_cast<uint64_t>(-static_cast<int64_t>(value));
   }
   format_unsigned(buf, buf_size, value, base, caps);
 }
 
-template <typename Out> static void SendRepeat(Out &o, char ch, int count) {
+template<typename Out>
+static void SendRepeat(Out &o, char ch, int count) {
   char pad[8];
   memset(pad, ch, sizeof(pad));
 
   const int pad_size = static_cast<int>(sizeof(pad));
   while (count > 0) {
-    int avail = count;
-    if (avail > pad_size) {
-      avail = pad_size;
-    }
-    o.Send(pad, avail);
-    count -= avail;
+	int avail = count;
+	if (avail > pad_size) {
+	  avail = pad_size;
+	}
+	o.Send(pad, avail);
+	count -= avail;
   }
 }
 
 /* Perform formatted output to an output target 'o' */
-template <typename Out> static void out_vformat(Out &o, const char *format, va_list args) {
+template<typename Out>
+static void out_vformat(Out &o, const char *format, va_list args) {
   int nn = 0;
 
   for (;;) {
-    int mm;
-    int padZero = 0;
-    int padLeft = 0;
-    char sign = '\0';
-    int width = -1;
-    int prec = -1;
-    size_t bytelen = sizeof(int);
-    int slen;
-    char buffer[32]; /* temporary buffer used to format numbers */
+	int mm;
+	int padZero = 0;
+	int padLeft = 0;
+	char sign = '\0';
+	int width = -1;
+	int prec = -1;
+	size_t bytelen = sizeof(int);
+	int slen;
+	char buffer[32]; /* temporary buffer used to format numbers */
 
-    char c;
+	char c;
 
-    /* first, find all characters that are not 0 or '%' */
-    /* then send them to the output directly */
-    mm = nn;
-    do {
-      c = format[mm];
-      if (c == '\0' || c == '%')
-        break;
-      mm++;
-    } while (1);
+	/* first, find all characters that are not 0 or '%' */
+	/* then send them to the output directly */
+	mm = nn;
+	do {
+	  c = format[mm];
+	  if (c == '\0' || c == '%')
+		break;
+	  mm++;
+	} while (1);
 
-    if (mm > nn) {
-      o.Send(format + nn, mm - nn);
-      nn = mm;
-    }
+	if (mm > nn) {
+	  o.Send(format + nn, mm - nn);
+	  nn = mm;
+	}
 
-    /* is this it ? then exit */
-    if (c == '\0')
-      break;
+	/* is this it ? then exit */
+	if (c == '\0')
+	  break;
 
-    /* nope, we are at a '%' modifier */
-    nn++; // skip it
+	/* nope, we are at a '%' modifier */
+	nn++; // skip it
 
-    /* parse flags */
-    for (;;) {
-      c = format[nn++];
-      if (c == '\0') { /* single trailing '%' ? */
-        c = '%';
-        o.Send(&c, 1);
-        return;
-      } else if (c == '0') {
-        padZero = 1;
-        continue;
-      } else if (c == '-') {
-        padLeft = 1;
-        continue;
-      } else if (c == ' ' || c == '+') {
-        sign = c;
-        continue;
-      }
-      break;
-    }
+	/* parse flags */
+	for (;;) {
+	  c = format[nn++];
+	  if (c == '\0') { /* single trailing '%' ? */
+		c = '%';
+		o.Send(&c, 1);
+		return;
+	  } else if (c == '0') {
+		padZero = 1;
+		continue;
+	  } else if (c == '-') {
+		padLeft = 1;
+		continue;
+	  } else if (c == ' ' || c == '+') {
+		sign = c;
+		continue;
+	  }
+	  break;
+	}
 
-    /* parse field width */
-    if ((c >= '0' && c <= '9')) {
-      nn--;
-      width = static_cast<int>(parse_decimal(format, &nn));
-      c = format[nn++];
-    }
+	/* parse field width */
+	if ((c >= '0' && c <= '9')) {
+	  nn--;
+	  width = static_cast<int>(parse_decimal(format, &nn));
+	  c = format[nn++];
+	}
 
-    /* parse precision */
-    if (c == '.') {
-      prec = static_cast<int>(parse_decimal(format, &nn));
-      c = format[nn++];
-    }
+	/* parse precision */
+	if (c == '.') {
+	  prec = static_cast<int>(parse_decimal(format, &nn));
+	  c = format[nn++];
+	}
 
-    /* length modifier */
-    switch (c) {
-    case 'h':
-      bytelen = sizeof(short);
-      if (format[nn] == 'h') {
-        bytelen = sizeof(char);
-        nn += 1;
-      }
-      c = format[nn++];
-      break;
-    case 'l':
-      bytelen = sizeof(long);
-      if (format[nn] == 'l') {
-        bytelen = sizeof(long long);
-        nn += 1;
-      }
-      c = format[nn++];
-      break;
-    case 'z':
-      bytelen = sizeof(size_t);
-      c = format[nn++];
-      break;
-    case 't':
-      bytelen = sizeof(ptrdiff_t);
-      c = format[nn++];
-      break;
-    default:;
-    }
+	/* length modifier */
+	switch (c) {
+	  case 'h':bytelen = sizeof(short);
+		if (format[nn] == 'h') {
+		  bytelen = sizeof(char);
+		  nn += 1;
+		}
+		c = format[nn++];
+		break;
+	  case 'l':bytelen = sizeof(long);
+		if (format[nn] == 'l') {
+		  bytelen = sizeof(long long);
+		  nn += 1;
+		}
+		c = format[nn++];
+		break;
+	  case 'z':bytelen = sizeof(size_t);
+		c = format[nn++];
+		break;
+	  case 't':bytelen = sizeof(ptrdiff_t);
+		c = format[nn++];
+		break;
+	  default:;
+	}
 
-    /* conversion specifier */
-    const char *str = buffer;
-    if (c == 's') {
-      /* string */
-      str = va_arg(args, const char *);
-      if (str == nullptr) {
-        str = "(null)";
-      }
-    } else if (c == 'c') {
-      /* character */
-      /* NOTE: char is promoted to int when passed through the stack */
-      buffer[0] = static_cast<char>(va_arg(args, int));
-      buffer[1] = '\0';
-    } else if (c == 'p') {
-      uint64_t value = reinterpret_cast<uintptr_t>(va_arg(args, void *));
-      buffer[0] = '0';
-      buffer[1] = 'x';
-      format_integer(buffer + 2, sizeof(buffer) - 2, value, 'x');
-    } else if (c == 'd' || c == 'i' || c == 'o' || c == 'u' || c == 'x' || c == 'X') {
-      /* integers - first read value from stack */
-      uint64_t value;
-      int is_signed = (c == 'd' || c == 'i' || c == 'o');
+	/* conversion specifier */
+	const char *str = buffer;
+	if (c == 's') {
+	  /* string */
+	  str = va_arg(args, const char *);
+	  if (str == nullptr) {
+		str = "(null)";
+	  }
+	} else if (c == 'c') {
+	  /* character */
+	  /* NOTE: char is promoted to int when passed through the stack */
+	  buffer[0] = static_cast<char>(va_arg(args, int));
+	  buffer[1] = '\0';
+	} else if (c == 'p') {
+	  uint64_t value = reinterpret_cast<uintptr_t>(va_arg(args, void *));
+	  buffer[0] = '0';
+	  buffer[1] = 'x';
+	  format_integer(buffer + 2, sizeof(buffer) - 2, value, 'x');
+	} else if (c == 'd' || c == 'i' || c == 'o' || c == 'u' || c == 'x' || c == 'X') {
+	  /* integers - first read value from stack */
+	  uint64_t value;
+	  int is_signed = (c == 'd' || c == 'i' || c == 'o');
 
-      /* NOTE: int8_t and int16_t are promoted to int when passed
-       *       through the stack
-       */
-      switch (bytelen) {
-      case 1:
-        value = static_cast<uint8_t>(va_arg(args, int));
-        break;
-      case 2:
-        value = static_cast<uint16_t>(va_arg(args, int));
-        break;
-      case 4:
-        value = va_arg(args, uint32_t);
-        break;
-      case 8:
-        value = va_arg(args, uint64_t);
-        break;
-      default:
-        return; /* should not happen */
-      }
+	  /* NOTE: int8_t and int16_t are promoted to int when passed
+	   *       through the stack
+	   */
+	  switch (bytelen) {
+		case 1:value = static_cast<uint8_t>(va_arg(args, int));
+		  break;
+		case 2:value = static_cast<uint16_t>(va_arg(args, int));
+		  break;
+		case 4:value = va_arg(args, uint32_t);
+		  break;
+		case 8:value = va_arg(args, uint64_t);
+		  break;
+		default:return; /* should not happen */
+	  }
 
-      /* sign extension, if needed */
-      if (is_signed) {
-        int shift = 64 - 8 * bytelen;
-        value = static_cast<uint64_t>((static_cast<int64_t>(value << shift)) >> shift);
-      }
+	  /* sign extension, if needed */
+	  if (is_signed) {
+		int shift = 64 - 8 * bytelen;
+		value = static_cast<uint64_t>((static_cast<int64_t>(value << shift)) >> shift);
+	  }
 
-      /* format the number properly into our buffer */
-      format_integer(buffer, sizeof(buffer), value, c);
-    } else if (c == '%') {
-      buffer[0] = '%';
-      buffer[1] = '\0';
-    } else {
-      __assert(__FILE__, __LINE__, "conversion specifier unsupported");
-    }
+	  /* format the number properly into our buffer */
+	  format_integer(buffer, sizeof(buffer), value, c);
+	} else if (c == '%') {
+	  buffer[0] = '%';
+	  buffer[1] = '\0';
+	} else {
+	  __assert(__FILE__, __LINE__, "conversion specifier unsupported");
+	}
 
-    /* if we are here, 'str' points to the content that must be
-     * outputted. handle padding and alignment now */
+	/* if we are here, 'str' points to the content that must be
+	 * outputted. handle padding and alignment now */
 
-    slen = strlen(str);
+	slen = strlen(str);
 
-    if (sign != '\0' || prec != -1) {
-      __assert(__FILE__, __LINE__, "sign/precision unsupported");
-    }
+	if (sign != '\0' || prec != -1) {
+	  __assert(__FILE__, __LINE__, "sign/precision unsupported");
+	}
 
-    if (slen < width && !padLeft) {
-      char padChar = padZero ? '0' : ' ';
-      SendRepeat(o, padChar, width - slen);
-    }
+	if (slen < width && !padLeft) {
+	  char padChar = padZero ? '0' : ' ';
+	  SendRepeat(o, padChar, width - slen);
+	}
 
-    o.Send(str, slen);
+	o.Send(str, slen);
 
-    if (slen < width && padLeft) {
-      char padChar = padZero ? '0' : ' ';
-      SendRepeat(o, padChar, width - slen);
-    }
+	if (slen < width && padLeft) {
+	  char padChar = padZero ? '0' : ' ';
+	  SendRepeat(o, padChar, width - slen);
+	}
   }
 }
 
 int async_safe_format_buffer_va_list(char *buffer, size_t buffer_size, const char *format,
-                                     va_list args) {
+									 va_list args) {
   BufferOutputStream os(buffer, buffer_size);
   out_vformat(os, format, args);
   return os.total;
@@ -453,7 +446,7 @@ int async_safe_format_fd(int fd, const char *format, ...) {
 static int write_stderr(int priority, const char *tag, const char *msg) {
   static int api_level = android_get_device_api_level();
   if (api_level < __ANDROID_API_L__) {
-    __android_log_write(priority, tag, msg);
+	__android_log_write(priority, tag, msg);
   }
   iovec vec[4];
   vec[0].iov_base = const_cast<char *>(tag);
@@ -478,20 +471,20 @@ static int open_log_socket() {
 
   int log_fd = TEMP_FAILURE_RETRY(__socket(PF_UNIX, SOCK_DGRAM | SOCK_CLOEXEC | SOCK_NONBLOCK, 0));
   if (log_fd == -1) {
-    return -1;
+	return -1;
   }
 
   union {
-    struct sockaddr addr;
-    struct sockaddr_un addrUn;
+	struct sockaddr addr;
+	struct sockaddr_un addrUn;
   } u;
   memset(&u, 0, sizeof(u));
   u.addrUn.sun_family = AF_UNIX;
   strlcpy(u.addrUn.sun_path, "/dev/socket/logdw", sizeof(u.addrUn.sun_path));
 
   if (TEMP_FAILURE_RETRY(connect(log_fd, &u.addr, sizeof(u.addrUn))) != 0) {
-    __close(log_fd);
-    return -1;
+	__close(log_fd);
+	return -1;
   }
 
   return log_fd;
@@ -505,8 +498,8 @@ struct log_time { // Wire format
 int async_safe_write_log(int priority, const char *tag, const char *msg) {
   int main_log_fd = open_log_socket();
   if (main_log_fd == -1) {
-    // Try stderr instead.
-    return write_stderr(priority, tag, msg);
+	// Try stderr instead.
+	return write_stderr(priority, tag, msg);
   }
 
   iovec vec[6];
@@ -534,8 +527,8 @@ int async_safe_write_log(int priority, const char *tag, const char *msg) {
   int result = TEMP_FAILURE_RETRY(writev(main_log_fd, vec, sizeof(vec) / sizeof(vec[0])));
   __close(main_log_fd);
   if (result == -1) {
-    // Try stderr instead.
-    result = write_stderr(priority, tag, msg);
+	// Try stderr instead.
+	result = write_stderr(priority, tag, msg);
   }
   return result;
 }
@@ -561,16 +554,16 @@ void async_safe_fatal_va_list(const char *prefix, const char *format, va_list ar
   BufferOutputStream os(msg, sizeof(msg));
 
   if (prefix) {
-    os.Send(prefix, strlen(prefix));
-    os.Send(": ", 2);
+	os.Send(prefix, strlen(prefix));
+	os.Send(": ", 2);
   }
 
   out_vformat(os, format, args);
 
   // Log to stderr for the benefit of "adb shell" users and gtests.
   struct iovec iov[2] = {
-      {msg, strlen(msg)},
-      {const_cast<char *>("\n"), 1},
+	  {msg, strlen(msg)},
+	  {const_cast<char *>("\n"), 1},
   };
   TEMP_FAILURE_RETRY(writev(2, iov, 2));
 

@@ -32,22 +32,22 @@ namespace unwindstack {
 
 Global::Global(std::shared_ptr<Memory> &memory) : memory_(memory) {}
 Global::Global(std::shared_ptr<Memory> &memory, std::vector<std::string> &search_libs)
-    : memory_(memory), search_libs_(search_libs) {}
+	: memory_(memory), search_libs_(search_libs) {}
 
 void Global::SetArch(ArchEnum arch) {
   if (arch_ == ARCH_UNKNOWN) {
-    arch_ = arch;
-    ProcessArch();
+	arch_ = arch;
+	ProcessArch();
   }
 }
 
 bool Global::Searchable(const std::string &name) {
   if (search_libs_.empty()) {
-    return true;
+	return true;
   }
 
   if (name.empty()) {
-    return false;
+	return false;
   }
   /*
    * glibc has a basename in <string.h> that's different to the POSIX one in <libgen.h>.
@@ -55,9 +55,9 @@ bool Global::Searchable(const std::string &name) {
    */
   const char *base_name = basename(name.c_str());
   for (const std::string &lib : search_libs_) {
-    if (base_name == lib) {
-      return true;
-    }
+	if (base_name == lib) {
+	  return true;
+	}
   }
   return false;
 }
@@ -82,22 +82,22 @@ void Global::FindAndReadVariable(Maps *maps, const char *var_str) {
   //   f3000-f4000 2000 rw- /system/lib/libc.so
   MapInfo *map_zero = nullptr;
   for (const auto &info : *maps) {
-    if (info->offset != 0 && (info->flags & (PROT_READ | PROT_WRITE)) == (PROT_READ | PROT_WRITE) &&
-        map_zero != nullptr && Searchable(info->name) && info->name == map_zero->name) {
-      Elf *elf = map_zero->GetElf(memory_, arch());
-      uint64_t ptr;
-      if (elf->GetGlobalVariableOffset(variable, &ptr) && ptr != 0) {
-        uint64_t offset_end = info->offset + info->end - info->start;
-        if (ptr >= info->offset && ptr < offset_end) {
-          ptr = info->start + ptr - info->offset;
-          if (ReadVariableData(ptr)) {
-            break;
-          }
-        }
-      }
-    } else if (info->offset == 0 && !info->name.empty()) {
-      map_zero = info.get();
-    }
+	if (info->offset != 0 && (info->flags & (PROT_READ | PROT_WRITE)) == (PROT_READ | PROT_WRITE) &&
+		map_zero != nullptr && Searchable(info->name) && info->name == map_zero->name) {
+	  Elf *elf = map_zero->GetElf(memory_, arch());
+	  uint64_t ptr;
+	  if (elf->GetGlobalVariableOffset(variable, &ptr) && ptr != 0) {
+		uint64_t offset_end = info->offset + info->end - info->start;
+		if (ptr >= info->offset && ptr < offset_end) {
+		  ptr = info->start + ptr - info->offset;
+		  if (ReadVariableData(ptr)) {
+			break;
+		  }
+		}
+	  }
+	} else if (info->offset == 0 && !info->name.empty()) {
+	  map_zero = info.get();
+	}
   }
 }
 

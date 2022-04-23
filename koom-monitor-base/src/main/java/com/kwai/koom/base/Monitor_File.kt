@@ -36,42 +36,41 @@ const val ZIP_LAST_PATH_NAME = -1
 const val ZIP_FULL_PATH_NAME = 0
 
 fun File.zipTo(zipFile: File, zipType: Int = ZIP_LAST_PATH_NAME) {
-  if (isFile) {
-    arrayListOf(this).zipTo(zipFile.absolutePath, zipType)
-  } else if (isDirectory) {
-    arrayListOf<File>().apply { buildSrcFileList(this) }
-        .zipTo(zipFile.absolutePath, zipType)
-  }
+    if(isFile) {
+        arrayListOf(this).zipTo(zipFile.absolutePath, zipType)
+    } else if(isDirectory) {
+        arrayListOf<File>().apply { buildSrcFileList(this) }.zipTo(zipFile.absolutePath, zipType)
+    }
 }
 
 fun List<File>.zipTo(zipFilePath: String, zipType: Int = ZIP_LAST_PATH_NAME) {
-  ZipOutputStream(FileOutputStream(zipFilePath)).use { out ->
-    for (file in this) {
-      val filePath = file.absolutePath
-
-      if (zipType == ZIP_LAST_PATH_NAME) {
-        ZipEntry(filePath.substring(filePath.lastIndexOf("/") + 1))
-      } else {
-        ZipEntry(filePath)
-      }.also {
-        out.putNextEntry(it)
-      }
-
-      FileInputStream(file).use { it.copyTo(out) }
+    ZipOutputStream(FileOutputStream(zipFilePath)).use { out ->
+        for (file in this) {
+            val filePath = file.absolutePath
+            
+            if(zipType == ZIP_LAST_PATH_NAME) {
+                ZipEntry(filePath.substring(filePath.lastIndexOf("/") + 1))
+            } else {
+                ZipEntry(filePath)
+            }.also {
+                out.putNextEntry(it)
+            }
+            
+            FileInputStream(file).use { it.copyTo(out) }
+        }
     }
-  }
 }
 
 fun File.readFirstLine(): String? {
-  useLines { return it.firstOrNull() }
+    useLines { return it.firstOrNull() }
 }
 
 private fun File.buildSrcFileList(srcFileList: MutableList<File>) {
-  for (file in listFiles().orEmpty()) {
-    if (file.isDirectory) {
-      file.buildSrcFileList(srcFileList)
-    } else if (file.isFile) {
-      srcFileList.add(file)
+    for (file in listFiles().orEmpty()) {
+        if(file.isDirectory) {
+            file.buildSrcFileList(srcFileList)
+        } else if(file.isFile) {
+            srcFileList.add(file)
+        }
     }
-  }
 }

@@ -34,9 +34,9 @@ class MemoryOffline : public Memory {
   MemoryOffline() = default;
   virtual ~MemoryOffline() = default;
 
-  bool Init(const std::string& file, uint64_t offset);
+  bool Init(const std::string &file, uint64_t offset);
 
-  size_t Read(uint64_t addr, void* dst, size_t size) override;
+  size_t Read(uint64_t addr, void *dst, size_t size) override;
 
  private:
   std::unique_ptr<MemoryRange> memory_;
@@ -47,12 +47,12 @@ class MemoryOfflineParts : public Memory {
   MemoryOfflineParts() = default;
   virtual ~MemoryOfflineParts();
 
-  void Add(MemoryOffline* memory) { memories_.push_back(memory); }
+  void Add(MemoryOffline *memory) { memories_.push_back(memory); }
 
-  size_t Read(uint64_t addr, void* dst, size_t size) override;
+  size_t Read(uint64_t addr, void *dst, size_t size) override;
 
  private:
-  std::vector<MemoryOffline*> memories_;
+  std::vector<MemoryOffline *> memories_;
 };
 
 }  // namespace unwindstack

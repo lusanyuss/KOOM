@@ -8,8 +8,8 @@ import java.security.NoSuchAlgorithmException
 internal val UTF_8: Charset = Charset.forName("UTF-8")
 
 internal fun String.lastSegment(segmentingChar: Char): String {
-  val separator = lastIndexOf(segmentingChar)
-  return if (separator == -1) this else this.substring(separator + 1)
+    val separator = lastIndexOf(segmentingChar)
+    return if(separator == -1) this else this.substring(separator + 1)
 }
 
 internal fun String.createSHA1Hash(): String = createHash(this, "SHA-1")
@@ -19,24 +19,22 @@ internal fun String.createSHA1Hash(): String = createHash(this, "SHA-1")
  * [this snippet](http://www.androidsnippets.com/create-a-md5-hash-and-dump-as-a-hex-string).
  */
 private fun createHash(
-  text: String,
-  algorithm: String
+    text: String, algorithm: String
 ): String {
-  try {
-    // Create MD5 Hash.
-    val digest = MessageDigest.getInstance(algorithm)
-    digest.update(text.getBytes())
-    val messageDigest = digest.digest()
-
-    // Create Hex String.
-    val hexString = StringBuilder()
-    for (b in messageDigest) {
-      hexString.append(Integer.toHexString(0xff and b.toInt()))
+    try { // Create MD5 Hash.
+        val digest = MessageDigest.getInstance(algorithm)
+        digest.update(text.getBytes())
+        val messageDigest = digest.digest()
+        
+        // Create Hex String.
+        val hexString = StringBuilder()
+        for (b in messageDigest) {
+            hexString.append(Integer.toHexString(0xff and b.toInt()))
+        }
+        return hexString.toString()
+    } catch (e: NoSuchAlgorithmException) {
+        throw AssertionError("Unable to construct MessageDigest for $algorithm")
     }
-    return hexString.toString()
-  } catch (e: NoSuchAlgorithmException) {
-    throw AssertionError("Unable to construct MessageDigest for $algorithm")
-  }
 }
 
 /** Gets the string as an array of UTF-8 bytes. */

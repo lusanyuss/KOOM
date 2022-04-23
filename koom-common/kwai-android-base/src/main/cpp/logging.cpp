@@ -65,7 +65,7 @@
 #include "logging_splitters.h"
 
 extern "C" int __android_log_is_loggable(int prio, const char *tag, int default_prio)
-    __attribute__((weak));
+__attribute__((weak));
 
 namespace android {
 namespace base {
@@ -80,9 +80,9 @@ static const char *getprogname() {
   static char progname[MAX_PATH] = {};
 
   if (first) {
-    snprintf(progname, sizeof(progname), "%s",
-             android::base::Basename(android::base::GetExecutablePath()).c_str());
-    first = false;
+	snprintf(progname, sizeof(progname), "%s",
+			 android::base::Basename(android::base::GetExecutablePath()).c_str());
+	first = false;
   }
 
   return progname;
@@ -95,12 +95,12 @@ static const char *GetFileBasename(const char *file) {
   // have a non-modifying basename.
   const char *last_slash = strrchr(file, '/');
   if (last_slash != nullptr) {
-    return last_slash + 1;
+	return last_slash + 1;
   }
 #if defined(_WIN32)
   const char *last_backslash = strrchr(file, '\\');
   if (last_backslash != nullptr) {
-    return last_backslash + 1;
+	return last_backslash + 1;
   }
 #endif
   return file;
@@ -112,12 +112,12 @@ static int OpenKmsg() {
   // pick up 'file w /dev/kmsg' environment from daemon's init rc file
   const auto val = getenv("ANDROID_FILE__dev_kmsg");
   if (val != nullptr) {
-    int fd;
-    if (android::base::ParseInt(val, &fd, 0)) {
-      auto flags = fcntl(fd, F_GETFL);
-      if ((flags != -1) && ((flags & O_ACCMODE) == O_WRONLY))
-        return fd;
-    }
+	int fd;
+	if (android::base::ParseInt(val, &fd, 0)) {
+	  auto flags = fcntl(fd, F_GETFL);
+	  if ((flags != -1) && ((flags & O_ACCMODE) == O_WRONLY))
+		return fd;
+	}
   }
 #endif
   return TEMP_FAILURE_RETRY(open("/dev/kmsg", O_WRONLY | O_CLOEXEC));
@@ -126,73 +126,49 @@ static int OpenKmsg() {
 
 static LogId log_id_tToLogId(int32_t buffer_id) {
   switch (buffer_id) {
-  case LOG_ID_MAIN:
-    return MAIN;
-  case LOG_ID_SYSTEM:
-    return SYSTEM;
-  case LOG_ID_RADIO:
-    return RADIO;
-  case LOG_ID_CRASH:
-    return CRASH;
-  case LOG_ID_DEFAULT:
-  default:
-    return DEFAULT;
+	case LOG_ID_MAIN:return MAIN;
+	case LOG_ID_SYSTEM:return SYSTEM;
+	case LOG_ID_RADIO:return RADIO;
+	case LOG_ID_CRASH:return CRASH;
+	case LOG_ID_DEFAULT:
+	default:return DEFAULT;
   }
 }
 
 static int32_t LogIdTolog_id_t(LogId log_id) {
   switch (log_id) {
-  case MAIN:
-    return LOG_ID_MAIN;
-  case SYSTEM:
-    return LOG_ID_SYSTEM;
-  case RADIO:
-    return LOG_ID_RADIO;
-  case CRASH:
-    return LOG_ID_CRASH;
-  case DEFAULT:
-  default:
-    return LOG_ID_DEFAULT;
+	case MAIN:return LOG_ID_MAIN;
+	case SYSTEM:return LOG_ID_SYSTEM;
+	case RADIO:return LOG_ID_RADIO;
+	case CRASH:return LOG_ID_CRASH;
+	case DEFAULT:
+	default:return LOG_ID_DEFAULT;
   }
 }
 
 static LogSeverity PriorityToLogSeverity(int priority) {
   switch (priority) {
-  case ANDROID_LOG_DEFAULT:
-    return INFO;
-  case ANDROID_LOG_VERBOSE:
-    return VERBOSE;
-  case ANDROID_LOG_DEBUG:
-    return DEBUG;
-  case ANDROID_LOG_INFO:
-    return INFO;
-  case ANDROID_LOG_WARN:
-    return WARNING;
-  case ANDROID_LOG_ERROR:
-    return ERROR;
-  case ANDROID_LOG_FATAL:
-    return FATAL;
-  default:
-    return FATAL;
+	case ANDROID_LOG_DEFAULT:return INFO;
+	case ANDROID_LOG_VERBOSE:return VERBOSE;
+	case ANDROID_LOG_DEBUG:return DEBUG;
+	case ANDROID_LOG_INFO:return INFO;
+	case ANDROID_LOG_WARN:return WARNING;
+	case ANDROID_LOG_ERROR:return ERROR;
+	case ANDROID_LOG_FATAL:return FATAL;
+	default:return FATAL;
   }
 }
 
 static int32_t LogSeverityToPriority(LogSeverity severity) {
   switch (severity) {
-  case VERBOSE:
-    return ANDROID_LOG_VERBOSE;
-  case DEBUG:
-    return ANDROID_LOG_DEBUG;
-  case INFO:
-    return ANDROID_LOG_INFO;
-  case WARNING:
-    return ANDROID_LOG_WARN;
-  case ERROR:
-    return ANDROID_LOG_ERROR;
-  case FATAL_WITHOUT_ABORT:
-  case FATAL:
-  default:
-    return ANDROID_LOG_FATAL;
+	case VERBOSE:return ANDROID_LOG_VERBOSE;
+	case DEBUG:return ANDROID_LOG_DEBUG;
+	case INFO:return ANDROID_LOG_INFO;
+	case WARNING:return ANDROID_LOG_WARN;
+	case ERROR:return ANDROID_LOG_ERROR;
+	case FATAL_WITHOUT_ABORT:
+	case FATAL:
+	default:return ANDROID_LOG_FATAL;
   }
 }
 
@@ -221,16 +197,16 @@ static std::string *gDefaultTag;
 void SetDefaultTag(const std::string &tag) {
   static auto &liblog_functions = GetLibLogFunctions();
   if (liblog_functions) {
-    liblog_functions->__android_log_set_default_tag(tag.c_str());
+	liblog_functions->__android_log_set_default_tag(tag.c_str());
   } else {
-    std::lock_guard<std::recursive_mutex> lock(TagLock());
-    if (gDefaultTag != nullptr) {
-      delete gDefaultTag;
-      gDefaultTag = nullptr;
-    }
-    if (!tag.empty()) {
-      gDefaultTag = new std::string(tag);
-    }
+	std::lock_guard<std::recursive_mutex> lock(TagLock());
+	if (gDefaultTag != nullptr) {
+	  delete gDefaultTag;
+	  gDefaultTag = nullptr;
+	}
+	if (!tag.empty()) {
+	  gDefaultTag = new std::string(tag);
+	}
   }
 }
 
@@ -241,25 +217,25 @@ static LogSeverity gMinimumLogSeverity = INFO;
 
 #if defined(__linux__)
 static void KernelLogLine(const char *msg, int length, android::base::LogSeverity severity,
-                          const char *tag) {
+						  const char *tag) {
   // clang-format off
   static constexpr int kLogSeverityToKernelLogLevel[] = {
-      [android::base::VERBOSE] = 7,              // KERN_DEBUG (there is no verbose kernel log
-                                                 //             level)
-      [android::base::DEBUG] = 7,                // KERN_DEBUG
-      [android::base::INFO] = 6,                 // KERN_INFO
-      [android::base::WARNING] = 4,              // KERN_WARNING
-      [android::base::ERROR] = 3,                // KERN_ERROR
-      [android::base::FATAL_WITHOUT_ABORT] = 2,  // KERN_CRIT
-      [android::base::FATAL] = 2,                // KERN_CRIT
+	  [android::base::VERBOSE] = 7,              // KERN_DEBUG (there is no verbose kernel log
+	  //             level)
+	  [android::base::DEBUG] = 7,                // KERN_DEBUG
+	  [android::base::INFO] = 6,                 // KERN_INFO
+	  [android::base::WARNING] = 4,              // KERN_WARNING
+	  [android::base::ERROR] = 3,                // KERN_ERROR
+	  [android::base::FATAL_WITHOUT_ABORT] = 2,  // KERN_CRIT
+	  [android::base::FATAL] = 2,                // KERN_CRIT
   };
   // clang-format on
   static_assert(arraysize(kLogSeverityToKernelLogLevel) == android::base::FATAL + 1,
-                "Mismatch in size of kLogSeverityToKernelLogLevel and values in LogSeverity");
+				"Mismatch in size of kLogSeverityToKernelLogLevel and values in LogSeverity");
 
   static int klog_fd = OpenKmsg();
   if (klog_fd == -1)
-    return;
+	return;
 
   int level = kLogSeverityToKernelLogLevel[severity];
 
@@ -269,8 +245,8 @@ static void KernelLogLine(const char *msg, int length, android::base::LogSeverit
   char buf[1024] __attribute__((__uninitialized__));
   size_t size = snprintf(buf, sizeof(buf), "<%d>%s: %.*s\n", level, tag, length, msg);
   if (size > sizeof(buf)) {
-    size = snprintf(buf, sizeof(buf), "<%d>%s: %zu-byte message too long for printk\n", level, tag,
-                    size);
+	size = snprintf(buf, sizeof(buf), "<%d>%s: %zu-byte message too long for printk\n", level, tag,
+					size);
   }
 
   iovec iov[1];
@@ -280,13 +256,13 @@ static void KernelLogLine(const char *msg, int length, android::base::LogSeverit
 }
 
 void KernelLogger(android::base::LogId, android::base::LogSeverity severity, const char *tag,
-                  const char *, unsigned int, const char *full_message) {
+				  const char *, unsigned int, const char *full_message) {
   SplitByLines(full_message, KernelLogLine, severity, tag);
 }
 #endif
 
 void StderrLogger(LogId, LogSeverity severity, const char *tag, const char *file, unsigned int line,
-                  const char *message) {
+				  const char *message) {
   struct tm now;
   time_t t = time(nullptr);
 
@@ -296,20 +272,20 @@ void StderrLogger(LogId, LogSeverity severity, const char *tag, const char *file
   localtime_r(&t, &now);
 #endif
   auto output_string =
-      StderrOutputGenerator(now, getpid(), GetThreadId(), severity, tag, file, line, message);
+	  StderrOutputGenerator(now, getpid(), GetThreadId(), severity, tag, file, line, message);
 
   fputs(output_string.c_str(), stderr);
 }
 
 void StdioLogger(LogId, LogSeverity severity, const char * /*tag*/, const char * /*file*/,
-                 unsigned int /*line*/, const char *message) {
+				 unsigned int /*line*/, const char *message) {
   if (severity >= WARNING) {
-    fflush(stdout);
+	fflush(stdout);
 #if __ANDROID_API__ >= 21
-    fprintf(stderr, "%s: %s\n", GetFileBasename(kwai_getprogname()), message);
+	fprintf(stderr, "%s: %s\n", GetFileBasename(kwai_getprogname()), message);
 #endif
   } else {
-    fprintf(stdout, "%s\n", message);
+	fprintf(stdout, "%s\n", message);
   }
 }
 
@@ -328,20 +304,20 @@ static void LogdLogChunk(LogId id, LogSeverity severity, const char *tag, const 
 
   static auto &liblog_functions = GetLibLogFunctions();
   if (liblog_functions) {
-    __android_log_message log_message = {sizeof(__android_log_message),      lg_id, priority, tag,
-                                         static_cast<const char *>(nullptr), 0,     message};
-    liblog_functions->__android_log_logd_logger(&log_message);
+	__android_log_message log_message = {sizeof(__android_log_message), lg_id, priority, tag,
+										 static_cast<const char *>(nullptr), 0, message};
+	liblog_functions->__android_log_logd_logger(&log_message);
   } else {
-    __android_log_buf_print(lg_id, priority, tag, "%s", message);
+	__android_log_buf_print(lg_id, priority, tag, "%s", message);
   }
 }
 
 LogdLogger::LogdLogger(LogId default_log_id) : default_log_id_(default_log_id) {}
 
 void LogdLogger::operator()(LogId id, LogSeverity severity, const char *tag, const char *file,
-                            unsigned int line, const char *message) {
+							unsigned int line, const char *message) {
   if (id == DEFAULT) {
-    id = default_log_id_;
+	id = default_log_id_;
   }
 
   SplitByLogdChunks(id, severity, tag, file, line, message, LogdLogChunk);
@@ -352,7 +328,7 @@ void InitLogging(char *argv[], LogFunction &&logger, AbortFunction &&aborter) {
   SetAborter(std::forward<AbortFunction>(aborter));
 
   if (gInitialized) {
-    return;
+	return;
   }
 
   gInitialized = true;
@@ -361,46 +337,39 @@ void InitLogging(char *argv[], LogFunction &&logger, AbortFunction &&aborter) {
   // Linux to recover this, but we don't have that luxury on the Mac/Windows,
   // and there are a couple of argv[0] variants that are commonly used.
   if (argv != nullptr) {
-    SetDefaultTag(basename(argv[0]));
+	SetDefaultTag(basename(argv[0]));
   }
 
   const char *tags = getenv("ANDROID_LOG_TAGS");
   if (tags == nullptr) {
-    return;
+	return;
   }
 
   std::vector<std::string> specs = Split(tags, " ");
   for (size_t i = 0; i < specs.size(); ++i) {
-    // "tag-pattern:[vdiwefs]"
-    std::string spec(specs[i]);
-    if (spec.size() == 3 && StartsWith(spec, "*:")) {
-      switch (spec[2]) {
-      case 'v':
-        SetMinimumLogSeverity(VERBOSE);
-        continue;
-      case 'd':
-        SetMinimumLogSeverity(DEBUG);
-        continue;
-      case 'i':
-        SetMinimumLogSeverity(INFO);
-        continue;
-      case 'w':
-        SetMinimumLogSeverity(WARNING);
-        continue;
-      case 'e':
-        SetMinimumLogSeverity(ERROR);
-        continue;
-      case 'f':
-        SetMinimumLogSeverity(FATAL_WITHOUT_ABORT);
-        continue;
-      // liblog will even suppress FATAL if you say 's' for silent, but fatal should
-      // never be suppressed.
-      case 's':
-        SetMinimumLogSeverity(FATAL_WITHOUT_ABORT);
-        continue;
-      }
-    }
-    LOG(FATAL) << "unsupported '" << spec << "' in ANDROID_LOG_TAGS (" << tags << ")";
+	// "tag-pattern:[vdiwefs]"
+	std::string spec(specs[i]);
+	if (spec.size() == 3 && StartsWith(spec, "*:")) {
+	  switch (spec[2]) {
+		case 'v':SetMinimumLogSeverity(VERBOSE);
+		  continue;
+		case 'd':SetMinimumLogSeverity(DEBUG);
+		  continue;
+		case 'i':SetMinimumLogSeverity(INFO);
+		  continue;
+		case 'w':SetMinimumLogSeverity(WARNING);
+		  continue;
+		case 'e':SetMinimumLogSeverity(ERROR);
+		  continue;
+		case 'f':SetMinimumLogSeverity(FATAL_WITHOUT_ABORT);
+		  continue;
+		  // liblog will even suppress FATAL if you say 's' for silent, but fatal should
+		  // never be suppressed.
+		case 's':SetMinimumLogSeverity(FATAL_WITHOUT_ABORT);
+		  continue;
+	  }
+	}
+	LOG(FATAL) << "unsupported '" << spec << "' in ANDROID_LOG_TAGS (" << tags << ")";
   }
 }
 
@@ -410,13 +379,13 @@ LogFunction SetLogger(LogFunction &&logger) {
 
   static auto &liblog_functions = GetLibLogFunctions();
   if (liblog_functions) {
-    liblog_functions->__android_log_set_logger([](const struct __android_log_message *log_message) {
-      auto log_id = log_id_tToLogId(log_message->buffer_id);
-      auto severity = PriorityToLogSeverity(log_message->priority);
+	liblog_functions->__android_log_set_logger([](const struct __android_log_message *log_message) {
+	  auto log_id = log_id_tToLogId(log_message->buffer_id);
+	  auto severity = PriorityToLogSeverity(log_message->priority);
 
-      Logger()(log_id, severity, log_message->tag, log_message->file, log_message->line,
-               log_message->message);
-    });
+	  Logger()(log_id, severity, log_message->tag, log_message->file, log_message->line,
+			   log_message->message);
+	});
   }
   return old_logger;
 }
@@ -427,8 +396,8 @@ AbortFunction SetAborter(AbortFunction &&aborter) {
 
   static auto &liblog_functions = GetLibLogFunctions();
   if (liblog_functions) {
-    liblog_functions->__android_log_set_aborter(
-        [](const char *abort_message) { Aborter()(abort_message); });
+	liblog_functions->__android_log_set_aborter(
+		[](const char *abort_message) { Aborter()(abort_message); });
   }
   return old_aborter;
 }
@@ -436,11 +405,11 @@ AbortFunction SetAborter(AbortFunction &&aborter) {
 // This indirection greatly reduces the stack impact of having lots of
 // checks/logging in a function.
 class LogMessageData {
-public:
+ public:
   LogMessageData(const char *file, unsigned int line, LogSeverity severity, const char *tag,
-                 int error)
-      : file_(GetFileBasename(file)), line_number_(line), severity_(severity), tag_(tag),
-        error_(error) {}
+				 int error)
+	  : file_(GetFileBasename(file)), line_number_(line), severity_(severity), tag_(tag),
+		error_(error) {}
 
   const char *GetFile() const { return file_; }
 
@@ -456,7 +425,7 @@ public:
 
   std::string ToString() const { return buffer_.str(); }
 
-private:
+ private:
   std::ostringstream buffer_;
   const char *const file_;
   const unsigned int line_number_;
@@ -468,77 +437,77 @@ private:
 };
 
 LogMessage::LogMessage(const char *file, unsigned int line, LogId, LogSeverity severity,
-                       const char *tag, int error)
-    : LogMessage(file, line, severity, tag, error) {}
+					   const char *tag, int error)
+	: LogMessage(file, line, severity, tag, error) {}
 
 LogMessage::LogMessage(const char *file, unsigned int line, LogSeverity severity, const char *tag,
-                       int error)
-    : data_(new LogMessageData(file, line, severity, tag, error)) {}
+					   int error)
+	: data_(new LogMessageData(file, line, severity, tag, error)) {}
 
 LogMessage::~LogMessage() {
   // Check severity again. This is duplicate work wrt/ LOG macros, but not LOG_STREAM.
   if (!WOULD_LOG(data_->GetSeverity())) {
-    return;
+	return;
   }
 
   // Finish constructing the message.
   if (data_->GetError() != -1) {
-    data_->GetBuffer() << ": " << strerror(data_->GetError());
+	data_->GetBuffer() << ": " << strerror(data_->GetError());
   }
   std::string msg(data_->ToString());
 
   if (data_->GetSeverity() == FATAL) {
 #ifdef __ANDROID__
-    // Set the bionic abort message early to avoid liblog doing it
-    // with the individual lines, so that we get the whole message.
-    kwai_set_abort_message(msg.c_str());
+	// Set the bionic abort message early to avoid liblog doing it
+	// with the individual lines, so that we get the whole message.
+	kwai_set_abort_message(msg.c_str());
 #endif
   }
 
   LogLine(data_->GetFile(), data_->GetLineNumber(), data_->GetSeverity(), data_->GetTag(),
-          msg.c_str());
+		  msg.c_str());
 
   // Abort if necessary.
   if (data_->GetSeverity() == FATAL) {
-    static auto &liblog_functions = GetLibLogFunctions();
-    if (liblog_functions) {
-      liblog_functions->__android_log_call_aborter(msg.c_str());
-    } else {
-      Aborter()(msg.c_str());
-    }
+	static auto &liblog_functions = GetLibLogFunctions();
+	if (liblog_functions) {
+	  liblog_functions->__android_log_call_aborter(msg.c_str());
+	} else {
+	  Aborter()(msg.c_str());
+	}
   }
 }
 
 std::ostream &LogMessage::stream() { return data_->GetBuffer(); }
 
 void LogMessage::LogLine(const char *file, unsigned int line, LogSeverity severity, const char *tag,
-                         const char *message) {
+						 const char *message) {
   static auto &liblog_functions = GetLibLogFunctions();
   int32_t priority = LogSeverityToPriority(severity);
   if (liblog_functions) {
-    __android_log_message log_message = {
-        sizeof(__android_log_message), LOG_ID_DEFAULT, priority, tag, file, line, message};
-    liblog_functions->__android_log_write_log_message(&log_message);
+	__android_log_message log_message = {
+		sizeof(__android_log_message), LOG_ID_DEFAULT, priority, tag, file, line, message};
+	liblog_functions->__android_log_write_log_message(&log_message);
   } else {
-    if (tag == nullptr) {
-      std::lock_guard<std::recursive_mutex> lock(TagLock());
-      if (gDefaultTag == nullptr) {
-        gDefaultTag = new std::string(kwai_getprogname());
-      }
+	if (tag == nullptr) {
+	  std::lock_guard<std::recursive_mutex> lock(TagLock());
+	  if (gDefaultTag == nullptr) {
+		gDefaultTag = new std::string(kwai_getprogname());
+	  }
 
-      Logger()(DEFAULT, severity, gDefaultTag->c_str(), file, line, message);
-    } else {
-      Logger()(DEFAULT, severity, tag, file, line, message);
-    }
+	  Logger()(DEFAULT, severity, gDefaultTag->c_str(), file, line, message);
+	} else {
+	  Logger()(DEFAULT, severity, tag, file, line, message);
+	}
   }
 }
 
 LogSeverity GetMinimumLogSeverity() {
   static auto &liblog_functions = GetLibLogFunctions();
   if (liblog_functions) {
-    return PriorityToLogSeverity(liblog_functions->__android_log_get_minimum_priority());
+	return PriorityToLogSeverity(liblog_functions->__android_log_get_minimum_priority());
   } else {
-    return gMinimumLogSeverity;
+	return gMinimumLogSeverity;
   }
 }
 
@@ -548,22 +517,22 @@ bool ShouldLog(LogSeverity severity, const char *tag) {
   // we need to fall back to using gMinimumLogSeverity, since __android_log_is_loggable() will not
   // take into consideration the value from SetMinimumLogSeverity().
   if (liblog_functions) {
-    int32_t priority = LogSeverityToPriority(severity);
-    return __android_log_is_loggable(priority, tag, ANDROID_LOG_INFO);
+	int32_t priority = LogSeverityToPriority(severity);
+	return __android_log_is_loggable(priority, tag, ANDROID_LOG_INFO);
   } else {
-    return severity >= gMinimumLogSeverity;
+	return severity >= gMinimumLogSeverity;
   }
 }
 
 LogSeverity SetMinimumLogSeverity(LogSeverity new_severity) {
   static auto &liblog_functions = GetLibLogFunctions();
   if (liblog_functions) {
-    int32_t priority = LogSeverityToPriority(new_severity);
-    return PriorityToLogSeverity(liblog_functions->__android_log_set_minimum_priority(priority));
+	int32_t priority = LogSeverityToPriority(new_severity);
+	return PriorityToLogSeverity(liblog_functions->__android_log_set_minimum_priority(priority));
   } else {
-    LogSeverity old_severity = gMinimumLogSeverity;
-    gMinimumLogSeverity = new_severity;
-    return old_severity;
+	LogSeverity old_severity = gMinimumLogSeverity;
+	gMinimumLogSeverity = new_severity;
+	return old_severity;
   }
 }
 

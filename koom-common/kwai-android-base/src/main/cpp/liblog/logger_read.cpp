@@ -39,10 +39,10 @@ log_id_t android_logger_get_id(struct logger *logger) {
 }
 
 static struct logger_list *android_logger_list_alloc_internal(int mode, unsigned int tail,
-                                                              log_time start, pid_t pid) {
+															  log_time start, pid_t pid) {
   auto *logger_list = static_cast<struct logger_list *>(calloc(1, sizeof(struct logger_list)));
   if (!logger_list) {
-    return nullptr;
+	return nullptr;
   }
 
   logger_list->mode = mode;
@@ -64,7 +64,7 @@ struct logger_list *android_logger_list_alloc_time(int mode, log_time start, pid
 /* Open the named log and add it to the logger list */
 struct logger *android_logger_open(struct logger_list *logger_list, log_id_t logId) {
   if (!logger_list || (logId >= LOG_ID_MAX)) {
-    return nullptr;
+	return nullptr;
   }
 
   logger_list->log_mask |= 1 << logId;
@@ -76,16 +76,16 @@ struct logger *android_logger_open(struct logger_list *logger_list, log_id_t log
 
 /* Open the single named log and make it part of a new logger list */
 struct logger_list *android_logger_list_open(log_id_t logId, int mode, unsigned int tail,
-                                             pid_t pid) {
+											 pid_t pid) {
   struct logger_list *logger_list = android_logger_list_alloc(mode, tail, pid);
 
   if (!logger_list) {
-    return NULL;
+	return NULL;
   }
 
   if (!android_logger_open(logger_list, logId)) {
-    android_logger_list_free(logger_list);
-    return NULL;
+	android_logger_list_free(logger_list);
+	return NULL;
   }
 
   return logger_list;
@@ -93,54 +93,54 @@ struct logger_list *android_logger_list_open(log_id_t logId, int mode, unsigned 
 
 int android_logger_list_read(struct logger_list *logger_list, struct log_msg *log_msg) {
   if (logger_list == nullptr || logger_list->log_mask == 0) {
-    return -EINVAL;
+	return -EINVAL;
   }
 
   int ret = 0;
 
 #ifdef __ANDROID__
   if (logger_list->mode & ANDROID_LOG_PSTORE) {
-    ret = PmsgRead(logger_list, log_msg);
+	ret = PmsgRead(logger_list, log_msg);
   } else {
-    ret = LogdRead(logger_list, log_msg);
+	ret = LogdRead(logger_list, log_msg);
   }
 #endif
 
   if (ret <= 0) {
-    return ret;
+	return ret;
   }
 
   if (ret > LOGGER_ENTRY_MAX_LEN) {
-    ret = LOGGER_ENTRY_MAX_LEN;
+	ret = LOGGER_ENTRY_MAX_LEN;
   }
 
   if (ret < static_cast<int>(sizeof(log_msg->entry))) {
-    return -EINVAL;
+	return -EINVAL;
   }
 
   /* propagate errors, or make sure len & hdr_size members visible */
   if (ret < (int)(sizeof(log_msg->entry.len) + sizeof(log_msg->entry.hdr_size))) {
-    if (ret >= (int)sizeof(log_msg->entry.len)) {
-      log_msg->entry.len = 0;
-    }
-    return ret;
+	if (ret >= (int)sizeof(log_msg->entry.len)) {
+	  log_msg->entry.len = 0;
+	}
+	return ret;
   }
 
   /* hdr_size correction (logger_entry -> logger_entry_v2+ conversion) */
   if (log_msg->entry_v2.hdr_size == 0) {
-    log_msg->entry_v2.hdr_size = sizeof(struct logger_entry_v1);
+	log_msg->entry_v2.hdr_size = sizeof(struct logger_entry_v1);
   }
   if ((log_msg->entry_v2.hdr_size < sizeof(log_msg->entry_v1)) ||
-      (log_msg->entry_v2.hdr_size > sizeof(log_msg->entry)) ||
-      log_msg->entry.hdr_size >= LOGGER_ENTRY_MAX_LEN - sizeof(log_msg->entry)) {
-    return -EINVAL;
+	  (log_msg->entry_v2.hdr_size > sizeof(log_msg->entry)) ||
+	  log_msg->entry.hdr_size >= LOGGER_ENTRY_MAX_LEN - sizeof(log_msg->entry)) {
+	return -EINVAL;
   }
 
   /* len validation */
   if (ret <= log_msg->entry_v2.hdr_size) {
-    log_msg->entry.len = 0;
+	log_msg->entry.len = 0;
   } else {
-    log_msg->entry.len = ret - log_msg->entry_v2.hdr_size;
+	log_msg->entry.len = ret - log_msg->entry_v2.hdr_size;
   }
 
   log_msg->buf[log_msg->entry.len + log_msg->entry.hdr_size] = '\0';
@@ -151,14 +151,14 @@ int android_logger_list_read(struct logger_list *logger_list, struct log_msg *lo
 /* Close all the logs */
 void android_logger_list_free(struct logger_list *logger_list) {
   if (logger_list == NULL) {
-    return;
+	return;
   }
 
 #ifdef __ANDROID__
   if (logger_list->mode & ANDROID_LOG_PSTORE) {
-    PmsgClose(logger_list);
+	PmsgClose(logger_list);
   } else {
-    LogdClose(logger_list);
+	LogdClose(logger_list);
   }
 #endif
 

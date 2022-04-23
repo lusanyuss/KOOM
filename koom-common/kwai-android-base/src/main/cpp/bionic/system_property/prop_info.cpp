@@ -32,9 +32,9 @@
 #include <string.h>
 
 constexpr static const char kLongLegacyError[] =
-    "Must use __system_property_read_callback() to read";
+	"Must use __system_property_read_callback() to read";
 static_assert(sizeof(kLongLegacyError) < prop_info::kLongLegacyErrorBufferSize,
-              "Error message for long properties read by legacy libc must fit within 56 chars");
+			  "Error message for long properties read by legacy libc must fit within 56 chars");
 
 prop_info::prop_info(const char *name, uint32_t namelen, const char *value, uint32_t valuelen) {
   memcpy(this->name, name, namelen);

@@ -46,41 +46,41 @@ void LoadLibdexfileExternal();
 
 // Minimal std::string look-alike for a string returned from libdexfile.
 class DexString final {
-public:
-  DexString(DexString &&dex_str) noexcept : ext_string_(dex_str.ext_string_) {
-    dex_str.ext_string_ = MakeExtDexFileString("", 0);
+ public:
+  DexString(DexString &&dex_str) noexcept: ext_string_(dex_str.ext_string_) {
+	dex_str.ext_string_ = MakeExtDexFileString("", 0);
   }
   explicit DexString(const char *str = "")
-      : ext_string_(MakeExtDexFileString(str, std::strlen(str))) {}
+	  : ext_string_(MakeExtDexFileString(str, std::strlen(str))) {}
   explicit DexString(std::string_view str)
-      : ext_string_(MakeExtDexFileString(str.data(), str.size())) {}
+	  : ext_string_(MakeExtDexFileString(str.data(), str.size())) {}
   ~DexString() { g_ExtDexFileFreeString(ext_string_); }
 
   DexString &operator=(DexString &&dex_str) noexcept {
-    std::swap(ext_string_, dex_str.ext_string_);
-    return *this;
+	std::swap(ext_string_, dex_str.ext_string_);
+	return *this;
   }
 
   const char *data() const {
-    size_t ignored;
-    return g_ExtDexFileGetString(ext_string_, &ignored);
+	size_t ignored;
+	return g_ExtDexFileGetString(ext_string_, &ignored);
   }
   const char *c_str() const { return data(); }
 
   size_t size() const {
-    size_t len;
-    (void)g_ExtDexFileGetString(ext_string_, &len);
-    return len;
+	size_t len;
+	(void)g_ExtDexFileGetString(ext_string_, &len);
+	return len;
   }
   size_t length() const { return size(); }
 
   operator std::string_view() const {
-    size_t len;
-    const char *chars = g_ExtDexFileGetString(ext_string_, &len);
-    return std::string_view(chars, len);
+	size_t len;
+	const char *chars = g_ExtDexFileGetString(ext_string_, &len);
+	return std::string_view(chars, len);
   }
 
-private:
+ private:
   friend bool TryLoadLibdexfileExternal(std::string *error_msg);
   friend class DexFile;
   friend bool operator==(const DexString &, const DexString &);
@@ -93,10 +93,10 @@ private:
   static decltype(ExtDexFileFreeString) *g_ExtDexFileFreeString;
 
   static const struct ExtDexFileString *MakeExtDexFileString(const char *str, size_t size) {
-    if (UNLIKELY(g_ExtDexFileMakeString == nullptr)) {
-      LoadLibdexfileExternal();
-    }
-    return g_ExtDexFileMakeString(str, size);
+	if (UNLIKELY(g_ExtDexFileMakeString == nullptr)) {
+	  LoadLibdexfileExternal();
+	}
+	return g_ExtDexFileMakeString(str, size);
   }
 
   DISALLOW_COPY_AND_ASSIGN(DexString);
@@ -124,16 +124,16 @@ inline bool operator==(const MethodInfo &s1, const MethodInfo &s2) {
 // the stable C ABI and handles instance ownership. Thread-compatible but not
 // thread-safe.
 class DexFile {
-public:
+ public:
   DexFile(DexFile &&dex_file) noexcept {
-    ext_dex_file_ = dex_file.ext_dex_file_;
-    dex_file.ext_dex_file_ = nullptr;
+	ext_dex_file_ = dex_file.ext_dex_file_;
+	dex_file.ext_dex_file_ = nullptr;
   }
 
   explicit DexFile(std::unique_ptr<DexFile> &dex_file) noexcept {
-    ext_dex_file_ = dex_file->ext_dex_file_;
-    dex_file->ext_dex_file_ = nullptr;
-    dex_file.reset(nullptr);
+	ext_dex_file_ = dex_file->ext_dex_file_;
+	dex_file->ext_dex_file_ = nullptr;
+	dex_file.reset(nullptr);
   }
   virtual ~DexFile();
 
@@ -147,20 +147,20 @@ public:
   //
   // The caller must retain the memory.
   static std::unique_ptr<DexFile> OpenFromMemory(const void *addr, size_t *size,
-                                                 const std::string &location,
-                                                 /*out*/ std::string *error_msg) {
-    if (UNLIKELY(g_ExtDexFileOpenFromMemory == nullptr)) {
-      // Load libdexfile_external.so in this factory function, so instance
-      // methods don't need to check this.
-      LoadLibdexfileExternal();
-    }
-    ExtDexFile *ext_dex_file;
-    const ExtDexFileString *ext_error_msg = nullptr;
-    if (g_ExtDexFileOpenFromMemory(addr, size, location.c_str(), &ext_error_msg, &ext_dex_file)) {
-      return std::unique_ptr<DexFile>(new DexFile(ext_dex_file));
-    }
-    *error_msg = (ext_error_msg == nullptr) ? "" : std::string(DexString(ext_error_msg));
-    return nullptr;
+												 const std::string &location,
+	  /*out*/ std::string *error_msg) {
+	if (UNLIKELY(g_ExtDexFileOpenFromMemory == nullptr)) {
+	  // Load libdexfile_external.so in this factory function, so instance
+	  // methods don't need to check this.
+	  LoadLibdexfileExternal();
+	}
+	ExtDexFile *ext_dex_file;
+	const ExtDexFileString *ext_error_msg = nullptr;
+	if (g_ExtDexFileOpenFromMemory(addr, size, location.c_str(), &ext_error_msg, &ext_dex_file)) {
+	  return std::unique_ptr<DexFile>(new DexFile(ext_dex_file));
+	}
+	*error_msg = (ext_error_msg == nullptr) ? "" : std::string(DexString(ext_error_msg));
+	return nullptr;
   }
 
   // mmaps the given file offset in the open fd and reads a dexfile from there.
@@ -169,19 +169,19 @@ public:
   // location is a string that describes the dex file, and is preferably its
   // path. It is mostly used to make error messages better, and may be "".
   static std::unique_ptr<DexFile> OpenFromFd(int fd, off_t offset, const std::string &location,
-                                             /*out*/ std::string *error_msg) {
-    if (UNLIKELY(g_ExtDexFileOpenFromFd == nullptr)) {
-      // Load libdexfile_external.so in this factory function, so instance
-      // methods don't need to check this.
-      LoadLibdexfileExternal();
-    }
-    ExtDexFile *ext_dex_file;
-    const ExtDexFileString *ext_error_msg = nullptr;
-    if (g_ExtDexFileOpenFromFd(fd, offset, location.c_str(), &ext_error_msg, &ext_dex_file)) {
-      return std::unique_ptr<DexFile>(new DexFile(ext_dex_file));
-    }
-    *error_msg = std::string(DexString(ext_error_msg));
-    return nullptr;
+	  /*out*/ std::string *error_msg) {
+	if (UNLIKELY(g_ExtDexFileOpenFromFd == nullptr)) {
+	  // Load libdexfile_external.so in this factory function, so instance
+	  // methods don't need to check this.
+	  LoadLibdexfileExternal();
+	}
+	ExtDexFile *ext_dex_file;
+	const ExtDexFileString *ext_error_msg = nullptr;
+	if (g_ExtDexFileOpenFromFd(fd, offset, location.c_str(), &ext_error_msg, &ext_dex_file)) {
+	  return std::unique_ptr<DexFile>(new DexFile(ext_dex_file));
+	}
+	*error_msg = std::string(DexString(ext_error_msg));
+	return nullptr;
   }
 
   // Given an offset relative to the start of the dex file header, if there is a
@@ -190,25 +190,25 @@ public:
   // the full function signature if with_signature is set, otherwise it gets the
   // class and method name only.
   MethodInfo GetMethodInfoForOffset(int64_t dex_offset, bool with_signature) {
-    ExtDexFileMethodInfo ext_method_info;
-    if (g_ExtDexFileGetMethodInfoForOffset(ext_dex_file_, dex_offset, with_signature,
-                                           &ext_method_info)) {
-      return AbsorbMethodInfo(ext_method_info);
-    }
-    return {/*offset=*/0, /*len=*/0, /*name=*/DexString()};
+	ExtDexFileMethodInfo ext_method_info;
+	if (g_ExtDexFileGetMethodInfoForOffset(ext_dex_file_, dex_offset, with_signature,
+										   &ext_method_info)) {
+	  return AbsorbMethodInfo(ext_method_info);
+	}
+	return {/*offset=*/0, /*len=*/0, /*name=*/DexString()};
   }
 
   // Returns info structs about all methods in the dex file. MethodInfo.name
   // receives the full function signature if with_signature is set, otherwise it
   // gets the class and method name only.
   std::vector<MethodInfo> GetAllMethodInfos(bool with_signature) {
-    MethodInfoVector res;
-    g_ExtDexFileGetAllMethodInfos(ext_dex_file_, with_signature, AddMethodInfoCallback,
-                                  static_cast<void *>(&res));
-    return res;
+	MethodInfoVector res;
+	g_ExtDexFileGetAllMethodInfos(ext_dex_file_, with_signature, AddMethodInfoCallback,
+								  static_cast<void *>(&res));
+	return res;
   }
 
-private:
+ private:
   friend bool TryLoadLibdexfileExternal(std::string *error_msg);
   explicit DexFile(ExtDexFile *ext_dex_file) : ext_dex_file_(ext_dex_file) {}
   ExtDexFile *ext_dex_file_; // Owned instance. nullptr only in moved-from zombies.

@@ -41,15 +41,15 @@ TEST(UtilTest, UTF16ToUTF8EmptyString) {
 
 template <typename Converter, typename Char>
 void check_utf_conversion_error(
-    const char* message,
-    fmt::basic_string_view<Char> str = fmt::basic_string_view<Char>(0, 1)) {
+	const char* message,
+	fmt::basic_string_view<Char> str = fmt::basic_string_view<Char>(0, 1)) {
   fmt::memory_buffer out;
   fmt::detail::format_windows_error(out, ERROR_INVALID_PARAMETER, message);
   fmt::system_error error(0, "");
   try {
-    (Converter)(str);
+	(Converter)(str);
   } catch (const fmt::system_error& e) {
-    error = e;
+	error = e;
   }
   EXPECT_EQ(ERROR_INVALID_PARAMETER, error.error_code());
   EXPECT_EQ(fmt::to_string(out), error.what());
@@ -57,35 +57,35 @@ void check_utf_conversion_error(
 
 TEST(UtilTest, UTF16ToUTF8Error) {
   check_utf_conversion_error<fmt::detail::utf16_to_utf8, wchar_t>(
-      "cannot convert string from UTF-16 to UTF-8");
+	  "cannot convert string from UTF-16 to UTF-8");
 }
 
 TEST(UtilTest, UTF16ToUTF8Convert) {
   fmt::detail::utf16_to_utf8 u;
   EXPECT_EQ(ERROR_INVALID_PARAMETER, u.convert(fmt::wstring_view(0, 1)));
   EXPECT_EQ(ERROR_INVALID_PARAMETER,
-            u.convert(fmt::wstring_view(L"foo", INT_MAX + 1u)));
+			u.convert(fmt::wstring_view(L"foo", INT_MAX + 1u)));
 }
 
 TEST(UtilTest, FormatWindowsError) {
   LPWSTR message = 0;
   FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
-                     FORMAT_MESSAGE_IGNORE_INSERTS,
-                 0, ERROR_FILE_EXISTS,
-                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                 reinterpret_cast<LPWSTR>(&message), 0, 0);
+					 FORMAT_MESSAGE_IGNORE_INSERTS,
+				 0, ERROR_FILE_EXISTS,
+				 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+				 reinterpret_cast<LPWSTR>(&message), 0, 0);
   fmt::detail::utf16_to_utf8 utf8_message(message);
   LocalFree(message);
   fmt::memory_buffer actual_message;
   fmt::detail::format_windows_error(actual_message, ERROR_FILE_EXISTS, "test");
   EXPECT_EQ(fmt::format("test: {}", utf8_message.str()),
-            fmt::to_string(actual_message));
+			fmt::to_string(actual_message));
   actual_message.resize(0);
   auto max_size = fmt::detail::max_value<size_t>();
   fmt::detail::format_windows_error(actual_message, ERROR_FILE_EXISTS,
-                                    fmt::string_view(0, max_size));
+									fmt::string_view(0, max_size));
   EXPECT_EQ(fmt::format("error {}", ERROR_FILE_EXISTS),
-            fmt::to_string(actual_message));
+			fmt::to_string(actual_message));
 }
 
 TEST(UtilTest, FormatLongWindowsError) {
@@ -94,30 +94,30 @@ TEST(UtilTest, FormatLongWindowsError) {
   // Windows SDKs, so do not fail the test if the error string cannot
   // be retrieved.
   const int provisioning_not_allowed =
-      0x80284013L /*TBS_E_PROVISIONING_NOT_ALLOWED*/;
+	  0x80284013L /*TBS_E_PROVISIONING_NOT_ALLOWED*/;
   if (FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                         FORMAT_MESSAGE_FROM_SYSTEM |
-                         FORMAT_MESSAGE_IGNORE_INSERTS,
-                     0, static_cast<DWORD>(provisioning_not_allowed),
-                     MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                     reinterpret_cast<LPWSTR>(&message), 0, 0) == 0) {
-    return;
+						 FORMAT_MESSAGE_FROM_SYSTEM |
+						 FORMAT_MESSAGE_IGNORE_INSERTS,
+					 0, static_cast<DWORD>(provisioning_not_allowed),
+					 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+					 reinterpret_cast<LPWSTR>(&message), 0, 0) == 0) {
+	return;
   }
   fmt::detail::utf16_to_utf8 utf8_message(message);
   LocalFree(message);
   fmt::memory_buffer actual_message;
   fmt::detail::format_windows_error(actual_message, provisioning_not_allowed,
-                                    "test");
+									"test");
   EXPECT_EQ(fmt::format("test: {}", utf8_message.str()),
-            fmt::to_string(actual_message));
+			fmt::to_string(actual_message));
 }
 
 TEST(UtilTest, WindowsError) {
   fmt::system_error error(0, "");
   try {
-    throw fmt::windows_error(ERROR_FILE_EXISTS, "test {}", "error");
+	throw fmt::windows_error(ERROR_FILE_EXISTS, "test {}", "error");
   } catch (const fmt::system_error& e) {
-    error = e;
+	error = e;
   }
   fmt::memory_buffer message;
   fmt::detail::format_windows_error(message, ERROR_FILE_EXISTS, "test error");
@@ -130,8 +130,8 @@ TEST(UtilTest, ReportWindowsError) {
   fmt::detail::format_windows_error(out, ERROR_FILE_EXISTS, "test error");
   out.push_back('\n');
   EXPECT_WRITE(stderr,
-               fmt::report_windows_error(ERROR_FILE_EXISTS, "test error"),
-               fmt::to_string(out));
+			   fmt::report_windows_error(ERROR_FILE_EXISTS, "test error"),
+			   fmt::to_string(out));
 }
 
 #endif  // _WIN32
@@ -167,11 +167,11 @@ static void write(file& f, fmt::string_view s) {
   size_t num_chars_left = s.size();
   const char* ptr = s.data();
   do {
-    size_t count = f.write(ptr, num_chars_left);
-    ptr += count;
-    // We can't write more than size_t bytes since num_chars_left
-    // has type size_t.
-    num_chars_left -= count;
+	size_t count = f.write(ptr, num_chars_left);
+	ptr += count;
+	// We can't write more than size_t bytes since num_chars_left
+	// has type size_t.
+	num_chars_left -= count;
   } while (num_chars_left != 0);
 }
 
@@ -230,8 +230,8 @@ TEST(BufferedFileTest, MoveFromTemporaryInAssignmentClosesFile) {
 TEST(BufferedFileTest, CloseFileInDtor) {
   int fd = 0;
   {
-    buffered_file f = open_buffered_file();
-    fd = f.fileno();
+	buffered_file f = open_buffered_file();
+	fd = f.fileno();
   }
   EXPECT_TRUE(isclosed(fd));
 }
@@ -239,16 +239,16 @@ TEST(BufferedFileTest, CloseFileInDtor) {
 TEST(BufferedFileTest, CloseErrorInDtor) {
   std::unique_ptr<buffered_file> f(new buffered_file(open_buffered_file()));
   EXPECT_WRITE(
-      stderr,
-      {
-        // The close function must be called inside EXPECT_WRITE,
-        // otherwise the system may recycle closed file descriptor when
-        // redirecting the output in EXPECT_STDERR and the second close
-        // will break output redirection.
-        FMT_POSIX(close(f->fileno()));
-        SUPPRESS_ASSERT(f.reset(nullptr));
-      },
-      format_system_error(EBADF, "cannot close file") + "\n");
+	  stderr,
+	  {
+		// The close function must be called inside EXPECT_WRITE,
+		// otherwise the system may recycle closed file descriptor when
+		// redirecting the output in EXPECT_STDERR and the second close
+		// will break output redirection.
+		FMT_POSIX(close(f->fileno()));
+		SUPPRESS_ASSERT(f.reset(nullptr));
+	  },
+	  format_system_error(EBADF, "cannot close file") + "\n");
 }
 
 TEST(BufferedFileTest, Close) {
@@ -272,14 +272,14 @@ TEST(BufferedFileTest, Fileno) {
   // fileno on a null FILE pointer either crashes or returns an error.
   // Disable Coverity because this is intentional.
   EXPECT_DEATH_IF_SUPPORTED(
-      {
-        try {
-          f.fileno();
-        } catch (const fmt::system_error&) {
-          std::exit(1);
-        }
-      },
-      "");
+	  {
+		try {
+		  f.fileno();
+		} catch (const fmt::system_error&) {
+		  std::exit(1);
+		}
+	  },
+	  "");
 #  endif
   f = open_buffered_file();
   EXPECT_TRUE(f.fileno() != -1);
@@ -289,7 +289,7 @@ TEST(BufferedFileTest, Fileno) {
 
 TEST(DirectBufferedFileTest, Print) {
   fmt::direct_buffered_file out(
-    "test-file", fmt::file::WRONLY | fmt::file::CREATE);
+	"test-file", fmt::file::WRONLY | fmt::file::CREATE);
   fmt::print(out, "The answer is {}.\n", 42);
   out.close();
   file in("test-file", file::RDONLY);
@@ -299,7 +299,7 @@ TEST(DirectBufferedFileTest, Print) {
 TEST(DirectBufferedFileTest, BufferBoundary) {
   auto str = std::string(4096, 'x');
   fmt::direct_buffered_file out(
-    "test-file", fmt::file::WRONLY | fmt::file::CREATE);
+	"test-file", fmt::file::WRONLY | fmt::file::CREATE);
   fmt::print(out, "{}", str);
   fmt::print(out, "{}", str);
   out.close();
@@ -322,7 +322,7 @@ TEST(FileTest, OpenBufferedFileInCtor) {
 
 TEST(FileTest, OpenBufferedFileError) {
   EXPECT_SYSTEM_ERROR(file("nonexistent", file::RDONLY), ENOENT,
-                      "cannot open file nonexistent");
+					  "cannot open file nonexistent");
 }
 
 TEST(FileTest, MoveCtor) {
@@ -382,8 +382,8 @@ TEST(FileTest, MoveFromTemporaryInAssignmentClosesFile) {
 TEST(FileTest, CloseFileInDtor) {
   int fd = 0;
   {
-    file f = open_file();
-    fd = f.descriptor();
+	file f = open_file();
+	fd = f.descriptor();
   }
   EXPECT_TRUE(isclosed(fd));
 }
@@ -391,16 +391,16 @@ TEST(FileTest, CloseFileInDtor) {
 TEST(FileTest, CloseErrorInDtor) {
   std::unique_ptr<file> f(new file(open_file()));
   EXPECT_WRITE(
-      stderr,
-      {
-        // The close function must be called inside EXPECT_WRITE,
-        // otherwise the system may recycle closed file descriptor when
-        // redirecting the output in EXPECT_STDERR and the second close
-        // will break output redirection.
-        FMT_POSIX(close(f->descriptor()));
-        SUPPRESS_ASSERT(f.reset(nullptr));
-      },
-      format_system_error(EBADF, "cannot close file") + "\n");
+	  stderr,
+	  {
+		// The close function must be called inside EXPECT_WRITE,
+		// otherwise the system may recycle closed file descriptor when
+		// redirecting the output in EXPECT_STDERR and the second close
+		// will break output redirection.
+		FMT_POSIX(close(f->descriptor()));
+		SUPPRESS_ASSERT(f.reset(nullptr));
+	  },
+	  format_system_error(EBADF, "cannot close file") + "\n");
 }
 
 TEST(FileTest, Close) {
@@ -457,7 +457,7 @@ TEST(FileTest, Dup) {
 TEST(FileTest, DupError) {
   int value = -1;
   EXPECT_SYSTEM_ERROR_NOASSERT(file::dup(value), EBADF,
-                               "cannot duplicate file descriptor -1");
+							   "cannot duplicate file descriptor -1");
 }
 #  endif
 
@@ -472,8 +472,8 @@ TEST(FileTest, Dup2) {
 TEST(FileTest, Dup2Error) {
   file f = open_file();
   EXPECT_SYSTEM_ERROR_NOASSERT(
-      f.dup2(-1), EBADF,
-      fmt::format("cannot duplicate file descriptor {} to -1", f.descriptor()));
+	  f.dup2(-1), EBADF,
+	  fmt::format("cannot duplicate file descriptor {} to -1", f.descriptor()));
 }
 
 TEST(FileTest, Dup2NoExcept) {

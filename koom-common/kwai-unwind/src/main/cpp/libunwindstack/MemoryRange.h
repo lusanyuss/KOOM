@@ -32,11 +32,11 @@ namespace unwindstack {
 // such that range.read(offset) is equivalent to underlying.read(src_begin).
 class MemoryRange : public Memory {
  public:
-  MemoryRange(const std::shared_ptr<Memory>& memory, uint64_t begin, uint64_t length,
-              uint64_t offset);
+  MemoryRange(const std::shared_ptr<Memory> &memory, uint64_t begin, uint64_t length,
+			  uint64_t offset);
   virtual ~MemoryRange() = default;
 
-  size_t Read(uint64_t addr, void* dst, size_t size) override;
+  size_t Read(uint64_t addr, void *dst, size_t size) override;
 
   uint64_t offset() { return offset_; }
   uint64_t length() { return length_; }
@@ -53,9 +53,9 @@ class MemoryRanges : public Memory {
   MemoryRanges() = default;
   virtual ~MemoryRanges() = default;
 
-  void Insert(MemoryRange* memory);
+  void Insert(MemoryRange *memory);
 
-  size_t Read(uint64_t addr, void* dst, size_t size) override;
+  size_t Read(uint64_t addr, void *dst, size_t size) override;
 
  private:
   std::map<uint64_t, std::unique_ptr<MemoryRange>> maps_;

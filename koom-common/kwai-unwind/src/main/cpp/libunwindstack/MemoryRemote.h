@@ -31,7 +31,7 @@ class MemoryRemote : public Memory {
   MemoryRemote(pid_t pid) : pid_(pid), read_redirect_func_(0) {}
   virtual ~MemoryRemote() = default;
 
-  size_t Read(uint64_t addr, void* dst, size_t size) override;
+  size_t Read(uint64_t addr, void *dst, size_t size) override;
   long ReadTag(uint64_t addr) override;
 
   pid_t pid() { return pid_; }

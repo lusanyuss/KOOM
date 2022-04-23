@@ -60,15 +60,15 @@ namespace leak_monitor {
 HOOK(void, free, void *ptr) {
   free(ptr);
   if (ptr) {
-    LeakMonitor::GetInstance().UnregisterAlloc(
-        reinterpret_cast<uintptr_t>(ptr));
+	LeakMonitor::GetInstance().UnregisterAlloc(
+		reinterpret_cast<uintptr_t>(ptr));
   }
 }
 
 HOOK(void *, malloc, size_t size) {
   auto result = malloc(size);
   LeakMonitor::GetInstance().OnMonitor(reinterpret_cast<intptr_t>(result),
-                                       size);
+									   size);
   CLEAR_MEMORY(result, size);
   return result;
 }
@@ -76,25 +76,25 @@ HOOK(void *, malloc, size_t size) {
 HOOK(void *, realloc, void *ptr, size_t size) {
   auto result = realloc(ptr, size);
   if (ptr != nullptr) {
-    LeakMonitor::GetInstance().UnregisterAlloc(
-        reinterpret_cast<uintptr_t>(ptr));
+	LeakMonitor::GetInstance().UnregisterAlloc(
+		reinterpret_cast<uintptr_t>(ptr));
   }
   LeakMonitor::GetInstance().OnMonitor(reinterpret_cast<intptr_t>(result),
-                                       size);
+									   size);
   return result;
 }
 
 HOOK(void *, calloc, size_t item_count, size_t item_size) {
   auto result = calloc(item_count, item_size);
   LeakMonitor::GetInstance().OnMonitor(reinterpret_cast<intptr_t>(result),
-                                       item_count * item_size);
+									   item_count * item_size);
   return result;
 }
 
 HOOK(void *, memalign, size_t alignment, size_t byte_count) {
   auto result = memalign(alignment, byte_count);
   LeakMonitor::GetInstance().OnMonitor(reinterpret_cast<intptr_t>(result),
-                                       byte_count);
+									   byte_count);
   CLEAR_MEMORY(result, byte_count);
   return result;
 }
@@ -102,7 +102,7 @@ HOOK(void *, memalign, size_t alignment, size_t byte_count) {
 HOOK(int, posix_memalign, void **memptr, size_t alignment, size_t size) {
   auto result = posix_memalign(memptr, alignment, size);
   LeakMonitor::GetInstance().OnMonitor(reinterpret_cast<intptr_t>(*memptr),
-                                       size);
+									   size);
   CLEAR_MEMORY(*memptr, size);
   return result;
 }
@@ -113,48 +113,48 @@ LeakMonitor &LeakMonitor::GetInstance() {
 }
 
 bool LeakMonitor::Install(std::vector<std::string> *selected_list,
-                          std::vector<std::string> *ignore_list) {
+						  std::vector<std::string> *ignore_list) {
   KCHECK(!has_install_monitor_);
 
   // Reinstall can't hook again
   if (has_install_monitor_) {
-    return true;
+	return true;
   }
 
   memory_analyzer_ = std::make_unique<MemoryAnalyzer>();
   if (!memory_analyzer_->IsValid()) {
-    ALOGE("memory_analyzer_ NOT Valid");
-    return false;
+	ALOGE("memory_analyzer_ NOT Valid");
+	return false;
   }
 
   std::vector<const std::string> register_pattern = {"^/data/.*\\.so$"};
   std::vector<const std::string> ignore_pattern = {".*/libkoom-native.so$",
-                                                   ".*/libxhook_lib.so$"};
+												   ".*/libxhook_lib.so$"};
 
   if (ignore_list != nullptr) {
-    for (std::string &item : *ignore_list) {
-      ignore_pattern.push_back(".*/" + item + ".so$");
-    }
+	for (std::string &item : *ignore_list) {
+	  ignore_pattern.push_back(".*/" + item + ".so$");
+	}
   }
   if (selected_list != nullptr && !selected_list->empty()) {
-    // only hook the so in selected list
-    register_pattern.clear();
-    for (std::string &item : *selected_list) {
-      register_pattern.push_back("^/data/.*/" + item + ".so$");
-    }
+	// only hook the so in selected list
+	register_pattern.clear();
+	for (std::string &item : *selected_list) {
+	  register_pattern.push_back("^/data/.*/" + item + ".so$");
+	}
   }
   std::vector<std::pair<const std::string, void *const>> hook_entries = {
-      std::make_pair("malloc", reinterpret_cast<void *>(WRAP(malloc))),
-      std::make_pair("realloc", reinterpret_cast<void *>(WRAP(realloc))),
-      std::make_pair("calloc", reinterpret_cast<void *>(WRAP(calloc))),
-      std::make_pair("memalign", reinterpret_cast<void *>(WRAP(memalign))),
-      std::make_pair("posix_memalign",
-                     reinterpret_cast<void *>(WRAP(posix_memalign))),
-      std::make_pair("free", reinterpret_cast<void *>(WRAP(free)))};
+	  std::make_pair("malloc", reinterpret_cast<void *>(WRAP(malloc))),
+	  std::make_pair("realloc", reinterpret_cast<void *>(WRAP(realloc))),
+	  std::make_pair("calloc", reinterpret_cast<void *>(WRAP(calloc))),
+	  std::make_pair("memalign", reinterpret_cast<void *>(WRAP(memalign))),
+	  std::make_pair("posix_memalign",
+					 reinterpret_cast<void *>(WRAP(posix_memalign))),
+	  std::make_pair("free", reinterpret_cast<void *>(WRAP(free)))};
 
   if (HookHelper::HookMethods(register_pattern, ignore_pattern, hook_entries)) {
-    has_install_monitor_ = true;
-    return true;
+	has_install_monitor_ = true;
+	return true;
   }
 
   HookHelper::UnHookMethods();
@@ -185,29 +185,29 @@ std::vector<std::shared_ptr<AllocRecord>> LeakMonitor::GetLeakAllocs() {
 
   // Collect live memory blocks
   auto collect_func = [&](std::shared_ptr<AllocRecord> &alloc_info) -> void {
-    live_allocs.push_back(alloc_info);
+	live_allocs.push_back(alloc_info);
   };
   live_alloc_records_.Dump(collect_func);
 
   auto is_leak = [&](decltype(unreachable_allocs)::value_type &unreachable,
-                     std::shared_ptr<AllocRecord> &live) -> bool {
-    auto live_start = CONFUSE(live->address);
-    auto live_end = live_start + live->size;
-    auto unreachable_start = unreachable.first;
-    auto unreachable_end = unreachable_start + unreachable.second;
-    // TODO why
-    return live_start == unreachable_start ||
-           live_start >= unreachable_start && live_end <= unreachable_end;
+					 std::shared_ptr<AllocRecord> &live) -> bool {
+	auto live_start = CONFUSE(live->address);
+	auto live_end = live_start + live->size;
+	auto unreachable_start = unreachable.first;
+	auto unreachable_end = unreachable_start + unreachable.second;
+	// TODO why
+	return live_start == unreachable_start ||
+		live_start >= unreachable_start && live_end <= unreachable_end;
   };
   // Check leak allocation (unreachable && not free)
   for (auto &live : live_allocs) {
-    for (auto &unreachable : unreachable_allocs) {
-      if (is_leak(unreachable, live)) {
-        leak_allocs.push_back(live);
-        // Just remove leak allocation(never be free)
-        UnregisterAlloc(live->address);
-      }
-    }
+	for (auto &unreachable : unreachable_allocs) {
+	  if (is_leak(unreachable, live)) {
+		leak_allocs.push_back(live);
+		// Just remove leak allocation(never be free)
+		UnregisterAlloc(live->address);
+	  }
+	}
   }
 
   return leak_allocs;
@@ -220,11 +220,11 @@ uint64_t LeakMonitor::CurrentAllocIndex() {
 
 ALWAYS_INLINE void LeakMonitor::RegisterAlloc(uintptr_t address, size_t size) {
   if (!address || !size) {
-    return;
+	return;
   }
 
   auto unwind_backtrace = [](uintptr_t *frames, uint32_t *frame_count) {
-    *frame_count = StackTrace::FastUnwind(frames, kMaxBacktraceSize);
+	*frame_count = StackTrace::FastUnwind(frames, kMaxBacktraceSize);
   };
 
   thread_local ThreadInfo thread_info;
@@ -243,8 +243,8 @@ ALWAYS_INLINE void LeakMonitor::UnregisterAlloc(uintptr_t address) {
 
 ALWAYS_INLINE void LeakMonitor::OnMonitor(uintptr_t address, size_t size) {
   if (!has_install_monitor_ || !address ||
-      size < alloc_threshold_.load(std::memory_order_relaxed)) {
-    return;
+	  size < alloc_threshold_.load(std::memory_order_relaxed)) {
+	return;
   }
 
   RegisterAlloc(address, size);

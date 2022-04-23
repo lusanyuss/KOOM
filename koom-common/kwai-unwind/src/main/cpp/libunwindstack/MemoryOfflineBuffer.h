@@ -25,15 +25,15 @@ namespace unwindstack {
 
 class MemoryOfflineBuffer : public Memory {
  public:
-  MemoryOfflineBuffer(const uint8_t* data, uint64_t start, uint64_t end);
+  MemoryOfflineBuffer(const uint8_t *data, uint64_t start, uint64_t end);
   virtual ~MemoryOfflineBuffer() = default;
 
-  void Reset(const uint8_t* data, uint64_t start, uint64_t end);
+  void Reset(const uint8_t *data, uint64_t start, uint64_t end);
 
-  size_t Read(uint64_t addr, void* dst, size_t size) override;
+  size_t Read(uint64_t addr, void *dst, size_t size) override;
 
  private:
-  const uint8_t* data_;
+  const uint8_t *data_;
   uint64_t start_;
   uint64_t end_;
 };

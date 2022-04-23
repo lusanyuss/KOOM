@@ -24,9 +24,9 @@ import com.kwai.koom.demo.common.CommonInitTask;
 
 public class KOOMApplication extends Application {
 
-  @Override
-  public void onCreate() {
-    super.onCreate();
-    CommonInitTask.INSTANCE.init(this);
-  }
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        CommonInitTask.INSTANCE.init(this);
+    }
 }

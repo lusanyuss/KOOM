@@ -42,7 +42,7 @@ struct DwarfLocation {
 };
 
 struct DwarfLocations : public std::unordered_map<uint32_t, DwarfLocation> {
-  const DwarfCie* cie;
+  const DwarfCie *cie;
   // The range of PCs where the locations are valid (end is exclusive).
   uint64_t pc_start = 0;
   uint64_t pc_end = 0;

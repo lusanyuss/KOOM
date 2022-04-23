@@ -31,31 +31,31 @@ namespace unwindstack {
 class MemoryFileAtOffset;
 
 struct MapInfo {
-  MapInfo(MapInfo* prev_map, MapInfo* prev_real_map, uint64_t start, uint64_t end, uint64_t offset,
-          uint64_t flags, const char* name)
-      : start(start),
-        end(end),
-        offset(offset),
-        flags(flags),
-        name(name),
-        prev_map(prev_map),
-        prev_real_map(prev_real_map),
-        load_bias(INT64_MAX),
-        build_id(0) {
-    if (prev_real_map != nullptr) prev_real_map->next_real_map = this;
+  MapInfo(MapInfo *prev_map, MapInfo *prev_real_map, uint64_t start, uint64_t end, uint64_t offset,
+		  uint64_t flags, const char *name)
+	  : start(start),
+		end(end),
+		offset(offset),
+		flags(flags),
+		name(name),
+		prev_map(prev_map),
+		prev_real_map(prev_real_map),
+		load_bias(INT64_MAX),
+		build_id(0) {
+	if (prev_real_map != nullptr) prev_real_map->next_real_map = this;
   }
-  MapInfo(MapInfo* prev_map, MapInfo* prev_real_map, uint64_t start, uint64_t end, uint64_t offset,
-          uint64_t flags, const std::string& name)
-      : start(start),
-        end(end),
-        offset(offset),
-        flags(flags),
-        name(name),
-        prev_map(prev_map),
-        prev_real_map(prev_real_map),
-        load_bias(INT64_MAX),
-        build_id(0) {
-    if (prev_real_map != nullptr) prev_real_map->next_real_map = this;
+  MapInfo(MapInfo *prev_map, MapInfo *prev_real_map, uint64_t start, uint64_t end, uint64_t offset,
+		  uint64_t flags, const std::string &name)
+	  : start(start),
+		end(end),
+		offset(offset),
+		flags(flags),
+		name(name),
+		prev_map(prev_map),
+		prev_real_map(prev_real_map),
+		load_bias(INT64_MAX),
+		build_id(0) {
+	if (prev_real_map != nullptr) prev_real_map->next_real_map = this;
   }
   ~MapInfo();
 
@@ -76,7 +76,7 @@ struct MapInfo {
   // shared libraries into a read-only and read-execute map.
   uint64_t elf_start_offset = 0;
 
-  MapInfo* prev_map = nullptr;
+  MapInfo *prev_map = nullptr;
   // This is the previous map that is not empty with a 0 offset. For
   // example, this set of maps:
   //  1000-2000  r--p 000000 00:00 0 libc.so
@@ -84,10 +84,10 @@ struct MapInfo {
   //  3000-4000  r-xp 003000 00:00 0 libc.so
   // The last map's prev_map would point to the 2000-3000 map, while the
   // prev_real_map would point to the 1000-2000 map.
-  MapInfo* prev_real_map = nullptr;
+  MapInfo *prev_real_map = nullptr;
 
   // Same as above but set to point to the next map.
-  MapInfo* next_real_map = nullptr;
+  MapInfo *next_real_map = nullptr;
 
   std::atomic_int64_t load_bias;
 
@@ -100,13 +100,13 @@ struct MapInfo {
   bool memory_backed_elf = false;
 
   // This function guarantees it will never return nullptr.
-  Elf* GetElf(const std::shared_ptr<Memory>& process_memory, ArchEnum expected_arch);
+  Elf *GetElf(const std::shared_ptr<Memory> &process_memory, ArchEnum expected_arch);
 
-  uint64_t GetLoadBias(const std::shared_ptr<Memory>& process_memory);
+  uint64_t GetLoadBias(const std::shared_ptr<Memory> &process_memory);
 
-  Memory* CreateMemory(const std::shared_ptr<Memory>& process_memory);
+  Memory *CreateMemory(const std::shared_ptr<Memory> &process_memory);
 
-  bool GetFunctionName(uint64_t addr, std::string* name, uint64_t* func_offset);
+  bool GetFunctionName(uint64_t addr, std::string *name, uint64_t *func_offset);
 
   // Returns the raw build id read from the elf data.
   std::string GetBuildID();
@@ -117,11 +117,11 @@ struct MapInfo {
   inline bool IsBlank() { return offset == 0 && flags == 0 && name.empty(); }
 
  private:
-  MapInfo(const MapInfo&) = delete;
-  void operator=(const MapInfo&) = delete;
+  MapInfo(const MapInfo &) = delete;
+  void operator=(const MapInfo &) = delete;
 
-  Memory* GetFileMemory();
-  bool InitFileMemoryFromPreviousReadOnlyMap(MemoryFileAtOffset* memory);
+  Memory *GetFileMemory();
+  bool InitFileMemoryFromPreviousReadOnlyMap(MemoryFileAtOffset *memory);
 
   // Protect the creation of the elf object.
   std::mutex mutex_;

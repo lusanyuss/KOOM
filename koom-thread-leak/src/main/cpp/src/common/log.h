@@ -30,32 +30,32 @@ class Log {
   enum Type { Info, Error };
 
   static void info(const char *tag, const char *format, ...) {
-    if (!log_enable) return;
-    char log_buffer[kMaxLogLine];
-    va_list args;
-    va_start(args, format);
-    vsnprintf(const_cast<char *>(log_buffer), kMaxLogLine, format, args);
-    va_end(args);
-    log(Info, tag, log_buffer);
+	if (!log_enable) return;
+	char log_buffer[kMaxLogLine];
+	va_list args;
+	va_start(args, format);
+	vsnprintf(const_cast<char *>(log_buffer), kMaxLogLine, format, args);
+	va_end(args);
+	log(Info, tag, log_buffer);
   }
 
   static void error(const char *tag, const char *format, ...) {
-    if (!log_enable) return;
-    char log_buffer[kMaxLogLine];
-    va_list args;
-    va_start(args, format);
-    vsnprintf(const_cast<char *>(log_buffer), kMaxLogLine, format, args);
-    va_end(args);
-    log(Error, tag, log_buffer);
+	if (!log_enable) return;
+	char log_buffer[kMaxLogLine];
+	va_list args;
+	va_start(args, format);
+	vsnprintf(const_cast<char *>(log_buffer), kMaxLogLine, format, args);
+	va_end(args);
+	log(Error, tag, log_buffer);
   }
 
   static bool log_enable;
 
  private:
   static void log(Type type, const char *tag, char *log_buffer) {
-    if (!log_enable) return;
-    __android_log_print(type == Info ? ANDROID_LOG_INFO : ANDROID_LOG_ERROR,
-                        tag, "%s", log_buffer);
+	if (!log_enable) return;
+	__android_log_print(type == Info ? ANDROID_LOG_INFO : ANDROID_LOG_ERROR,
+						tag, "%s", log_buffer);
   }
 
   static const int kMaxLogLine = 512;

@@ -29,12 +29,12 @@ std::vector<const std::string> HookHelper::ignore_pattern_;
 std::vector<std::pair<const std::string, void *const>> HookHelper::methods_;
 
 bool HookHelper::HookMethods(
-    std::vector<const std::string> &register_pattern,
-    std::vector<const std::string> &ignore_pattern,
-    std::vector<std::pair<const std::string, void *const>> &methods) {
+	std::vector<const std::string> &register_pattern,
+	std::vector<const std::string> &ignore_pattern,
+	std::vector<std::pair<const std::string, void *const>> &methods) {
   if (register_pattern.empty() || methods.empty()) {
-    ALOGE("Hook nothing");
-    return false;
+	ALOGE("Hook nothing");
+	return false;
   }
 
   register_pattern_ = std::move(register_pattern);
@@ -59,26 +59,26 @@ bool HookHelper::HookImpl() {
   pthread_mutex_lock(&DlopenCb::hook_mutex);
   xhook_clear();
   for (auto &pattern : register_pattern_) {
-    for (auto &method : methods_) {
-      if (xhook_register(pattern.c_str(), method.first.c_str(), method.second,
-                         nullptr) != EXIT_SUCCESS) {
-        ALOGE("xhook_register pattern %s method %s fail", pattern.c_str(),
-              method.first.c_str());
-        pthread_mutex_unlock(&DlopenCb::hook_mutex);
-        return false;
-      }
-    }
+	for (auto &method : methods_) {
+	  if (xhook_register(pattern.c_str(), method.first.c_str(), method.second,
+						 nullptr) != EXIT_SUCCESS) {
+		ALOGE("xhook_register pattern %s method %s fail", pattern.c_str(),
+			  method.first.c_str());
+		pthread_mutex_unlock(&DlopenCb::hook_mutex);
+		return false;
+	  }
+	}
   }
 
   for (auto &pattern : ignore_pattern_) {
-    for (auto &method : methods_) {
-      if (xhook_ignore(pattern.c_str(), method.first.c_str()) != EXIT_SUCCESS) {
-        ALOGE("xhook_ignore pattern %s method %s fail", pattern.c_str(),
-              method.first.c_str());
-        pthread_mutex_unlock(&DlopenCb::hook_mutex);
-        return false;
-      }
-    }
+	for (auto &method : methods_) {
+	  if (xhook_ignore(pattern.c_str(), method.first.c_str()) != EXIT_SUCCESS) {
+		ALOGE("xhook_ignore pattern %s method %s fail", pattern.c_str(),
+			  method.first.c_str());
+		pthread_mutex_unlock(&DlopenCb::hook_mutex);
+		return false;
+	  }
+	}
   }
 
   int ret = xhook_refresh(0);

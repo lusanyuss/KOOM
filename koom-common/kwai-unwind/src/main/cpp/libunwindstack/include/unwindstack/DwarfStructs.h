@@ -45,7 +45,7 @@ struct DwarfFde {
   uint64_t pc_start = 0;
   uint64_t pc_end = 0;
   uint64_t lsda_address = 0;
-  const DwarfCie* cie = nullptr;
+  const DwarfCie *cie = nullptr;
 };
 
 constexpr uint16_t CFA_REG = static_cast<uint16_t>(-1);

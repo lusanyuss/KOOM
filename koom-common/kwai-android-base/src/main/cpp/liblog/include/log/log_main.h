@@ -195,10 +195,10 @@ extern int __fake_use_va_args(int, ...);
 #if LOG_NDEBUG
 #define ALOGV(...)                                                                                 \
   do {                                                                                             \
-    __FAKE_USE_VA_ARGS(__VA_ARGS__);                                                               \
-    if (false) {                                                                                   \
-      __ALOGV(__VA_ARGS__);                                                                        \
-    }                                                                                              \
+	__FAKE_USE_VA_ARGS(__VA_ARGS__);                                                               \
+	if (false) {                                                                                   \
+	  __ALOGV(__VA_ARGS__);                                                                        \
+	}                                                                                              \
   } while (false)
 #else
 #define ALOGV(...) __ALOGV(__VA_ARGS__)
@@ -362,7 +362,7 @@ int __android_log_is_loggable_len(int prio, const char *tag, size_t len, int def
 #if LOG_NDEBUG /* Production */
 #define android_testLog(prio, tag)                                                                 \
   (__android_log_is_loggable_len(prio, tag, ((tag) && *(tag)) ? strlen(tag) : 0,                   \
-                                 ANDROID_LOG_DEBUG) != 0)
+								 ANDROID_LOG_DEBUG) != 0)
 #else
 #define android_testLog(prio, tag)                                                                 \
   (__android_log_is_loggable_len(prio, tag, ((tag) && *(tag)) ? strlen(tag) : 0,                   \

@@ -22,41 +22,41 @@ import com.kwai.koom.base.MonitorLog
 import com.kwai.koom.javaoom.monitor.tracker.model.SystemInfo
 
 class PhysicalMemoryOOMTracker : OOMTracker() {
-
-  companion object {
-    private const val TAG: String = "OOMMonitor_PhysicalMemoryTracker"
-  }
-
-  override fun track(): Boolean {
-    val info = SystemInfo.memInfo
-    when {
-      info.rate < monitorConfig.deviceMemoryThreshold -> {
-        MonitorLog.e(TAG, "oom meminfo.rate < " +
-            "${monitorConfig.deviceMemoryThreshold * 100}%")
-        //return true //先只是上传，不真实触发dump
-      }
-
-      info.rate < 0.10f -> {
-        MonitorLog.i(TAG, "oom meminfo.rate < 10.0%")
-      }
-
-      info.rate < 0.15f -> {
-        MonitorLog.i(TAG, "oom meminfo.rate < 15.0%")
-      }
-
-      info.rate < 0.20f -> {
-        MonitorLog.i(TAG, "oom meminfo.rate < 20.0%")
-      }
-
-      info.rate < 0.30f -> {
-        MonitorLog.i(TAG, "oom meminfo.rate < 30.0%")
-      }
+    
+    companion object {
+        private const val TAG: String = "OOMMonitor_PhysicalMemoryTracker"
     }
-    return false
-  }
-
-  override fun reset() = Unit
-
-  override fun reason() = "reason_lmk_oom"
-
+    
+    override fun track(): Boolean {
+        val info = SystemInfo.memInfo
+        when {
+            info.rate < monitorConfig.deviceMemoryThreshold -> {
+                MonitorLog.e(
+                    TAG, "oom meminfo.rate < " + "${monitorConfig.deviceMemoryThreshold * 100}%"
+                ) //return true //先只是上传，不真实触发dump
+            }
+            
+            info.rate < 0.10f -> {
+                MonitorLog.i(TAG, "oom meminfo.rate < 10.0%")
+            }
+            
+            info.rate < 0.15f -> {
+                MonitorLog.i(TAG, "oom meminfo.rate < 15.0%")
+            }
+            
+            info.rate < 0.20f -> {
+                MonitorLog.i(TAG, "oom meminfo.rate < 20.0%")
+            }
+            
+            info.rate < 0.30f -> {
+                MonitorLog.i(TAG, "oom meminfo.rate < 30.0%")
+            }
+        }
+        return false
+    }
+    
+    override fun reset() = Unit
+    
+    override fun reason() = "reason_lmk_oom"
+    
 }

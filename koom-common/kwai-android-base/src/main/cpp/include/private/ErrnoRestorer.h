@@ -21,14 +21,14 @@
 #include "platform/bionic/macros.h"
 
 class ErrnoRestorer {
-public:
+ public:
   explicit ErrnoRestorer() : saved_errno_(errno) {}
 
   ~ErrnoRestorer() { errno = saved_errno_; }
 
   void override(int new_errno) { saved_errno_ = new_errno; }
 
-private:
+ private:
   int saved_errno_;
 
   BIONIC_DISALLOW_COPY_AND_ASSIGN(ErrnoRestorer);

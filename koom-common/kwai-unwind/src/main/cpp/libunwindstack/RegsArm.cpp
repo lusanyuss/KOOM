@@ -51,17 +51,17 @@ void RegsArm::set_sp(uint64_t sp) {
   regs_[ARM_REG_SP] = sp;
 }
 
-bool RegsArm::SetPcFromReturnAddress(Memory*) {
+bool RegsArm::SetPcFromReturnAddress(Memory *) {
   uint32_t lr = regs_[ARM_REG_LR];
   if (regs_[ARM_REG_PC] == lr) {
-    return false;
+	return false;
   }
 
   regs_[ARM_REG_PC] = lr;
   return true;
 }
 
-void RegsArm::IterateRegisters(std::function<void(const char*, uint64_t)> fn) {
+void RegsArm::IterateRegisters(std::function<void(const char *, uint64_t)> fn) {
   fn("r0", regs_[ARM_REG_R0]);
   fn("r1", regs_[ARM_REG_R1]);
   fn("r2", regs_[ARM_REG_R2]);
@@ -80,94 +80,94 @@ void RegsArm::IterateRegisters(std::function<void(const char*, uint64_t)> fn) {
   fn("pc", regs_[ARM_REG_PC]);
 }
 
-Regs* RegsArm::Read(void* remote_data) {
-  arm_user_regs* user = reinterpret_cast<arm_user_regs*>(remote_data);
+Regs *RegsArm::Read(void *remote_data) {
+  arm_user_regs *user = reinterpret_cast<arm_user_regs *>(remote_data);
 
-  RegsArm* regs = new RegsArm();
+  RegsArm *regs = new RegsArm();
   memcpy(regs->RawData(), &user->regs[0], ARM_REG_LAST * sizeof(uint32_t));
   return regs;
 }
 
-Regs* RegsArm::CreateFromUcontext(void* ucontext) {
-  arm_ucontext_t* arm_ucontext = reinterpret_cast<arm_ucontext_t*>(ucontext);
+Regs *RegsArm::CreateFromUcontext(void *ucontext) {
+  arm_ucontext_t *arm_ucontext = reinterpret_cast<arm_ucontext_t *>(ucontext);
 
-  RegsArm* regs = new RegsArm();
+  RegsArm *regs = new RegsArm();
   memcpy(regs->RawData(), &arm_ucontext->uc_mcontext.regs[0], ARM_REG_LAST * sizeof(uint32_t));
   return regs;
 }
 
-bool RegsArm::StepIfSignalHandler(uint64_t elf_offset, Elf* elf, Memory* process_memory) {
+bool RegsArm::StepIfSignalHandler(uint64_t elf_offset, Elf *elf, Memory *process_memory) {
   uint32_t data;
-  Memory* elf_memory = elf->memory();
+  Memory *elf_memory = elf->memory();
   // Read from elf memory since it is usually more expensive to read from
   // process memory.
   if (!elf_memory->ReadFully(elf_offset, &data, sizeof(data))) {
-    return false;
+	return false;
   }
 
   uint64_t offset = 0;
   if (data == 0xe3a07077 || data == 0xef900077 || data == 0xdf002777) {
-    uint64_t sp = regs_[ARM_REG_SP];
-    // non-RT sigreturn call.
-    // __restore:
-    //
-    // Form 1 (arm):
-    // 0x77 0x70              mov r7, #0x77
-    // 0xa0 0xe3              svc 0x00000000
-    //
-    // Form 2 (arm):
-    // 0x77 0x00 0x90 0xef    svc 0x00900077
-    //
-    // Form 3 (thumb):
-    // 0x77 0x27              movs r7, #77
-    // 0x00 0xdf              svc 0
-    if (!process_memory->ReadFully(sp, &data, sizeof(data))) {
-      return false;
-    }
-    if (data == 0x5ac3c35a) {
-      // SP + uc_mcontext offset + r0 offset.
-      offset = sp + 0x14 + 0xc;
-    } else {
-      // SP + r0 offset
-      offset = sp + 0xc;
-    }
+	uint64_t sp = regs_[ARM_REG_SP];
+	// non-RT sigreturn call.
+	// __restore:
+	//
+	// Form 1 (arm):
+	// 0x77 0x70              mov r7, #0x77
+	// 0xa0 0xe3              svc 0x00000000
+	//
+	// Form 2 (arm):
+	// 0x77 0x00 0x90 0xef    svc 0x00900077
+	//
+	// Form 3 (thumb):
+	// 0x77 0x27              movs r7, #77
+	// 0x00 0xdf              svc 0
+	if (!process_memory->ReadFully(sp, &data, sizeof(data))) {
+	  return false;
+	}
+	if (data == 0x5ac3c35a) {
+	  // SP + uc_mcontext offset + r0 offset.
+	  offset = sp + 0x14 + 0xc;
+	} else {
+	  // SP + r0 offset
+	  offset = sp + 0xc;
+	}
   } else if (data == 0xe3a070ad || data == 0xef9000ad || data == 0xdf0027ad) {
-    uint64_t sp = regs_[ARM_REG_SP];
-    // RT sigreturn call.
-    // __restore_rt:
-    //
-    // Form 1 (arm):
-    // 0xad 0x70      mov r7, #0xad
-    // 0xa0 0xe3      svc 0x00000000
-    //
-    // Form 2 (arm):
-    // 0xad 0x00 0x90 0xef    svc 0x009000ad
-    //
-    // Form 3 (thumb):
-    // 0xad 0x27              movs r7, #ad
-    // 0x00 0xdf              svc 0
-    if (!process_memory->ReadFully(sp, &data, sizeof(data))) {
-      return false;
-    }
-    if (data == sp + 8) {
-      // SP + 8 + sizeof(siginfo_t) + uc_mcontext_offset + r0 offset
-      offset = sp + 8 + 0x80 + 0x14 + 0xc;
-    } else {
-      // SP + sizeof(siginfo_t) + uc_mcontext_offset + r0 offset
-      offset = sp + 0x80 + 0x14 + 0xc;
-    }
+	uint64_t sp = regs_[ARM_REG_SP];
+	// RT sigreturn call.
+	// __restore_rt:
+	//
+	// Form 1 (arm):
+	// 0xad 0x70      mov r7, #0xad
+	// 0xa0 0xe3      svc 0x00000000
+	//
+	// Form 2 (arm):
+	// 0xad 0x00 0x90 0xef    svc 0x009000ad
+	//
+	// Form 3 (thumb):
+	// 0xad 0x27              movs r7, #ad
+	// 0x00 0xdf              svc 0
+	if (!process_memory->ReadFully(sp, &data, sizeof(data))) {
+	  return false;
+	}
+	if (data == sp + 8) {
+	  // SP + 8 + sizeof(siginfo_t) + uc_mcontext_offset + r0 offset
+	  offset = sp + 8 + 0x80 + 0x14 + 0xc;
+	} else {
+	  // SP + sizeof(siginfo_t) + uc_mcontext_offset + r0 offset
+	  offset = sp + 0x80 + 0x14 + 0xc;
+	}
   }
   if (offset == 0) {
-    return false;
+	return false;
   }
 
   if (!process_memory->ReadFully(offset, regs_.data(), sizeof(uint32_t) * ARM_REG_LAST)) {
-    return false;
+	return false;
   }
   return true;
 }
 
-Regs* RegsArm::Clone() {
+Regs *RegsArm::Clone() {
   return new RegsArm(*this);
 }
 

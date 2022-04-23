@@ -52,18 +52,18 @@ namespace base {
 // this happens, file descriptors are still sent to the other end, but with
 // truncated data. For this reason, using SOCK_SEQPACKET or SOCK_DGRAM is recommended.
 ssize_t SendFileDescriptorVector(borrowed_fd sock, const void *data, size_t len,
-                                 const std::vector<int> &fds);
+								 const std::vector<int> &fds);
 
 // Receive file descriptors from a Unix domain socket.
 //
 // If more FDs (or bytes, for datagram sockets) are received than expected,
 // -1 is returned with errno set to EMSGSIZE, and all received FDs are thrown away.
 ssize_t ReceiveFileDescriptorVector(borrowed_fd sock, void *data, size_t len, size_t max_fds,
-                                    std::vector<android::base::unique_fd> *fds);
+									std::vector<android::base::unique_fd> *fds);
 
 // Helper for SendFileDescriptorVector that constructs a std::vector for you, e.g.:
 //   SendFileDescriptors(sock, "foo", 3, std::move(fd1), std::move(fd2))
-template <typename... Args>
+template<typename... Args>
 ssize_t SendFileDescriptors(borrowed_fd sock, const void *data, size_t len, Args &&... sent_fds) {
   // Do not allow implicit conversion to int: people might try to do something along the lines of:
   //   SendFileDescriptors(..., std::move(a_unique_fd))
@@ -78,7 +78,7 @@ ssize_t SendFileDescriptors(borrowed_fd sock, const void *data, size_t len, Args
 // If more file descriptors are received than requested, -1 is returned with errno set to EMSGSIZE.
 // If fewer file descriptors are received than requested, -1 is returned with errno set to ENOMSG.
 // In both cases, all arguments are cleared and any received FDs are thrown away.
-template <typename... Args>
+template<typename... Args>
 ssize_t ReceiveFileDescriptors(borrowed_fd sock, void *data, size_t len, Args &&... received_fds) {
   std::vector<unique_fd *> fds;
   Append(fds, std::forward<Args>(received_fds)...);
@@ -86,16 +86,16 @@ ssize_t ReceiveFileDescriptors(borrowed_fd sock, void *data, size_t len, Args &&
   std::vector<unique_fd> result;
   ssize_t rc = ReceiveFileDescriptorVector(sock, data, len, fds.size(), &result);
   if (rc == -1 || result.size() != fds.size()) {
-    int err = rc == -1 ? errno : ENOMSG;
-    for (unique_fd *fd : fds) {
-      fd->reset();
-    }
-    errno = err;
-    return -1;
+	int err = rc == -1 ? errno : ENOMSG;
+	for (unique_fd *fd : fds) {
+	  fd->reset();
+	}
+	errno = err;
+	return -1;
   }
 
   for (size_t i = 0; i < fds.size(); ++i) {
-    *fds[i] = std::move(result[i]);
+	*fds[i] = std::move(result[i]);
   }
   return rc;
 }

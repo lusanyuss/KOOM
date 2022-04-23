@@ -25,67 +25,62 @@ import com.kwai.koom.javaoom.monitor.OOMFileManager
 import java.io.File
 
 class FdOOMTracker : OOMTracker() {
-  companion object {
-    private const val TAG = "OOMMonitor_FdOOMTracker"
-
-    private const val FD_COUNT_THRESHOLD_GAP = 50 //FD连续值递增浮动范围50
-  }
-
-  private var mLastFdCount = 0
-  private var mOverThresholdCount = 0
-
-  override fun track(): Boolean {
-    val fdCount = getFdCount()
-    if (fdCount > monitorConfig.fdThreshold && fdCount >= mLastFdCount - FD_COUNT_THRESHOLD_GAP) {
-      mOverThresholdCount++
-
-      MonitorLog.i(TAG,
-          "[meet condition] "
-              + "overThresholdCount: $mOverThresholdCount"
-              + ", fdCount: $fdCount")
-
-      dumpFdIfNeed()
-    } else {
-      reset()
+    companion object {
+        private const val TAG = "OOMMonitor_FdOOMTracker"
+        
+        private const val FD_COUNT_THRESHOLD_GAP = 50 //FD连续值递增浮动范围50
     }
-
-    mLastFdCount = fdCount
-
-    return mOverThresholdCount >= monitorConfig.maxOverThresholdCount
-  }
-
-  override fun reset() {
-    mLastFdCount = 0
-    mOverThresholdCount = 0
-  }
-
-  override fun reason() = "reason_fd_oom"
-
-  private fun getFdCount(): Int {
-    return File("/proc/self/fd").listFiles()?.size ?: 0
-  }
-
-  private fun dumpFdIfNeed() {
-    MonitorLog.i(TAG, "over threshold dumpFdIfNeed")
-
-    if (mOverThresholdCount > monitorConfig.maxOverThresholdCount) return
-
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return
-
-    val fdNames = runCatching { File("/proc/self/fd").listFiles() }
-        .getOrElse {
-          MonitorLog.i(TAG, "/proc/self/fd child files is empty")
-
-          return@getOrElse emptyArray()
+    
+    private var mLastFdCount = 0
+    private var mOverThresholdCount = 0
+    
+    override fun track(): Boolean {
+        val fdCount = getFdCount()
+        if(fdCount > monitorConfig.fdThreshold && fdCount >= mLastFdCount - FD_COUNT_THRESHOLD_GAP) {
+            mOverThresholdCount++
+            
+            MonitorLog.i(
+                TAG, "[meet condition] " + "overThresholdCount: $mOverThresholdCount" + ", fdCount: $fdCount"
+            )
+            
+            dumpFdIfNeed()
+        } else {
+            reset()
         }
-        ?.map { file ->
-          runCatching { Os.readlink(file.path) }.getOrElse { "failed to read link ${file.path}" }
-        }
-        ?: emptyList()
-
-    OOMFileManager.createDumpFile(OOMFileManager.fdDumpDir)
-        .run {
-          runCatching { writeText(fdNames.sorted().joinToString(separator = ",")) }
-        }
-  }
+        
+        mLastFdCount = fdCount
+        
+        return mOverThresholdCount >= monitorConfig.maxOverThresholdCount
+    }
+    
+    override fun reset() {
+        mLastFdCount = 0
+        mOverThresholdCount = 0
+    }
+    
+    override fun reason() = "reason_fd_oom"
+    
+    private fun getFdCount(): Int {
+        return File("/proc/self/fd").listFiles()?.size ?: 0
+    }
+    
+    private fun dumpFdIfNeed() {
+        MonitorLog.i(TAG, "over threshold dumpFdIfNeed")
+        
+        if(mOverThresholdCount > monitorConfig.maxOverThresholdCount) return
+        
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return
+        
+        val fdNames = runCatching { File("/proc/self/fd").listFiles() }.getOrElse {
+                MonitorLog.i(TAG, "/proc/self/fd child files is empty")
+                
+                return@getOrElse emptyArray()
+            }?.map { file ->
+                runCatching { Os.readlink(file.path) }.getOrElse { "failed to read link ${file.path}" }
+            } ?: emptyList()
+        
+        OOMFileManager.createDumpFile(OOMFileManager.fdDumpDir).run {
+                runCatching { writeText(fdNames.sorted().joinToString(separator = ",")) }
+            }
+    }
 }

@@ -65,37 +65,37 @@ static int check_log_uid_permissions() {
 
   /* Matches clientHasLogCredentials() in logd */
   if ((uid != AID_SYSTEM) && (uid != AID_ROOT) && (uid != AID_LOG)) {
-    uid = geteuid();
-    if ((uid != AID_SYSTEM) && (uid != AID_ROOT) && (uid != AID_LOG)) {
-      gid_t gid = getgid();
-      if ((gid != AID_SYSTEM) && (gid != AID_ROOT) && (gid != AID_LOG)) {
-        gid = getegid();
-        if ((gid != AID_SYSTEM) && (gid != AID_ROOT) && (gid != AID_LOG)) {
-          int num_groups;
-          gid_t *groups;
+	uid = geteuid();
+	if ((uid != AID_SYSTEM) && (uid != AID_ROOT) && (uid != AID_LOG)) {
+	  gid_t gid = getgid();
+	  if ((gid != AID_SYSTEM) && (gid != AID_ROOT) && (gid != AID_LOG)) {
+		gid = getegid();
+		if ((gid != AID_SYSTEM) && (gid != AID_ROOT) && (gid != AID_LOG)) {
+		  int num_groups;
+		  gid_t *groups;
 
-          num_groups = getgroups(0, NULL);
-          if (num_groups <= 0) {
-            return -EPERM;
-          }
-          groups = static_cast<gid_t *>(calloc(num_groups, sizeof(gid_t)));
-          if (!groups) {
-            return -ENOMEM;
-          }
-          num_groups = getgroups(num_groups, groups);
-          while (num_groups > 0) {
-            if (groups[num_groups - 1] == AID_LOG) {
-              break;
-            }
-            --num_groups;
-          }
-          free(groups);
-          if (num_groups <= 0) {
-            return -EPERM;
-          }
-        }
-      }
-    }
+		  num_groups = getgroups(0, NULL);
+		  if (num_groups <= 0) {
+			return -EPERM;
+		  }
+		  groups = static_cast<gid_t *>(calloc(num_groups, sizeof(gid_t)));
+		  if (!groups) {
+			return -ENOMEM;
+		  }
+		  num_groups = getgroups(num_groups, groups);
+		  while (num_groups > 0) {
+			if (groups[num_groups - 1] == AID_LOG) {
+			  break;
+			}
+			--num_groups;
+		  }
+		  free(groups);
+		  if (num_groups <= 0) {
+			return -EPERM;
+		  }
+		}
+	  }
+	}
   }
   return 0;
 }
@@ -120,16 +120,16 @@ static const char *getprogname() {
   static char progname[MAX_PATH] = {};
 
   if (first) {
-    char path[PATH_MAX + 1];
-    DWORD result = GetModuleFileName(nullptr, path, sizeof(path) - 1);
-    if (result == 0 || result == sizeof(path) - 1)
-      return "";
-    path[PATH_MAX - 1] = 0;
+	char path[PATH_MAX + 1];
+	DWORD result = GetModuleFileName(nullptr, path, sizeof(path) - 1);
+	if (result == 0 || result == sizeof(path) - 1)
+	  return "";
+	path[PATH_MAX - 1] = 0;
 
-    char *path_basename = basename(path);
+	char *path_basename = basename(path);
 
-    snprintf(progname, sizeof(progname), "%s", path_basename);
-    first = false;
+	snprintf(progname, sizeof(progname), "%s", path_basename);
+	first = false;
   }
 
   return progname;
@@ -185,28 +185,28 @@ static int write_to_log(log_id_t log_id, struct iovec *vec, size_t nr) {
   struct timespec ts;
 
   if (log_id == LOG_ID_KERNEL) {
-    return -EINVAL;
+	return -EINVAL;
   }
 
   clock_gettime(CLOCK_REALTIME, &ts);
 
   if (log_id == LOG_ID_SECURITY) {
-    if (vec[0].iov_len < 4) {
-      return -EINVAL;
-    }
+	if (vec[0].iov_len < 4) {
+	  return -EINVAL;
+	}
 
-    ret = check_log_uid_permissions();
-    if (ret < 0) {
-      return ret;
-    }
-    if (!__android_log_security()) {
-      /* If only we could reset downstream logd counter */
-      return -EPERM;
-    }
+	ret = check_log_uid_permissions();
+	if (ret < 0) {
+	  return ret;
+	}
+	if (!__android_log_security()) {
+	  /* If only we could reset downstream logd counter */
+	  return -EPERM;
+	}
   } else if (log_id == LOG_ID_EVENTS || log_id == LOG_ID_STATS) {
-    if (vec[0].iov_len < 4) {
-      return -EINVAL;
-    }
+	if (vec[0].iov_len < 4) {
+	  return -EINVAL;
+	}
   }
 
   ret = LogdWrite(log_id, &ts, vec, nr);
@@ -252,34 +252,34 @@ void __android_log_stderr_logger(const struct __android_log_message *log_message
 
   static const char log_characters[] = "XXVDIWEF";
   static_assert(arraysize(log_characters) - 1 == ANDROID_LOG_SILENT,
-                "Mismatch in size of log_characters and values in android_LogPriority");
+				"Mismatch in size of log_characters and values in android_LogPriority");
   int32_t priority =
-      log_message->priority > ANDROID_LOG_SILENT ? ANDROID_LOG_FATAL : log_message->priority;
+	  log_message->priority > ANDROID_LOG_SILENT ? ANDROID_LOG_FATAL : log_message->priority;
   char priority_char = log_characters[priority];
   uint64_t tid = GetThreadId();
 
   if (log_message->file != nullptr) {
-    fprintf(stderr, "%s %c %s %5d %5" PRIu64 " %s:%u] %s\n",
-            log_message->tag ? log_message->tag : "nullptr", priority_char, timestamp, getpid(),
-            tid, log_message->file, log_message->line, log_message->message);
+	fprintf(stderr, "%s %c %s %5d %5" PRIu64 " %s:%u] %s\n",
+			log_message->tag ? log_message->tag : "nullptr", priority_char, timestamp, getpid(),
+			tid, log_message->file, log_message->line, log_message->message);
   } else {
-    fprintf(stderr, "%s %c %s %5d %5" PRIu64 " %s\n",
-            log_message->tag ? log_message->tag : "nullptr", priority_char, timestamp, getpid(),
-            tid, log_message->message);
+	fprintf(stderr, "%s %c %s %5d %5" PRIu64 " %s\n",
+			log_message->tag ? log_message->tag : "nullptr", priority_char, timestamp, getpid(),
+			tid, log_message->message);
   }
 }
 
 void __android_log_logd_logger(const struct __android_log_message *log_message) {
   static int api_level = android_get_device_api_level();
   if (api_level < __ANDROID_API_L__) {
-    __android_log_write(log_message->priority, log_message->tag, log_message->message);
-    return;
+	__android_log_write(log_message->priority, log_message->tag, log_message->message);
+	return;
   }
   int buffer_id = log_message->buffer_id == LOG_ID_DEFAULT ? LOG_ID_MAIN : log_message->buffer_id;
 
   struct iovec vec[3];
   vec[0].iov_base =
-      const_cast<unsigned char *>(reinterpret_cast<const unsigned char *>(&log_message->priority));
+	  const_cast<unsigned char *>(reinterpret_cast<const unsigned char *>(&log_message->priority));
   vec[0].iov_len = 1;
   vec[1].iov_base = const_cast<void *>(static_cast<const void *>(log_message->tag));
   vec[1].iov_len = strlen(log_message->tag) + 1;
@@ -299,18 +299,18 @@ void __android_log_write_log_message(__android_log_message *log_message) {
   ErrnoRestorer errno_restorer;
 
   if (log_message->buffer_id != LOG_ID_DEFAULT && log_message->buffer_id != LOG_ID_MAIN &&
-      log_message->buffer_id != LOG_ID_SYSTEM && log_message->buffer_id != LOG_ID_RADIO &&
-      log_message->buffer_id != LOG_ID_CRASH) {
-    return;
+	  log_message->buffer_id != LOG_ID_SYSTEM && log_message->buffer_id != LOG_ID_RADIO &&
+	  log_message->buffer_id != LOG_ID_CRASH) {
+	return;
   }
 
   if (log_message->tag == nullptr) {
-    log_message->tag = GetDefaultTag().c_str();
+	log_message->tag = GetDefaultTag().c_str();
   }
 
 #if __BIONIC__
   if (log_message->priority == ANDROID_LOG_FATAL) {
-    kwai_set_abort_message(log_message->message);
+	kwai_set_abort_message(log_message->message);
   }
 #endif
   logger_function(log_message);
@@ -321,11 +321,11 @@ int __android_log_buf_write(int bufID, int prio, const char *tag, const char *ms
   ErrnoRestorer errno_restorer;
 
   if (!__android_log_is_loggable(prio, tag, ANDROID_LOG_VERBOSE)) {
-    return -EPERM;
+	return -EPERM;
   }
 
   __android_log_message log_message = {
-      sizeof(__android_log_message), bufID, prio, tag, nullptr, 0, msg};
+	  sizeof(__android_log_message), bufID, prio, tag, nullptr, 0, msg};
   __android_log_write_log_message(&log_message);
   return 1;
 }
@@ -334,7 +334,7 @@ int __android_log_vprint(int prio, const char *tag, const char *fmt, va_list ap)
   ErrnoRestorer errno_restorer;
 
   if (!__android_log_is_loggable(prio, tag, ANDROID_LOG_VERBOSE)) {
-    return -EPERM;
+	return -EPERM;
   }
 
   __attribute__((uninitialized)) char buf[LOG_BUF_SIZE];
@@ -342,7 +342,7 @@ int __android_log_vprint(int prio, const char *tag, const char *fmt, va_list ap)
   vsnprintf(buf, LOG_BUF_SIZE, fmt, ap);
 
   __android_log_message log_message = {
-      sizeof(__android_log_message), LOG_ID_MAIN, prio, tag, nullptr, 0, buf};
+	  sizeof(__android_log_message), LOG_ID_MAIN, prio, tag, nullptr, 0, buf};
   __android_log_write_log_message(&log_message);
   return 1;
 }
@@ -351,7 +351,7 @@ int __android_log_print(int prio, const char *tag, const char *fmt, ...) {
   ErrnoRestorer errno_restorer;
 
   if (!__android_log_is_loggable(prio, tag, ANDROID_LOG_VERBOSE)) {
-    return -EPERM;
+	return -EPERM;
   }
 
   va_list ap;
@@ -362,7 +362,7 @@ int __android_log_print(int prio, const char *tag, const char *fmt, ...) {
   va_end(ap);
 
   __android_log_message log_message = {
-      sizeof(__android_log_message), LOG_ID_MAIN, prio, tag, nullptr, 0, buf};
+	  sizeof(__android_log_message), LOG_ID_MAIN, prio, tag, nullptr, 0, buf};
   __android_log_write_log_message(&log_message);
   return 1;
 }
@@ -371,7 +371,7 @@ int __android_log_buf_print(int bufID, int prio, const char *tag, const char *fm
   ErrnoRestorer errno_restorer;
 
   if (!__android_log_is_loggable(prio, tag, ANDROID_LOG_VERBOSE)) {
-    return -EPERM;
+	return -EPERM;
   }
 
   va_list ap;
@@ -382,7 +382,7 @@ int __android_log_buf_print(int bufID, int prio, const char *tag, const char *fm
   va_end(ap);
 
   __android_log_message log_message = {
-      sizeof(__android_log_message), bufID, prio, tag, nullptr, 0, buf};
+	  sizeof(__android_log_message), bufID, prio, tag, nullptr, 0, buf};
   __android_log_write_log_message(&log_message);
   return 1;
 }
@@ -391,19 +391,19 @@ void __android_log_assert(const char *cond, const char *tag, const char *fmt, ..
   __attribute__((uninitialized)) char buf[LOG_BUF_SIZE];
 
   if (fmt) {
-    va_list ap;
-    va_start(ap, fmt);
-    vsnprintf(buf, LOG_BUF_SIZE, fmt, ap);
-    va_end(ap);
+	va_list ap;
+	va_start(ap, fmt);
+	vsnprintf(buf, LOG_BUF_SIZE, fmt, ap);
+	va_end(ap);
   } else {
-    /* Msg not provided, log condition.  N.B. Do not use cond directly as
-     * format string as it could contain spurious '%' syntax (e.g.
-     * "%d" in "blocks%devs == 0").
-     */
-    if (cond)
-      snprintf(buf, LOG_BUF_SIZE, "Assertion failed: %s", cond);
-    else
-      strcpy(buf, "Unspecified assertion failed");
+	/* Msg not provided, log condition.  N.B. Do not use cond directly as
+	 * format string as it could contain spurious '%' syntax (e.g.
+	 * "%d" in "blocks%devs == 0").
+	 */
+	if (cond)
+	  snprintf(buf, LOG_BUF_SIZE, "Assertion failed: %s", cond);
+	else
+	  strcpy(buf, "Unspecified assertion failed");
   }
 
   // Log assertion failures to stderr for the benefit of "adb shell" users

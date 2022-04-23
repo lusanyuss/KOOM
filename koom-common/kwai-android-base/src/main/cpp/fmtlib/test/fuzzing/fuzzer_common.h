@@ -40,25 +40,29 @@ constexpr auto Nfixed = 16;
 
 namespace fmt_fuzzer {
 // view data as a c char pointer.
-template <typename T> inline const char* as_chars(const T* data) {
-  return static_cast<const char*>(static_cast<const void*>(data));
+template<typename T>
+inline const char *as_chars(const T *data) {
+  return static_cast<const char *>(static_cast<const void *>(data));
 }
 
 // view data as a byte pointer
-template <typename T> inline const std::uint8_t* as_bytes(const T* data) {
-  return static_cast<const std::uint8_t*>(static_cast<const void*>(data));
+template<typename T>
+inline const std::uint8_t *as_bytes(const T *data) {
+  return static_cast<const std::uint8_t *>(static_cast<const void *>(data));
 }
 
 // blits bytes from Data to form an (assumed trivially constructible) object
 // of type Item
-template <class Item> inline Item assignFromBuf(const std::uint8_t* Data) {
+template<class Item>
+inline Item assignFromBuf(const std::uint8_t *Data) {
   Item item{};
   std::memcpy(&item, Data, sizeof(Item));
   return item;
 }
 
 // reads a boolean value by looking at the first byte from Data
-template <> inline bool assignFromBuf<bool>(const std::uint8_t* Data) {
+template<>
+inline bool assignFromBuf<bool>(const std::uint8_t *Data) {
   return !!Data[0];
 }
 

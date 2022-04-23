@@ -44,19 +44,19 @@ class Maps {
 
   // Maps are not copyable but movable, because they own pointers to MapInfo
   // objects.
-  Maps(const Maps&) = delete;
-  Maps& operator=(const Maps&) = delete;
-  Maps(Maps&&) = default;
-  Maps& operator=(Maps&&) = default;
+  Maps(const Maps &) = delete;
+  Maps &operator=(const Maps &) = delete;
+  Maps(Maps &&) = default;
+  Maps &operator=(Maps &&) = default;
 
-  MapInfo* Find(uint64_t pc);
+  MapInfo *Find(uint64_t pc);
 
   virtual bool Parse();
 
   virtual const std::string GetMapsFile() const { return ""; }
 
-  void Add(uint64_t start, uint64_t end, uint64_t offset, uint64_t flags, const std::string& name,
-           uint64_t load_bias);
+  void Add(uint64_t start, uint64_t end, uint64_t offset, uint64_t flags, const std::string &name,
+		   uint64_t load_bias);
 
   void Sort();
 
@@ -70,9 +70,9 @@ class Maps {
 
   size_t Total() { return maps_.size(); }
 
-  MapInfo* Get(size_t index) {
-    if (index >= maps_.size()) return nullptr;
-    return maps_[index].get();
+  MapInfo *Get(size_t index) {
+	if (index >= maps_.size()) return nullptr;
+	return maps_[index].get();
   }
 
  protected:
@@ -111,18 +111,18 @@ class LocalUpdatableMaps : public Maps {
 
 class BufferMaps : public Maps {
  public:
-  BufferMaps(const char* buffer) : buffer_(buffer) {}
+  BufferMaps(const char *buffer) : buffer_(buffer) {}
   virtual ~BufferMaps() = default;
 
   bool Parse() override;
 
  private:
-  const char* buffer_;
+  const char *buffer_;
 };
 
 class FileMaps : public Maps {
  public:
-  FileMaps(const std::string& file) : file_(file) {}
+  FileMaps(const std::string &file) : file_(file) {}
   virtual ~FileMaps() = default;
 
   const std::string GetMapsFile() const override { return file_; }

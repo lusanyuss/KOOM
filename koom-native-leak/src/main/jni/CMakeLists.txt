@@ -17,7 +17,7 @@ include_directories(
         ${KWAI_ANDROID_BASE_DIR}/src/main/cpp/include/
         ${KWAI_ANDROID_BASE_DIR}/src/main/cpp/liblog/include/
         ${THIRD_PARTY_DIR}/xhook/src/main/cpp/xhook/src/
-        )
+)
 
 link_directories(
         ${KWAI_ANDROID_BASE_DIR}/src/main/libs/${ANDROID_ABI}/

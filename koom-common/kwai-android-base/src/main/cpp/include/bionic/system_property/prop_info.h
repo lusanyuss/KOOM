@@ -54,35 +54,35 @@ struct prop_info {
   // break compatibility.
   constexpr static size_t kLongLegacyErrorBufferSize = 56;
 
-public:
+ public:
   atomic_uint_least32_t serial;
   // we need to keep this buffer around because the property
   // value can be modified whereas name is constant.
   union {
-    char value[PROP_VALUE_MAX];
-    struct {
-      char error_message[kLongLegacyErrorBufferSize];
-      uint32_t offset;
-    } long_property;
+	char value[PROP_VALUE_MAX];
+	struct {
+	  char error_message[kLongLegacyErrorBufferSize];
+	  uint32_t offset;
+	} long_property;
   };
   char name[0];
 
   bool is_long() const {
-    return (load_const_atomic(&serial, memory_order_relaxed) & kLongFlag) != 0;
+	return (load_const_atomic(&serial, memory_order_relaxed) & kLongFlag) != 0;
   }
 
   const char *long_value() const {
-    // We can't store pointers here since this is shared memory that will have different absolute
-    // pointers in different processes.  We don't have data_ from prop_area, but since we know
-    // `this` is data_ + some offset and long_value is data_ + some other offset, we calculate the
-    // offset from `this` to long_value and store it as long_property.offset.
-    return reinterpret_cast<const char *>(this) + long_property.offset;
+	// We can't store pointers here since this is shared memory that will have different absolute
+	// pointers in different processes.  We don't have data_ from prop_area, but since we know
+	// `this` is data_ + some offset and long_value is data_ + some other offset, we calculate the
+	// offset from `this` to long_value and store it as long_property.offset.
+	return reinterpret_cast<const char *>(this) + long_property.offset;
   }
 
   prop_info(const char *name, uint32_t namelen, const char *value, uint32_t valuelen);
   prop_info(const char *name, uint32_t namelen, uint32_t long_offset);
 
-private:
+ private:
   BIONIC_DISALLOW_IMPLICIT_CONSTRUCTORS(prop_info);
 };
 

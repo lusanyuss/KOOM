@@ -1,34 +1,45 @@
 # LeakMonitor 介绍
 
-用于监控应用的 Native 内存泄漏问题，它的核心原理如下，详情可参考 [libmemunreachable 实现](https://android.googlesource.com/platform/system/memory/libmemunreachable/+/master/README.md)
+用于监控应用的 Native
+内存泄漏问题，它的核心原理如下，详情可参考 [libmemunreachable 实现](https://android.googlesource.com/platform/system/memory/libmemunreachable/+/master/README.md)
+
 - hook malloc/free 等内存分配器方法，用于记录 Native 内存分配元数据「大小、堆栈、地址等」
 - 周期性的使用 mark-and-sweep 分析整个进程 Native Heap，获取不可达的内存块信息「地址、大小」
 - 利用不可达的内存块的地址、大小等从我们记录的元数据中获取其分配堆栈，产出泄漏数据「不可达内存块地址、大小、分配堆栈等」
 
 # LeakMonitor 适用范围
+
 - Android N 及以上（API level >= 24）
 - 仅支持 arm64-v8a
 
 # LeakMonitor 接入
+
 ## 依赖配置
+
 - 项目根目录 build.gradle 中增加 mavenCentral
+
 ```groovy
 repositories {
     mavenCentral()
 }
 ```
+
 - 项目 app/build.gradle 中增加依赖
+
 ```groovy
 dependencies {
     implementation "com.kuaishou.koom:koom-native-leak:${latest_version}"
     implementation "com.kuaishou.koom:xhook:${latest_version}"
 }
 ```
+
 ## 使用
+
 - 初始化 MonitorManager, 参考[这里](../koom-monitor-base/README.zh-CN.md)
-由于 LeakMonitor 依赖 MonitorManager，确保 MonitorManager 已经初始化
+  由于 LeakMonitor 依赖 MonitorManager，确保 MonitorManager 已经初始化
 
 - 初始化 LeakMonitor
+
 ```java
 LeakMonitorConfig config = new LeakMonitorConfig.Builder()
     .setLoopInterval(50000) // 设置轮训的间隔，单位：毫秒
@@ -41,24 +52,33 @@ LeakMonitorConfig config = new LeakMonitorConfig.Builder()
     .build();
 MonitorManager.addMonitorConfig(config);
 ```
+
 - 启动 LeakMonitor，开始周期性的检测泄漏
+
 ```java
 LeakMonitor.INSTANCE.start();
 ```
+
 - 停止 LeakMonitor，通常不用主动停止
+
 ```java
 LeakMonitor.INSTANCE.stop();
 ```
+
 - 主动获取泄漏，在`LeakListener`中接收到泄漏信息；通常不需要主动检查
+
 ```java
 LeakMonitor.INSTANCE.checkLeaks();
 ```
+
 # FAQ
+
 - 为什么不支持 Android N 以下的设备？
     - AOSP 在 Android N 之后系统才增加了 libmemunreachable 模块「当然也可以自己抽出来在 APP 测实现」
     - 考虑到内存泄漏的共性，只监控 Android N 以上的设备应该可解决大多数问题
 - 为什么不支持 armeabi-v7a
-    - 获取内存分配堆栈时，出于性能的考虑我们使用了 FP Unwind(frame pointer unwind)；而 armeabi-v7a 采用 ARM/Thumb 混合指令，而 FP Unwind 在 ARM/Thumb 指令混合的方法栈上不可靠
+    - 获取内存分配堆栈时，出于性能的考虑我们使用了 FP Unwind(frame pointer unwind)；而 armeabi-v7a 采用 ARM/Thumb 混合指令，而 FP
+      Unwind 在 ARM/Thumb 指令混合的方法栈上不可靠
     - AArch32(Arm 32-bit Architecture) 的 ABI 也没有规定 FP 的行为
 - LeakMonitor 的性能开销如何？
     - 由于需要获取、保存内存块的堆栈等元数据信息，性能有一定的开销，根据我们的测试整体性能损耗 < 5%，基本上不影响用户体验

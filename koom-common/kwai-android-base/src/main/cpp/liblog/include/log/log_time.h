@@ -41,90 +41,90 @@ struct log_time {
 
   log_time() {}
   explicit log_time(const timespec &T)
-      : tv_sec(static_cast<uint32_t>(T.tv_sec)), tv_nsec(static_cast<uint32_t>(T.tv_nsec)) {}
+	  : tv_sec(static_cast<uint32_t>(T.tv_sec)), tv_nsec(static_cast<uint32_t>(T.tv_nsec)) {}
   explicit log_time(uint32_t sec, uint32_t nsec = 0) : tv_sec(sec), tv_nsec(nsec) {}
 #ifdef __linux__
   explicit log_time(clockid_t id) {
-    timespec T;
-    clock_gettime(id, &T);
-    tv_sec = static_cast<uint32_t>(T.tv_sec);
-    tv_nsec = static_cast<uint32_t>(T.tv_nsec);
+	timespec T;
+	clock_gettime(id, &T);
+	tv_sec = static_cast<uint32_t>(T.tv_sec);
+	tv_nsec = static_cast<uint32_t>(T.tv_nsec);
   }
 #endif
   /* timespec */
   bool operator==(const timespec &T) const {
-    return (tv_sec == static_cast<uint32_t>(T.tv_sec)) &&
-           (tv_nsec == static_cast<uint32_t>(T.tv_nsec));
+	return (tv_sec == static_cast<uint32_t>(T.tv_sec)) &&
+		(tv_nsec == static_cast<uint32_t>(T.tv_nsec));
   }
   bool operator!=(const timespec &T) const { return !(*this == T); }
   bool operator<(const timespec &T) const {
-    return (tv_sec < static_cast<uint32_t>(T.tv_sec)) ||
-           ((tv_sec == static_cast<uint32_t>(T.tv_sec)) &&
-            (tv_nsec < static_cast<uint32_t>(T.tv_nsec)));
+	return (tv_sec < static_cast<uint32_t>(T.tv_sec)) ||
+		((tv_sec == static_cast<uint32_t>(T.tv_sec)) &&
+			(tv_nsec < static_cast<uint32_t>(T.tv_nsec)));
   }
   bool operator>=(const timespec &T) const { return !(*this < T); }
   bool operator>(const timespec &T) const {
-    return (tv_sec > static_cast<uint32_t>(T.tv_sec)) ||
-           ((tv_sec == static_cast<uint32_t>(T.tv_sec)) &&
-            (tv_nsec > static_cast<uint32_t>(T.tv_nsec)));
+	return (tv_sec > static_cast<uint32_t>(T.tv_sec)) ||
+		((tv_sec == static_cast<uint32_t>(T.tv_sec)) &&
+			(tv_nsec > static_cast<uint32_t>(T.tv_nsec)));
   }
   bool operator<=(const timespec &T) const { return !(*this > T); }
 
   /* log_time */
   bool operator==(const log_time &T) const {
-    return (tv_sec == T.tv_sec) && (tv_nsec == T.tv_nsec);
+	return (tv_sec == T.tv_sec) && (tv_nsec == T.tv_nsec);
   }
   bool operator!=(const log_time &T) const { return !(*this == T); }
   bool operator<(const log_time &T) const {
-    return (tv_sec < T.tv_sec) || ((tv_sec == T.tv_sec) && (tv_nsec < T.tv_nsec));
+	return (tv_sec < T.tv_sec) || ((tv_sec == T.tv_sec) && (tv_nsec < T.tv_nsec));
   }
   bool operator>=(const log_time &T) const { return !(*this < T); }
   bool operator>(const log_time &T) const {
-    return (tv_sec > T.tv_sec) || ((tv_sec == T.tv_sec) && (tv_nsec > T.tv_nsec));
+	return (tv_sec > T.tv_sec) || ((tv_sec == T.tv_sec) && (tv_nsec > T.tv_nsec));
   }
   bool operator<=(const log_time &T) const { return !(*this > T); }
 
   log_time operator-=(const log_time &T) {
-    // No concept of negative time, clamp to EPOCH
-    if (*this <= T) {
-      return *this = log_time(EPOCH);
-    }
+	// No concept of negative time, clamp to EPOCH
+	if (*this <= T) {
+	  return *this = log_time(EPOCH);
+	}
 
-    if (this->tv_nsec < T.tv_nsec) {
-      --this->tv_sec;
-      this->tv_nsec = NS_PER_SEC + this->tv_nsec - T.tv_nsec;
-    } else {
-      this->tv_nsec -= T.tv_nsec;
-    }
-    this->tv_sec -= T.tv_sec;
+	if (this->tv_nsec < T.tv_nsec) {
+	  --this->tv_sec;
+	  this->tv_nsec = NS_PER_SEC + this->tv_nsec - T.tv_nsec;
+	} else {
+	  this->tv_nsec -= T.tv_nsec;
+	}
+	this->tv_sec -= T.tv_sec;
 
-    return *this;
+	return *this;
   }
   log_time operator-(const log_time &T) const {
-    log_time local(*this);
-    return local -= T;
+	log_time local(*this);
+	return local -= T;
   }
   log_time operator+=(const log_time &T) {
-    this->tv_nsec += T.tv_nsec;
-    if (this->tv_nsec >= NS_PER_SEC) {
-      this->tv_nsec -= NS_PER_SEC;
-      ++this->tv_sec;
-    }
-    this->tv_sec += T.tv_sec;
+	this->tv_nsec += T.tv_nsec;
+	if (this->tv_nsec >= NS_PER_SEC) {
+	  this->tv_nsec -= NS_PER_SEC;
+	  ++this->tv_sec;
+	}
+	this->tv_sec += T.tv_sec;
 
-    return *this;
+	return *this;
   }
   log_time operator+(const log_time &T) const {
-    log_time local(*this);
-    return local += T;
+	log_time local(*this);
+	return local += T;
   }
 
   uint64_t nsec() const { return static_cast<uint64_t>(tv_sec) * NS_PER_SEC + tv_nsec; }
   uint64_t usec() const {
-    return static_cast<uint64_t>(tv_sec) * US_PER_SEC + tv_nsec / (NS_PER_SEC / US_PER_SEC);
+	return static_cast<uint64_t>(tv_sec) * US_PER_SEC + tv_nsec / (NS_PER_SEC / US_PER_SEC);
   }
   uint64_t msec() const {
-    return static_cast<uint64_t>(tv_sec) * MS_PER_SEC + tv_nsec / (NS_PER_SEC / MS_PER_SEC);
+	return static_cast<uint64_t>(tv_sec) * MS_PER_SEC + tv_nsec / (NS_PER_SEC / MS_PER_SEC);
   }
 
   /* Add %#q for the fraction of a second to the standard library functions */

@@ -45,19 +45,19 @@ class UnwindStackMap : public BacktraceMap {
 
   bool Build() override;
 
-  void FillIn(uint64_t addr, backtrace_map_t* map) override;
+  void FillIn(uint64_t addr, backtrace_map_t *map) override;
 
-  virtual std::string GetFunctionName(uint64_t pc, uint64_t* offset) override;
+  virtual std::string GetFunctionName(uint64_t pc, uint64_t *offset) override;
   virtual std::shared_ptr<unwindstack::Memory> GetProcessMemory() override final;
 
-  unwindstack::Maps* stack_maps() { return stack_maps_.get(); }
+  unwindstack::Maps *stack_maps() { return stack_maps_.get(); }
 
-  const std::shared_ptr<unwindstack::Memory>& process_memory() { return process_memory_; }
+  const std::shared_ptr<unwindstack::Memory> &process_memory() { return process_memory_; }
 
-  unwindstack::JitDebug* GetJitDebug() { return jit_debug_.get(); }
+  unwindstack::JitDebug *GetJitDebug() { return jit_debug_.get(); }
 
 #if !defined(NO_LIBDEXFILE_SUPPORT)
-  unwindstack::DexFiles* GetDexFiles() { return dex_files_.get(); }
+  unwindstack::DexFiles *GetDexFiles() { return dex_files_.get(); }
 #endif
 
   void SetArch(unwindstack::ArchEnum arch) { arch_ = arch; }

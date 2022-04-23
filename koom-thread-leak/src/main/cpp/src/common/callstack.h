@@ -31,9 +31,9 @@
 #include "util.h"
 
 namespace koom {
-
+//using 还可以指定别名
 using dump_java_stack_above_o_ptr = void (*)(void *, std::ostream &os, bool,
-                                             bool);
+											 bool);
 using dump_java_stack_ptr = void (*)(void *, std::ostream &os);
 
 class CallStack {

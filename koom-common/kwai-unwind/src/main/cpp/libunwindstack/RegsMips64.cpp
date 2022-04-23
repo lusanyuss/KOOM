@@ -30,7 +30,7 @@
 namespace unwindstack {
 
 RegsMips64::RegsMips64()
-    : RegsImpl<uint64_t>(MIPS64_REG_LAST, Location(LOCATION_REGISTER, MIPS64_REG_RA)) {}
+	: RegsImpl<uint64_t>(MIPS64_REG_LAST, Location(LOCATION_REGISTER, MIPS64_REG_RA)) {}
 
 ArchEnum RegsMips64::Arch() {
   return ARCH_MIPS64;
@@ -52,17 +52,17 @@ void RegsMips64::set_sp(uint64_t sp) {
   regs_[MIPS64_REG_SP] = sp;
 }
 
-bool RegsMips64::SetPcFromReturnAddress(Memory*) {
+bool RegsMips64::SetPcFromReturnAddress(Memory *) {
   uint64_t ra = regs_[MIPS64_REG_RA];
   if (regs_[MIPS64_REG_PC] == ra) {
-    return false;
+	return false;
   }
 
   regs_[MIPS64_REG_PC] = ra;
   return true;
 }
 
-void RegsMips64::IterateRegisters(std::function<void(const char*, uint64_t)> fn) {
+void RegsMips64::IterateRegisters(std::function<void(const char *, uint64_t)> fn) {
   fn("r0", regs_[MIPS64_REG_R0]);
   fn("r1", regs_[MIPS64_REG_R1]);
   fn("r2", regs_[MIPS64_REG_R2]);
@@ -98,10 +98,10 @@ void RegsMips64::IterateRegisters(std::function<void(const char*, uint64_t)> fn)
   fn("pc", regs_[MIPS64_REG_PC]);
 }
 
-Regs* RegsMips64::Read(void* remote_data) {
-  mips64_user_regs* user = reinterpret_cast<mips64_user_regs*>(remote_data);
-  RegsMips64* regs = new RegsMips64();
-  uint64_t* reg_data = reinterpret_cast<uint64_t*>(regs->RawData());
+Regs *RegsMips64::Read(void *remote_data) {
+  mips64_user_regs *user = reinterpret_cast<mips64_user_regs *>(remote_data);
+  RegsMips64 *regs = new RegsMips64();
+  uint64_t *reg_data = reinterpret_cast<uint64_t *>(regs->RawData());
 
   memcpy(regs->RawData(), &user->regs[MIPS64_EF_R0], (MIPS64_REG_R31 + 1) * sizeof(uint64_t));
 
@@ -109,23 +109,23 @@ Regs* RegsMips64::Read(void* remote_data) {
   return regs;
 }
 
-Regs* RegsMips64::CreateFromUcontext(void* ucontext) {
-  mips64_ucontext_t* mips64_ucontext = reinterpret_cast<mips64_ucontext_t*>(ucontext);
+Regs *RegsMips64::CreateFromUcontext(void *ucontext) {
+  mips64_ucontext_t *mips64_ucontext = reinterpret_cast<mips64_ucontext_t *>(ucontext);
 
-  RegsMips64* regs = new RegsMips64();
+  RegsMips64 *regs = new RegsMips64();
   // Copy 64 bit sc_regs over to 64 bit regs
   memcpy(regs->RawData(), &mips64_ucontext->uc_mcontext.sc_regs[0], 32 * sizeof(uint64_t));
   (*regs)[MIPS64_REG_PC] = mips64_ucontext->uc_mcontext.sc_pc;
   return regs;
 }
 
-bool RegsMips64::StepIfSignalHandler(uint64_t elf_offset, Elf* elf, Memory* process_memory) {
+bool RegsMips64::StepIfSignalHandler(uint64_t elf_offset, Elf *elf, Memory *process_memory) {
   uint64_t data;
-  Memory* elf_memory = elf->memory();
+  Memory *elf_memory = elf->memory();
   // Read from elf memory since it is usually more expensive to read from
   // process memory.
   if (!elf_memory->Read(elf_offset, &data, sizeof(data))) {
-    return false;
+	return false;
   }
 
   // Look for the kernel sigreturn function.
@@ -133,7 +133,7 @@ bool RegsMips64::StepIfSignalHandler(uint64_t elf_offset, Elf* elf, Memory* proc
   // 0x2402145b     li  v0, 0x145b
   // 0x0000000c     syscall
   if (data != 0x0000000c2402145bULL) {
-    return false;
+	return false;
   }
 
   // vdso_rt_sigreturn => read rt_sigframe
@@ -141,19 +141,19 @@ bool RegsMips64::StepIfSignalHandler(uint64_t elf_offset, Elf* elf, Memory* proc
   // read 64 bit sc_regs[32] from stack into 64 bit regs_
   uint64_t sp = regs_[MIPS64_REG_SP];
   if (!process_memory->Read(sp + 24 + 128 + 40, regs_.data(),
-                            sizeof(uint64_t) * (MIPS64_REG_LAST - 1))) {
-    return false;
+							sizeof(uint64_t) * (MIPS64_REG_LAST - 1))) {
+	return false;
   }
 
   // offset = siginfo offset + sizeof(siginfo) + uc_mcontext offset + sc_pc offset
   // read 64 bit sc_pc from stack into 64 bit regs_[MIPS64_REG_PC]
   if (!process_memory->Read(sp + 24 + 128 + 40 + 576, &regs_[MIPS64_REG_PC], sizeof(uint64_t))) {
-    return false;
+	return false;
   }
   return true;
 }
 
-Regs* RegsMips64::Clone() {
+Regs *RegsMips64::Clone() {
   return new RegsMips64(*this);
 }
 

@@ -41,52 +41,52 @@ extern "C" char *__cxa_demangle(const char *, char *, size_t *, int *);
 // Backtrace functions.
 //-------------------------------------------------------------------------
 Backtrace::Backtrace(pid_t pid, pid_t tid, BacktraceMap *map)
-    : pid_(pid), tid_(tid), map_(map), map_shared_(true) {
+	: pid_(pid), tid_(tid), map_(map), map_shared_(true) {
   if (map_ == nullptr) {
-    map_ = BacktraceMap::Create(pid);
-    map_shared_ = false;
+	map_ = BacktraceMap::Create(pid);
+	map_shared_ = false;
   }
 }
 
 Backtrace::~Backtrace() {
   if (map_ && !map_shared_) {
-    delete map_;
-    map_ = nullptr;
+	delete map_;
+	map_ = nullptr;
   }
 }
 
 std::string Backtrace::GetFunctionName(uint64_t pc, uint64_t *offset, const backtrace_map_t *map) {
   backtrace_map_t map_value;
   if (map == nullptr) {
-    FillInMap(pc, &map_value);
-    map = &map_value;
+	FillInMap(pc, &map_value);
+	map = &map_value;
   }
   // If no map is found, or this map is backed by a device, then return nothing.
   if (map->start == 0 || (map->flags & PROT_DEVICE_MAP)) {
-    return "";
+	return "";
   }
   std::string name(GetFunctionNameRaw(pc, offset));
   char *demangled_name = __cxa_demangle(name.c_str(), nullptr, nullptr, nullptr);
   if (demangled_name != nullptr) {
-    name = demangled_name;
-    free(demangled_name);
-    return name;
+	name = demangled_name;
+	free(demangled_name);
+	return name;
   }
   return name;
 }
 
 bool Backtrace::VerifyReadWordArgs(uint64_t ptr, word_t *out_value) {
   if (ptr & (sizeof(word_t) - 1)) {
-    BACK_LOGW("invalid pointer %p", reinterpret_cast<void *>(ptr));
-    *out_value = static_cast<word_t>(-1);
-    return false;
+	BACK_LOGW("invalid pointer %p", reinterpret_cast<void *>(ptr));
+	*out_value = static_cast<word_t>(-1);
+	return false;
   }
   return true;
 }
 
 KWAI_EXPORT std::string Backtrace::FormatFrameData(size_t frame_num) {
   if (frame_num >= frames_.size()) {
-    return "";
+	return "";
   }
   return FormatFrameData(&frames_[frame_num]);
 }
@@ -97,61 +97,48 @@ KWAI_EXPORT std::string Backtrace::FormatFrameData(const backtrace_frame_data_t 
 
 void Backtrace::FillInMap(uint64_t pc, backtrace_map_t *map) {
   if (map_ != nullptr) {
-    map_->FillIn(pc, map);
+	map_->FillIn(pc, map);
   }
 }
 
 KWAI_EXPORT Backtrace *Backtrace::Create(pid_t pid, pid_t tid, BacktraceMap *map) {
   if (pid == BACKTRACE_CURRENT_PROCESS) {
-    pid = getpid();
-    if (tid == BACKTRACE_CURRENT_THREAD) {
-      tid = android::base::GetThreadId();
-    }
+	pid = getpid();
+	if (tid == BACKTRACE_CURRENT_THREAD) {
+	  tid = android::base::GetThreadId();
+	}
   } else if (tid == BACKTRACE_CURRENT_THREAD) {
-    tid = pid;
+	tid = pid;
   }
 
   if (pid == getpid()) {
-    return new UnwindStackCurrent(pid, tid, map);
+	return new UnwindStackCurrent(pid, tid, map);
   } else {
-    return new UnwindStackPtrace(pid, tid, map);
+	return new UnwindStackPtrace(pid, tid, map);
   }
 }
 
 KWAI_EXPORT std::string Backtrace::GetErrorString(BacktraceUnwindError error) {
   switch (error.error_code) {
-  case BACKTRACE_UNWIND_NO_ERROR:
-    return "No error";
-  case BACKTRACE_UNWIND_ERROR_SETUP_FAILED:
-    return "Setup failed";
-  case BACKTRACE_UNWIND_ERROR_MAP_MISSING:
-    return "No map found";
-  case BACKTRACE_UNWIND_ERROR_INTERNAL:
-    return "Internal libbacktrace error, please submit a bugreport";
-  case BACKTRACE_UNWIND_ERROR_THREAD_DOESNT_EXIST:
-    return "Thread doesn't exist";
-  case BACKTRACE_UNWIND_ERROR_THREAD_TIMEOUT:
-    return "Thread has not responded to signal in time";
-  case BACKTRACE_UNWIND_ERROR_UNSUPPORTED_OPERATION:
-    return "Attempt to use an unsupported feature";
-  case BACKTRACE_UNWIND_ERROR_NO_CONTEXT:
-    return "Attempt to do an offline unwind without a context";
-  case BACKTRACE_UNWIND_ERROR_EXCEED_MAX_FRAMES_LIMIT:
-    return "Exceed MAX_BACKTRACE_FRAMES limit";
-  case BACKTRACE_UNWIND_ERROR_ACCESS_MEM_FAILED:
-    return android::base::StringPrintf("Failed to read memory at addr 0x%" PRIx64,
-                                       error.error_info.addr);
-  case BACKTRACE_UNWIND_ERROR_ACCESS_REG_FAILED:
-    return android::base::StringPrintf("Failed to read register %" PRIu64, error.error_info.regno);
-  case BACKTRACE_UNWIND_ERROR_FIND_PROC_INFO_FAILED:
-    return "Failed to find a function in debug sections";
-  case BACKTRACE_UNWIND_ERROR_EXECUTE_DWARF_INSTRUCTION_FAILED:
-    return "Failed to execute dwarf instructions in debug sections";
-  case BACKTRACE_UNWIND_ERROR_UNWIND_INFO:
-    return "Failed to unwind due to invalid unwind information";
-  case BACKTRACE_UNWIND_ERROR_REPEATED_FRAME:
-    return "Failed to unwind due to same sp/pc repeating";
-  case BACKTRACE_UNWIND_ERROR_INVALID_ELF:
-    return "Failed to unwind due to invalid elf";
+	case BACKTRACE_UNWIND_NO_ERROR:return "No error";
+	case BACKTRACE_UNWIND_ERROR_SETUP_FAILED:return "Setup failed";
+	case BACKTRACE_UNWIND_ERROR_MAP_MISSING:return "No map found";
+	case BACKTRACE_UNWIND_ERROR_INTERNAL:return "Internal libbacktrace error, please submit a bugreport";
+	case BACKTRACE_UNWIND_ERROR_THREAD_DOESNT_EXIST:return "Thread doesn't exist";
+	case BACKTRACE_UNWIND_ERROR_THREAD_TIMEOUT:return "Thread has not responded to signal in time";
+	case BACKTRACE_UNWIND_ERROR_UNSUPPORTED_OPERATION:return "Attempt to use an unsupported feature";
+	case BACKTRACE_UNWIND_ERROR_NO_CONTEXT:return "Attempt to do an offline unwind without a context";
+	case BACKTRACE_UNWIND_ERROR_EXCEED_MAX_FRAMES_LIMIT:return "Exceed MAX_BACKTRACE_FRAMES limit";
+	case BACKTRACE_UNWIND_ERROR_ACCESS_MEM_FAILED:
+	  return android::base::StringPrintf("Failed to read memory at addr 0x%" PRIx64,
+										 error.error_info.addr);
+	case BACKTRACE_UNWIND_ERROR_ACCESS_REG_FAILED:
+	  return android::base::StringPrintf("Failed to read register %" PRIu64,
+										 error.error_info.regno);
+	case BACKTRACE_UNWIND_ERROR_FIND_PROC_INFO_FAILED:return "Failed to find a function in debug sections";
+	case BACKTRACE_UNWIND_ERROR_EXECUTE_DWARF_INSTRUCTION_FAILED:return "Failed to execute dwarf instructions in debug sections";
+	case BACKTRACE_UNWIND_ERROR_UNWIND_INFO:return "Failed to unwind due to invalid unwind information";
+	case BACKTRACE_UNWIND_ERROR_REPEATED_FRAME:return "Failed to unwind due to same sp/pc repeating";
+	case BACKTRACE_UNWIND_ERROR_INVALID_ELF:return "Failed to unwind due to invalid elf";
   }
 }

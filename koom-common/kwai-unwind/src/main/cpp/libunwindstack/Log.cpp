@@ -39,29 +39,29 @@ void log_to_stdout(bool enable) {
 }
 
 // Send the data to the log.
-void log(uint8_t indent, const char* format, ...) {
+void log(uint8_t indent, const char *format, ...) {
   std::string real_format;
   if (indent > 0) {
-    real_format = android::base::StringPrintf("%*s%s", 2 * indent, " ", format);
+	real_format = android::base::StringPrintf("%*s%s", 2 * indent, " ", format);
   } else {
-    real_format = format;
+	real_format = format;
   }
   va_list args;
   va_start(args, format);
   if (g_print_to_stdout) {
-    real_format += '\n';
-    vprintf(real_format.c_str(), args);
+	real_format += '\n';
+	vprintf(real_format.c_str(), args);
   } else {
-    LOG_PRI_VA(ANDROID_LOG_INFO, LOG_TAG, real_format.c_str(), args);
+	LOG_PRI_VA(ANDROID_LOG_INFO, LOG_TAG, real_format.c_str(), args);
   }
   va_end(args);
 }
 
 #if defined(__BIONIC__)
-void log_async_safe(const char* format, ...) {
+void log_async_safe(const char *format, ...) {
   if (g_print_to_stdout) {
-    // Printing to stdout is never async safe, so throw the message away.
-    return;
+	// Printing to stdout is never async safe, so throw the message away.
+	return;
   }
 
   va_list args;

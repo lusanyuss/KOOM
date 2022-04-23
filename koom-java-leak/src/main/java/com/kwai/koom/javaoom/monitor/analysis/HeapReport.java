@@ -25,85 +25,81 @@ import java.util.List;
 
 public class HeapReport {
 
-  public RunningInfo runningInfo = new RunningInfo();
+    public RunningInfo runningInfo = new RunningInfo();
+    public List<GCPath> gcPaths = new ArrayList<>();//gc path of suspected objects
+    public List<ClassInfo> classInfos = new ArrayList<>();//Class's instances count list
+    public List<LeakObject> leakObjects = new ArrayList<>();
+    public Boolean analysisDone;//flag to record whether hprof is analyzed already.
+    public Integer reAnalysisTimes;//flag to record hprof reanalysis times.
 
-  //device and app running info
-  public static class RunningInfo {
-    //JVM info
-    public String jvmMax;//jvm max memory in MB
-    public String jvmUsed;//jvm used memory in MB
+    //device and app running info
+    public static class RunningInfo {
+        //JVM info
+        public String jvmMax;//jvm max memory in MB
+        public String jvmUsed;//jvm used memory in MB
 
-    //memory info
-    public String vss;//vss memory in MB
-    public String pss;//pss memory in MB
-    public String rss;//rss memory in MB
-    public String threadCount;
-    public String fdCount;
-    public List<String> threadList = new ArrayList<>();
-    public List<String> fdList = new ArrayList<>();
+        //memory info
+        public String vss;//vss memory in MB
+        public String pss;//pss memory in MB
+        public String rss;//rss memory in MB
+        public String threadCount;
+        public String fdCount;
+        public List<String> threadList = new ArrayList<>();
+        public List<String> fdList = new ArrayList<>();
 
-    //Device info
-    public String sdkInt;
-    public String manufacture;
-    public String buildModel;
+        //Device info
+        public String sdkInt;
+        public String manufacture;
+        public String buildModel;
 
-    //App info
-    public String appVersion;
-    public String currentPage;
-    public String usageSeconds;
-    public String nowTime;
-    public String deviceMemTotal;
-    public String deviceMemAvaliable;
+        //App info
+        public String appVersion;
+        public String currentPage;
+        public String usageSeconds;
+        public String nowTime;
+        public String deviceMemTotal;
+        public String deviceMemAvaliable;
 
-    public String dumpReason;//heap dump trigger reason,
-    public String analysisReason;//analysis trigger reason
+        public String dumpReason;//heap dump trigger reason,
+        public String analysisReason;//analysis trigger reason
 
-    //KOOM Perf data
-    public String koomVersion;
-    public String filterInstanceTime;
-    public String findGCPathTime;
-  }
-
-  public List<GCPath> gcPaths = new ArrayList<>();//gc path of suspected objects
-
-  /**
-   * GC Path means path of object to GC Root, it can also be called as reference chain.
-   */
-  public static class GCPath {
-    public Integer instanceCount;//instances number of same path to gc root
-    public String leakReason;//reason of why instance is suspected
-    public String gcRoot;
-    public String signature;//signature are computed by the sha1 of reference chain
-    public List<PathItem> path = new ArrayList<>();
-
-    //引用链Item
-    public static class PathItem {
-      String reference;//referenced instance's classname + filed name
-      String referenceType;//such as INSTANCE_FIELD/ARRAY_ENTRY/STATIC_FIELD
-      String declaredClass;//for cases when filed is inherited from ancestor's class.
+        //KOOM Perf data
+        public String koomVersion;
+        public String filterInstanceTime;
+        public String findGCPathTime;
     }
-  }
 
-  public List<ClassInfo> classInfos = new ArrayList<>();//Class's instances count list
+    /**
+     * GC Path means path of object to GC Root, it can also be called as reference chain.
+     */
+    public static class GCPath {
+        public Integer instanceCount;//instances number of same path to gc root
+        public String leakReason;//reason of why instance is suspected
+        public String gcRoot;
+        public String signature;//signature are computed by the sha1 of reference chain
+        public List<PathItem> path = new ArrayList<>();
 
-  /**
-   * ClassInfo contains data which describes the instances number of the Class.
-   */
-  public static class ClassInfo {
-    public String className;
-    public String instanceCount;//All instances's count of this class.
-    public String leakInstanceCount;//All leaked instances's count of this class.
-  }
+        //引用链Item
+        public static class PathItem {
+            String reference;//referenced instance's classname + filed name
+            String referenceType;//such as INSTANCE_FIELD/ARRAY_ENTRY/STATIC_FIELD
+            String declaredClass;//for cases when filed is inherited from ancestor's class.
+        }
+    }
 
-  public List<LeakObject> leakObjects = new ArrayList<>();
+    /**
+     * ClassInfo contains data which describes the instances number of the Class.
+     */
+    public static class ClassInfo {
+        public String className;
+        public String instanceCount;//All instances's count of this class.
+        public String leakInstanceCount;//All leaked instances's count of this class.
+    }
 
-  public static class LeakObject {
-    public String className;
-    public String size;
-    public String objectId;
-    public String extDetail;
-  }
-
-  public Boolean analysisDone;//flag to record whether hprof is analyzed already.
-  public Integer reAnalysisTimes;//flag to record hprof reanalysis times.
+    public static class LeakObject {
+        public String className;
+        public String size;
+        public String objectId;
+        public String extDetail;
+    }
 }

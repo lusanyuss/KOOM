@@ -63,73 +63,73 @@ class Memory;
 }
 
 class BacktraceMap {
-public:
+ public:
   // If uncached is true, then parse the current process map as of the call.
   // Passing a map created with uncached set to true to Backtrace::Create()
   // is unsupported.
-  static BacktraceMap* Create(pid_t pid, bool uncached = false);
+  static BacktraceMap *Create(pid_t pid, bool uncached = false);
 
   virtual ~BacktraceMap();
 
-  class iterator : public std::iterator<std::bidirectional_iterator_tag, backtrace_map_t*> {
+  class iterator : public std::iterator<std::bidirectional_iterator_tag, backtrace_map_t *> {
    public:
-    iterator(BacktraceMap* map, size_t index) : map_(map), index_(index) {}
+	iterator(BacktraceMap *map, size_t index) : map_(map), index_(index) {}
 
-    iterator& operator++() {
-      index_++;
-      return *this;
-    }
-    const iterator operator++(int increment) {
-      index_ += increment;
-      return *this;
-    }
-    iterator& operator--() {
-      index_--;
-      return *this;
-    }
-    const iterator operator--(int decrement) {
-      index_ -= decrement;
-      return *this;
-    }
+	iterator &operator++() {
+	  index_++;
+	  return *this;
+	}
+	const iterator operator++(int increment) {
+	  index_ += increment;
+	  return *this;
+	}
+	iterator &operator--() {
+	  index_--;
+	  return *this;
+	}
+	const iterator operator--(int decrement) {
+	  index_ -= decrement;
+	  return *this;
+	}
 
-    bool operator==(const iterator& rhs) { return this->index_ == rhs.index_; }
-    bool operator!=(const iterator& rhs) { return this->index_ != rhs.index_; }
+	bool operator==(const iterator &rhs) { return this->index_ == rhs.index_; }
+	bool operator!=(const iterator &rhs) { return this->index_ != rhs.index_; }
 
-    const backtrace_map_t* operator*() {
-      if (index_ >= map_->size()) {
-        return nullptr;
-      }
-      backtrace_map_t* map = &map_->maps_[index_];
-      if (map->load_bias == static_cast<uint64_t>(-1)) {
-        map->load_bias = map_->GetLoadBias(index_);
-      }
-      return map;
-    }
+	const backtrace_map_t *operator*() {
+	  if (index_ >= map_->size()) {
+		return nullptr;
+	  }
+	  backtrace_map_t *map = &map_->maps_[index_];
+	  if (map->load_bias == static_cast<uint64_t>(-1)) {
+		map->load_bias = map_->GetLoadBias(index_);
+	  }
+	  return map;
+	}
 
    private:
-    BacktraceMap* map_ = nullptr;
-    size_t index_ = 0;
+	BacktraceMap *map_ = nullptr;
+	size_t index_ = 0;
   };
 
   iterator begin() { return iterator(this, 0); }
   iterator end() { return iterator(this, maps_.size()); }
 
   // Fill in the map data structure for the given address.
-  virtual void FillIn(uint64_t addr, backtrace_map_t* map);
+  virtual void FillIn(uint64_t addr, backtrace_map_t *map);
 
   // Only supported with the new unwinder.
-  virtual std::string GetFunctionName(uint64_t /*pc*/, uint64_t* /*offset*/) { return ""; }
+  virtual std::string GetFunctionName(uint64_t /*pc*/, uint64_t * /*offset*/) { return ""; }
   virtual std::shared_ptr<unwindstack::Memory> GetProcessMemory() { return nullptr; }
 
   // The flags returned are the same flags as used by the mmap call.
   // The values are PROT_*.
   int GetFlags(uint64_t pc) {
-    backtrace_map_t map;
-    FillIn(pc, &map);
-    if (IsValid(map)) {
-      return map.flags;
-    }
-    return PROT_NONE;
+	backtrace_map_t map;
+	FillIn(pc, &map);
+	if (IsValid(map)) {
+	  return map.flags;
+	}
+	return PROT_NONE;
   }
 
   bool IsReadable(uint64_t pc) { return GetFlags(pc) & PROT_READ; }
@@ -146,15 +146,15 @@ public:
 
   virtual bool Build();
 
-  static inline bool IsValid(const backtrace_map_t& map) {
-    return map.end > 0;
+  static inline bool IsValid(const backtrace_map_t &map) {
+	return map.end > 0;
   }
 
   void SetSuffixesToIgnore(std::vector<std::string> suffixes) {
-    suffixes_to_ignore_.insert(suffixes_to_ignore_.end(), suffixes.begin(), suffixes.end());
+	suffixes_to_ignore_.insert(suffixes_to_ignore_.end(), suffixes.begin(), suffixes.end());
   }
 
-  const std::vector<std::string>& GetSuffixesToIgnore() { return suffixes_to_ignore_; }
+  const std::vector<std::string> &GetSuffixesToIgnore() { return suffixes_to_ignore_; }
 
   // Disabling the resolving of names results in the function name being
   // set to an empty string and the function offset being set to zero
@@ -175,17 +175,17 @@ public:
 };
 
 class ScopedBacktraceMapIteratorLock {
-public:
-  explicit ScopedBacktraceMapIteratorLock(BacktraceMap* map) : map_(map) {
-    map->LockIterator();
+ public:
+  explicit ScopedBacktraceMapIteratorLock(BacktraceMap *map) : map_(map) {
+	map->LockIterator();
   }
 
   ~ScopedBacktraceMapIteratorLock() {
-    map_->UnlockIterator();
+	map_->UnlockIterator();
   }
 
-private:
-  BacktraceMap* map_;
+ private:
+  BacktraceMap *map_;
 };
 
 #endif // _BACKTRACE_BACKTRACE_MAP_H

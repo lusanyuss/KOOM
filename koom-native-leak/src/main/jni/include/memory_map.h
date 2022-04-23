@@ -42,24 +42,24 @@
 
 struct MapEntry {
   MapEntry(uintptr_t start, uintptr_t end, uintptr_t offset, const char *name,
-           size_t name_len, int flags)
-      : start(start),
-        end(end),
-        offset(offset),
-        name(name, name_len),
-        flags(flags) {}
+		   size_t name_len, int flags)
+	  : start(start),
+		end(end),
+		offset(offset),
+		name(name, name_len),
+		flags(flags) {}
 
   explicit MapEntry(uintptr_t pc) : start(pc), end(pc) {}
 
   bool NeedIgnore() {
-    auto ends_with = [](std::string &target,
-                        const std::string &suffix) -> bool {
-      return target.size() >= suffix.size() &&
-             target.substr(target.size() - suffix.size(), suffix.size()) ==
-                 suffix;
-    };
-    return ends_with(name, LIB_ART) || ends_with(name, OAT_SUFFEX) ||
-           ends_with(name, ODEX_SUFFEX) || ends_with(name, DEX_SUFFEX);
+	auto ends_with = [](std::string &target,
+						const std::string &suffix) -> bool {
+	  return target.size() >= suffix.size() &&
+		  target.substr(target.size() - suffix.size(), suffix.size()) ==
+			  suffix;
+	};
+	return ends_with(name, LIB_ART) || ends_with(name, OAT_SUFFEX) ||
+		ends_with(name, ODEX_SUFFEX) || ends_with(name, DEX_SUFFEX);
   }
 
   uintptr_t start;
@@ -76,7 +76,7 @@ struct MapEntry {
 // Ordering comparator that returns equivalence for overlapping entries
 struct MapEntryCompare {
   bool operator()(const MapEntry *a, const MapEntry *b) const {
-    return a->end <= b->start;
+	return a->end <= b->start;
   }
 };
 

@@ -51,19 +51,19 @@ void RegsX86_64::set_sp(uint64_t sp) {
   regs_[X86_64_REG_SP] = sp;
 }
 
-bool RegsX86_64::SetPcFromReturnAddress(Memory* process_memory) {
+bool RegsX86_64::SetPcFromReturnAddress(Memory *process_memory) {
   // Attempt to get the return address from the top of the stack.
   uint64_t new_pc;
   if (!process_memory->ReadFully(regs_[X86_64_REG_SP], &new_pc, sizeof(new_pc)) ||
-      new_pc == regs_[X86_64_REG_PC]) {
-    return false;
+	  new_pc == regs_[X86_64_REG_PC]) {
+	return false;
   }
 
   regs_[X86_64_REG_PC] = new_pc;
   return true;
 }
 
-void RegsX86_64::IterateRegisters(std::function<void(const char*, uint64_t)> fn) {
+void RegsX86_64::IterateRegisters(std::function<void(const char *, uint64_t)> fn) {
   fn("rax", regs_[X86_64_REG_RAX]);
   fn("rbx", regs_[X86_64_REG_RBX]);
   fn("rcx", regs_[X86_64_REG_RCX]);
@@ -83,10 +83,10 @@ void RegsX86_64::IterateRegisters(std::function<void(const char*, uint64_t)> fn)
   fn("rip", regs_[X86_64_REG_RIP]);
 }
 
-Regs* RegsX86_64::Read(void* remote_data) {
-  x86_64_user_regs* user = reinterpret_cast<x86_64_user_regs*>(remote_data);
+Regs *RegsX86_64::Read(void *remote_data) {
+  x86_64_user_regs *user = reinterpret_cast<x86_64_user_regs *>(remote_data);
 
-  RegsX86_64* regs = new RegsX86_64();
+  RegsX86_64 *regs = new RegsX86_64();
   (*regs)[X86_64_REG_RAX] = user->rax;
   (*regs)[X86_64_REG_RBX] = user->rbx;
   (*regs)[X86_64_REG_RCX] = user->rcx;
@@ -108,7 +108,7 @@ Regs* RegsX86_64::Read(void* remote_data) {
   return regs;
 }
 
-void RegsX86_64::SetFromUcontext(x86_64_ucontext_t* ucontext) {
+void RegsX86_64::SetFromUcontext(x86_64_ucontext_t *ucontext) {
   // R8-R15
   memcpy(&regs_[X86_64_REG_R8], &ucontext->uc_mcontext.r8, 8 * sizeof(uint64_t));
 
@@ -124,26 +124,26 @@ void RegsX86_64::SetFromUcontext(x86_64_ucontext_t* ucontext) {
   regs_[X86_64_REG_RIP] = ucontext->uc_mcontext.rip;
 }
 
-Regs* RegsX86_64::CreateFromUcontext(void* ucontext) {
-  x86_64_ucontext_t* x86_64_ucontext = reinterpret_cast<x86_64_ucontext_t*>(ucontext);
+Regs *RegsX86_64::CreateFromUcontext(void *ucontext) {
+  x86_64_ucontext_t *x86_64_ucontext = reinterpret_cast<x86_64_ucontext_t *>(ucontext);
 
-  RegsX86_64* regs = new RegsX86_64();
+  RegsX86_64 *regs = new RegsX86_64();
   regs->SetFromUcontext(x86_64_ucontext);
   return regs;
 }
 
-bool RegsX86_64::StepIfSignalHandler(uint64_t elf_offset, Elf* elf, Memory* process_memory) {
+bool RegsX86_64::StepIfSignalHandler(uint64_t elf_offset, Elf *elf, Memory *process_memory) {
   uint64_t data;
-  Memory* elf_memory = elf->memory();
+  Memory *elf_memory = elf->memory();
   // Read from elf memory since it is usually more expensive to read from
   // process memory.
   if (!elf_memory->ReadFully(elf_offset, &data, sizeof(data)) || data != 0x0f0000000fc0c748) {
-    return false;
+	return false;
   }
 
   uint8_t data2;
   if (!elf_memory->ReadFully(elf_offset + 8, &data2, sizeof(data2)) || data2 != 0x05) {
-    return false;
+	return false;
   }
 
   // __restore_rt:
@@ -154,14 +154,14 @@ bool RegsX86_64::StepIfSignalHandler(uint64_t elf_offset, Elf* elf, Memory* proc
   // sp points to the ucontext data structure, read only the mcontext part.
   x86_64_ucontext_t x86_64_ucontext;
   if (!process_memory->ReadFully(regs_[X86_64_REG_SP] + 0x28, &x86_64_ucontext.uc_mcontext,
-                                 sizeof(x86_64_mcontext_t))) {
-    return false;
+								 sizeof(x86_64_mcontext_t))) {
+	return false;
   }
   SetFromUcontext(&x86_64_ucontext);
   return true;
 }
 
-Regs* RegsX86_64::Clone() {
+Regs *RegsX86_64::Clone() {
   return new RegsX86_64(*this);
 }
 

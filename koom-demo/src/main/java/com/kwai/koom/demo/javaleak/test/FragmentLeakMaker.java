@@ -19,12 +19,13 @@
 package com.kwai.koom.demo.javaleak.test;
 
 import android.content.Context;
+
 import androidx.fragment.app.Fragment;
 
 public class FragmentLeakMaker extends LeakMaker<Fragment> {
 
-  @Override
-  void startLeak(Context context) {
+    @Override
+    void startLeak(Context context) {
 
-  }
+    }
 }

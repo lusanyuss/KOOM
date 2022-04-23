@@ -26,30 +26,31 @@
 // both Unix and Windows if possible, but if this fails we'll need a different
 // function signature for each.
 static_assert(sizeof(int) >= sizeof(DWORD),
-              "Windows system error codes are too large to fit in an int.");
+"Windows system error codes are too large to fit in an int.");
 
 namespace android {
 namespace base {
 
-static constexpr DWORD kErrorMessageBufferSize = 256;
+static constexpr DWORD
+kErrorMessageBufferSize = 256;
 
 std::string SystemErrorCodeToString(int int_error_code) {
   WCHAR msgbuf[kErrorMessageBufferSize];
   DWORD error_code = int_error_code;
   DWORD flags = FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
   DWORD len =
-      FormatMessageW(flags, nullptr, error_code, 0, msgbuf, kErrorMessageBufferSize, nullptr);
+	  FormatMessageW(flags, nullptr, error_code, 0, msgbuf, kErrorMessageBufferSize, nullptr);
   if (len == 0) {
-    return android::base::StringPrintf("Error %lu while retrieving message for error %lu",
-                                       GetLastError(), error_code);
+	return android::base::StringPrintf("Error %lu while retrieving message for error %lu",
+									   GetLastError(), error_code);
   }
 
   // Convert UTF-16 to UTF-8.
   std::string msg;
   if (!android::base::WideToUTF8(msgbuf, &msg)) {
-    return android::base::StringPrintf(
-        "Error %lu while converting message for error %lu from UTF-16 to UTF-8", GetLastError(),
-        error_code);
+	return android::base::StringPrintf(
+		"Error %lu while converting message for error %lu from UTF-16 to UTF-8", GetLastError(),
+		error_code);
   }
 
   // Messages returned by the system end with line breaks.

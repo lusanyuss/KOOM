@@ -49,8 +49,8 @@ struct HookInfo {
   pthread_t thread_id;
   long long time;
   HookInfo(pthread_t threadId, long long time) {
-    this->thread_id = threadId;
-    this->time = time;
+	this->thread_id = threadId;
+	this->time = time;
   }
 };
 struct HookExitInfo {
@@ -59,10 +59,10 @@ struct HookExitInfo {
   int tid;
   std::string threadName;
   HookExitInfo(pthread_t threadId, int tid, char *threadName, long long time) {
-    this->thread_id = threadId;
-    this->tid = tid;
-    this->threadName.assign(threadName);
-    this->time = time;
+	this->thread_id = threadId;
+	this->tid = tid;
+	this->threadName.assign(threadName);
+	this->time = time;
   }
 };
 
@@ -75,12 +75,12 @@ struct HookAddInfo {
   ThreadCreateArg *create_arg;
 
   HookAddInfo(int tid, long long time, pthread_t pthread, bool isThreadDetached,
-              ThreadCreateArg *thread_create_arg) {
-    this->tid = tid;
-    this->time = time;
-    this->pthread = pthread;
-    this->is_thread_detached = isThreadDetached;
-    this->create_arg = thread_create_arg;
+			  ThreadCreateArg *thread_create_arg) {
+	this->tid = tid;
+	this->time = time;
+	this->pthread = pthread;
+	this->is_thread_detached = isThreadDetached;
+	this->create_arg = thread_create_arg;
   };
 };
 }  // namespace koom

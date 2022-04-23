@@ -2,8 +2,6 @@ package com.kwai.koom.demo.javaleak.test;
 
 import android.content.Context;
 
-import com.kwai.koom.demo.javaleak.test.LeakMaker;
-
 /**
  * Copyright 2020 Kwai, Inc. All rights reserved.
  * <p>
@@ -23,9 +21,9 @@ import com.kwai.koom.demo.javaleak.test.LeakMaker;
  */
 public class StringLeakMaker extends LeakMaker<String> {
 
-  @Override
-  void startLeak(Context context) {
-    String largeStr = new String(new byte[512 * 1024]);
-    uselessObjectList.add(largeStr);
-  }
+    @Override
+    void startLeak(Context context) {
+        String largeStr = new String(new byte[512 * 1024]);
+        uselessObjectList.add(largeStr);
+    }
 }

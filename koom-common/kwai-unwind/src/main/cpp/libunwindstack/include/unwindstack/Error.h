@@ -25,7 +25,7 @@ namespace unwindstack {
 enum WarningCode : uint64_t {
   WARNING_NONE = 0,
   WARNING_DEX_PC_NOT_IN_MAP = 0x1,  // A dex pc was found, but it doesn't exist
-                                    // in any valid map.
+  // in any valid map.
 };
 
 enum ErrorCode : uint8_t {
@@ -38,42 +38,31 @@ enum ErrorCode : uint8_t {
   ERROR_REPEATED_FRAME,         // The last frame has the same pc/sp as the next.
   ERROR_INVALID_ELF,            // Unwind in an invalid elf.
   ERROR_THREAD_DOES_NOT_EXIST,  // Attempt to unwind a local thread that does
-                                // not exist.
+  // not exist.
   ERROR_THREAD_TIMEOUT,         // Timeout trying to unwind a local thread.
   ERROR_SYSTEM_CALL,            // System call failed while unwinding.
 };
 
-static inline const char* GetErrorCodeString(ErrorCode error) {
+static inline const char *GetErrorCodeString(ErrorCode error) {
   switch (error) {
-    case ERROR_NONE:
-      return "None";
-    case ERROR_MEMORY_INVALID:
-      return "Memory Invalid";
-    case ERROR_UNWIND_INFO:
-      return "Unwind Info";
-    case ERROR_UNSUPPORTED:
-      return "Unsupported";
-    case ERROR_INVALID_MAP:
-      return "Invalid Map";
-    case ERROR_MAX_FRAMES_EXCEEDED:
-      return "Maximum Frames Exceeded";
-    case ERROR_REPEATED_FRAME:
-      return "Repeated Frame";
-    case ERROR_INVALID_ELF:
-      return "Invalid Elf";
-    case ERROR_THREAD_DOES_NOT_EXIST:
-      return "Thread Does Not Exist";
-    case ERROR_THREAD_TIMEOUT:
-      return "Thread Timeout";
-    case ERROR_SYSTEM_CALL:
-      return "System Call Failed";
+	case ERROR_NONE:return "None";
+	case ERROR_MEMORY_INVALID:return "Memory Invalid";
+	case ERROR_UNWIND_INFO:return "Unwind Info";
+	case ERROR_UNSUPPORTED:return "Unsupported";
+	case ERROR_INVALID_MAP:return "Invalid Map";
+	case ERROR_MAX_FRAMES_EXCEEDED:return "Maximum Frames Exceeded";
+	case ERROR_REPEATED_FRAME:return "Repeated Frame";
+	case ERROR_INVALID_ELF:return "Invalid Elf";
+	case ERROR_THREAD_DOES_NOT_EXIST:return "Thread Does Not Exist";
+	case ERROR_THREAD_TIMEOUT:return "Thread Timeout";
+	case ERROR_SYSTEM_CALL:return "System Call Failed";
   }
 }
 
 struct ErrorData {
   ErrorCode code;
   uint64_t address;  // Only valid when code is ERROR_MEMORY_INVALID.
-                     // Indicates the failing address.
+  // Indicates the failing address.
 };
 
 }  // namespace unwindstack

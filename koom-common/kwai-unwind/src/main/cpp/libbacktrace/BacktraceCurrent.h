@@ -35,7 +35,7 @@
 class BacktraceMap;
 
 class BacktraceCurrent : public Backtrace {
-public:
+ public:
   BacktraceCurrent(pid_t pid, pid_t tid, BacktraceMap *map) : Backtrace(pid, tid, map) {}
   virtual ~BacktraceCurrent() {}
 
@@ -45,7 +45,7 @@ public:
 
   bool Unwind(size_t num_ignore_frames, void *ucontext) override;
 
-private:
+ private:
   bool UnwindThread(size_t num_ignore_frames);
 
   virtual bool UnwindFromContext(size_t num_ignore_frames, void *ucontext) = 0;

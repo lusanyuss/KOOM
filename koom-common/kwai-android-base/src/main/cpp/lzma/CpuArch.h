@@ -17,184 +17,166 @@ MY_CPU_LE_UNALIGN means that CPU is LITTLE ENDIAN and CPU supports unaligned mem
 */
 
 #if  defined(_M_X64) \
-  || defined(_M_AMD64) \
-  || defined(__x86_64__) \
-  || defined(__AMD64__) \
-  || defined(__amd64__)
-  #define MY_CPU_AMD64
-  #ifdef __ILP32__
-    #define MY_CPU_NAME "x32"
-  #else
-    #define MY_CPU_NAME "x64"
-  #endif
-  #define MY_CPU_64BIT
+ || defined(_M_AMD64) \
+ || defined(__x86_64__) \
+ || defined(__AMD64__) \
+ || defined(__amd64__)
+#define MY_CPU_AMD64
+#ifdef __ILP32__
+#define MY_CPU_NAME "x32"
+#else
+#define MY_CPU_NAME "x64"
 #endif
-
+#define MY_CPU_64BIT
+#endif
 
 #if  defined(_M_IX86) \
-  || defined(__i386__)
-  #define MY_CPU_X86
-  #define MY_CPU_NAME "x86"
-  #define MY_CPU_32BIT
+ || defined(__i386__)
+#define MY_CPU_X86
+#define MY_CPU_NAME "x86"
+#define MY_CPU_32BIT
 #endif
-
 
 #if  defined(_M_ARM64) \
-  || defined(__AARCH64EL__) \
-  || defined(__AARCH64EB__) \
-  || defined(__aarch64__)
-  #define MY_CPU_ARM64
-  #define MY_CPU_NAME "arm64"
-  #define MY_CPU_64BIT
+ || defined(__AARCH64EL__) \
+ || defined(__AARCH64EB__) \
+ || defined(__aarch64__)
+#define MY_CPU_ARM64
+#define MY_CPU_NAME "arm64"
+#define MY_CPU_64BIT
 #endif
-
 
 #if  defined(_M_ARM) \
-  || defined(_M_ARM_NT) \
-  || defined(_M_ARMT) \
-  || defined(__arm__) \
-  || defined(__thumb__) \
-  || defined(__ARMEL__) \
-  || defined(__ARMEB__) \
-  || defined(__THUMBEL__) \
-  || defined(__THUMBEB__)
-  #define MY_CPU_ARM
-  #define MY_CPU_NAME "arm"
-  #define MY_CPU_32BIT
+ || defined(_M_ARM_NT) \
+ || defined(_M_ARMT) \
+ || defined(__arm__) \
+ || defined(__thumb__) \
+ || defined(__ARMEL__) \
+ || defined(__ARMEB__) \
+ || defined(__THUMBEL__) \
+ || defined(__THUMBEB__)
+#define MY_CPU_ARM
+#define MY_CPU_NAME "arm"
+#define MY_CPU_32BIT
 #endif
-
 
 #if  defined(_M_IA64) \
-  || defined(__ia64__)
-  #define MY_CPU_IA64
-  #define MY_CPU_NAME "ia64"
-  #define MY_CPU_64BIT
+ || defined(__ia64__)
+#define MY_CPU_IA64
+#define MY_CPU_NAME "ia64"
+#define MY_CPU_64BIT
 #endif
-
 
 #if  defined(__mips64) \
-  || defined(__mips64__) \
-  || (defined(__mips) && (__mips == 64 || __mips == 4 || __mips == 3))
-  #define MY_CPU_NAME "mips64"
-  #define MY_CPU_64BIT
+ || defined(__mips64__) \
+ || (defined(__mips) && (__mips == 64 || __mips == 4 || __mips == 3))
+#define MY_CPU_NAME "mips64"
+#define MY_CPU_64BIT
 #elif defined(__mips__)
-  #define MY_CPU_NAME "mips"
-  /* #define MY_CPU_32BIT */
+#define MY_CPU_NAME "mips"
+/* #define MY_CPU_32BIT */
 #endif
-
 
 #if  defined(__ppc64__) \
-  || defined(__powerpc64__)
-  #ifdef __ILP32__
-    #define MY_CPU_NAME "ppc64-32"
-  #else
-    #define MY_CPU_NAME "ppc64"
-  #endif
-  #define MY_CPU_64BIT
-#elif defined(__ppc__) \
-  || defined(__powerpc__)
-  #define MY_CPU_NAME "ppc"
-  #define MY_CPU_32BIT
+ || defined(__powerpc64__)
+#ifdef __ILP32__
+#define MY_CPU_NAME "ppc64-32"
+#else
+#define MY_CPU_NAME "ppc64"
 #endif
-
+#define MY_CPU_64BIT
+#elif defined(__ppc__) \
+ || defined(__powerpc__)
+#define MY_CPU_NAME "ppc"
+#define MY_CPU_32BIT
+#endif
 
 #if  defined(__sparc64__)
-  #define MY_CPU_NAME "sparc64"
-  #define MY_CPU_64BIT
+#define MY_CPU_NAME "sparc64"
+#define MY_CPU_64BIT
 #elif defined(__sparc__)
-  #define MY_CPU_NAME "sparc"
-  /* #define MY_CPU_32BIT */
+#define MY_CPU_NAME "sparc"
+/* #define MY_CPU_32BIT */
 #endif
-
 
 #if defined(MY_CPU_X86) || defined(MY_CPU_AMD64)
 #define MY_CPU_X86_OR_AMD64
 #endif
 
-
 #ifdef _WIN32
 
-  #ifdef MY_CPU_ARM
-  #define MY_CPU_ARM_LE
-  #endif
+#ifdef MY_CPU_ARM
+#define MY_CPU_ARM_LE
+#endif
 
-  #ifdef MY_CPU_ARM64
-  #define MY_CPU_ARM64_LE
-  #endif
+#ifdef MY_CPU_ARM64
+#define MY_CPU_ARM64_LE
+#endif
 
-  #ifdef _M_IA64
-  #define MY_CPU_IA64_LE
-  #endif
+#ifdef _M_IA64
+#define MY_CPU_IA64_LE
+#endif
 
 #endif
 
-
 #if defined(MY_CPU_X86_OR_AMD64) \
-    || defined(MY_CPU_ARM_LE) \
-    || defined(MY_CPU_ARM64_LE) \
-    || defined(MY_CPU_IA64_LE) \
-    || defined(__LITTLE_ENDIAN__) \
-    || defined(__ARMEL__) \
-    || defined(__THUMBEL__) \
-    || defined(__AARCH64EL__) \
-    || defined(__MIPSEL__) \
-    || defined(__MIPSEL) \
-    || defined(_MIPSEL) \
-    || defined(__BFIN__) \
-    || (defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__))
-  #define MY_CPU_LE
+ || defined(MY_CPU_ARM_LE) \
+ || defined(MY_CPU_ARM64_LE) \
+ || defined(MY_CPU_IA64_LE) \
+ || defined(__LITTLE_ENDIAN__) \
+ || defined(__ARMEL__) \
+ || defined(__THUMBEL__) \
+ || defined(__AARCH64EL__) \
+ || defined(__MIPSEL__) \
+ || defined(__MIPSEL) \
+ || defined(_MIPSEL) \
+ || defined(__BFIN__) \
+ || (defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__))
+#define MY_CPU_LE
 #endif
 
 #if defined(__BIG_ENDIAN__) \
-    || defined(__ARMEB__) \
-    || defined(__THUMBEB__) \
-    || defined(__AARCH64EB__) \
-    || defined(__MIPSEB__) \
-    || defined(__MIPSEB) \
-    || defined(_MIPSEB) \
-    || defined(__m68k__) \
-    || defined(__s390__) \
-    || defined(__s390x__) \
-    || defined(__zarch__) \
-    || (defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__))
-  #define MY_CPU_BE
+ || defined(__ARMEB__) \
+ || defined(__THUMBEB__) \
+ || defined(__AARCH64EB__) \
+ || defined(__MIPSEB__) \
+ || defined(__MIPSEB) \
+ || defined(_MIPSEB) \
+ || defined(__m68k__) \
+ || defined(__s390__) \
+ || defined(__s390x__) \
+ || defined(__zarch__) \
+ || (defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__))
+#define MY_CPU_BE
 #endif
-
 
 #if defined(MY_CPU_LE) && defined(MY_CPU_BE)
-  #error Stop_Compiling_Bad_Endian
+#error Stop_Compiling_Bad_Endian
 #endif
-
 
 #if defined(MY_CPU_32BIT) && defined(MY_CPU_64BIT)
-  #error Stop_Compiling_Bad_32_64_BIT
+#error Stop_Compiling_Bad_32_64_BIT
 #endif
-
 
 #ifndef MY_CPU_NAME
-  #ifdef MY_CPU_LE
-    #define MY_CPU_NAME "LE"
-  #elif defined(MY_CPU_BE)
-    #define MY_CPU_NAME "BE"
-  #else
-    /*
-    #define MY_CPU_NAME ""
-    */
-  #endif
+#ifdef MY_CPU_LE
+#define MY_CPU_NAME "LE"
+#elif defined(MY_CPU_BE)
+#define MY_CPU_NAME "BE"
+#else
+/*
+#define MY_CPU_NAME ""
+*/
 #endif
-
-
-
-
+#endif
 
 #ifdef MY_CPU_LE
-  #if defined(MY_CPU_X86_OR_AMD64) \
-      || defined(MY_CPU_ARM64) \
-      || defined(__ARM_FEATURE_UNALIGNED)
-    #define MY_CPU_LE_UNALIGN
-  #endif
+#if defined(MY_CPU_X86_OR_AMD64) \
+ || defined(MY_CPU_ARM64) \
+ || defined(__ARM_FEATURE_UNALIGNED)
+#define MY_CPU_LE_UNALIGN
 #endif
-
+#endif
 
 #ifdef MY_CPU_LE_UNALIGN
 
@@ -209,37 +191,37 @@ MY_CPU_LE_UNALIGN means that CPU is LITTLE ENDIAN and CPU supports unaligned mem
 #else
 
 #define GetUi16(p) ( (UInt16) ( \
-             ((const Byte *)(p))[0] | \
-    ((UInt16)((const Byte *)(p))[1] << 8) ))
+			 ((const Byte *)(p))[0] | \
+	((UInt16)((const Byte *)(p))[1] << 8) ))
 
 #define GetUi32(p) ( \
-             ((const Byte *)(p))[0]        | \
-    ((UInt32)((const Byte *)(p))[1] <<  8) | \
-    ((UInt32)((const Byte *)(p))[2] << 16) | \
-    ((UInt32)((const Byte *)(p))[3] << 24))
+			 ((const Byte *)(p))[0]        | \
+	((UInt32)((const Byte *)(p))[1] <<  8) | \
+	((UInt32)((const Byte *)(p))[2] << 16) | \
+	((UInt32)((const Byte *)(p))[3] << 24))
 
 #define GetUi64(p) (GetUi32(p) | ((UInt64)GetUi32(((const Byte *)(p)) + 4) << 32))
 
 #define SetUi16(p, v) { Byte *_ppp_ = (Byte *)(p); UInt32 _vvv_ = (v); \
-    _ppp_[0] = (Byte)_vvv_; \
-    _ppp_[1] = (Byte)(_vvv_ >> 8); }
+	_ppp_[0] = (Byte)_vvv_; \
+	_ppp_[1] = (Byte)(_vvv_ >> 8); }
 
 #define SetUi32(p, v) { Byte *_ppp_ = (Byte *)(p); UInt32 _vvv_ = (v); \
-    _ppp_[0] = (Byte)_vvv_; \
-    _ppp_[1] = (Byte)(_vvv_ >> 8); \
-    _ppp_[2] = (Byte)(_vvv_ >> 16); \
-    _ppp_[3] = (Byte)(_vvv_ >> 24); }
+	_ppp_[0] = (Byte)_vvv_; \
+	_ppp_[1] = (Byte)(_vvv_ >> 8); \
+	_ppp_[2] = (Byte)(_vvv_ >> 16); \
+	_ppp_[3] = (Byte)(_vvv_ >> 24); }
 
 #define SetUi64(p, v) { Byte *_ppp2_ = (Byte *)(p); UInt64 _vvv2_ = (v); \
-    SetUi32(_ppp2_    , (UInt32)_vvv2_); \
-    SetUi32(_ppp2_ + 4, (UInt32)(_vvv2_ >> 32)); }
+	SetUi32(_ppp2_    , (UInt32)_vvv2_); \
+	SetUi32(_ppp2_ + 4, (UInt32)(_vvv2_ >> 32)); }
 
 #endif
 
 #ifdef __has_builtin
-  #define MY__has_builtin(x) __has_builtin(x)
+#define MY__has_builtin(x) __has_builtin(x)
 #else
-  #define MY__has_builtin(x) 0
+#define MY__has_builtin(x) 0
 #endif
 
 #if defined(MY_CPU_LE_UNALIGN) && /* defined(_WIN64) && */ (_MSC_VER >= 1300)
@@ -258,9 +240,9 @@ MY_CPU_LE_UNALIGN means that CPU is LITTLE ENDIAN and CPU supports unaligned mem
 
 #define SetBe32(p, v) (*(UInt32 *)(void *)(p)) = _byteswap_ulong(v)
 
-#elif defined(MY_CPU_LE_UNALIGN) && ( \
+#elif defined(MY_CPU_LE_UNALIGN) && (\
        (defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3))) \
-    || (defined(__clang__) && MY__has_builtin(__builtin_bswap16)) )
+ || (defined(__clang__) && MY__has_builtin(__builtin_bswap16)))
 
 /* #define GetBe16(p) __builtin_bswap16(*(const UInt16 *)(const Byte *)(p)) */
 #define GetBe32(p) __builtin_bswap32(*(const UInt32 *)(const Byte *)(p))
@@ -286,7 +268,6 @@ MY_CPU_LE_UNALIGN means that CPU is LITTLE ENDIAN and CPU supports unaligned mem
 
 #endif
 
-
 #ifndef GetBe16
 
 #define GetBe16(p) ( (UInt16) ( \
@@ -294,8 +275,6 @@ MY_CPU_LE_UNALIGN means that CPU is LITTLE ENDIAN and CPU supports unaligned mem
              ((const Byte *)(p))[1] ))
 
 #endif
-
-
 
 #ifdef MY_CPU_X86_OR_AMD64
 

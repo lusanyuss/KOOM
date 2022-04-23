@@ -39,14 +39,14 @@ bool GetBoolProperty(const std::string &key, bool default_value);
 // Returns the signed integer corresponding to the system property `key`.
 // If the property is empty, doesn't exist, doesn't have an integer value, or is outside
 // the optional bounds, returns `default_value`.
-template <typename T>
+template<typename T>
 T GetIntProperty(const std::string &key, T default_value, T min = std::numeric_limits<T>::min(),
-                 T max = std::numeric_limits<T>::max());
+				 T max = std::numeric_limits<T>::max());
 
 // Returns the unsigned integer corresponding to the system property `key`.
 // If the property is empty, doesn't exist, doesn't have an integer value, or is outside
 // the optional bound, returns `default_value`.
-template <typename T>
+template<typename T>
 T GetUintProperty(const std::string &key, T default_value, T max = std::numeric_limits<T>::max());
 
 // Sets the system property `key` to `value`.
@@ -57,7 +57,7 @@ bool SetProperty(const std::string &key, const std::string &value);
 // Returns true on success, false on timeout.
 #if defined(__BIONIC__)
 bool WaitForProperty(const std::string &key, const std::string &expected_value,
-                     std::chrono::milliseconds relative_timeout = std::chrono::milliseconds::max());
+					 std::chrono::milliseconds relative_timeout = std::chrono::milliseconds::max());
 #endif
 
 // Waits for the system property `key` to be created.
@@ -65,14 +65,14 @@ bool WaitForProperty(const std::string &key, const std::string &expected_value,
 // Returns true on success, false on timeout.
 #if defined(__BIONIC__)
 bool WaitForPropertyCreation(const std::string &key, std::chrono::milliseconds relative_timeout =
-                                                         std::chrono::milliseconds::max());
+std::chrono::milliseconds::max());
 #endif
 
 #if defined(__BIONIC__) && __cplusplus >= 201703L
 // Cached system property lookup. For code that needs to read the same property multiple times,
 // this class helps optimize those lookups.
 class CachedProperty {
-public:
+ public:
   explicit CachedProperty(const char *property_name);
 
   // Returns the current value of the underlying system property as cheaply as possible.
@@ -84,7 +84,7 @@ public:
   // Note: *changed can be set to true even if the contents of the property remain the same.
   const char *Get(bool *changed = nullptr);
 
-private:
+ private:
   std::string property_name_;
   const prop_info *prop_info_;
   std::optional<uint32_t> cached_area_serial_;

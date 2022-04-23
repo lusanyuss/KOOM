@@ -111,7 +111,7 @@ namespace base {
 //     return result;
 //   }
 class SCOPED_CAPABILITY ScopedLockAssertion {
-public:
+ public:
   ScopedLockAssertion(std::mutex &mutex) ACQUIRE(mutex) {}
   ~ScopedLockAssertion() RELEASE() {}
 };

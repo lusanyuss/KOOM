@@ -29,7 +29,7 @@ namespace base {
 //
 // On failure, returns false and fills |error|.
 bool ParseNetAddress(const std::string &address, std::string *host, int *port,
-                     std::string *canonical_address, std::string *error);
+					 std::string *canonical_address, std::string *error);
 
 } // namespace base
 } // namespace android

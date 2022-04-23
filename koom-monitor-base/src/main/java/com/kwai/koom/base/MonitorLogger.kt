@@ -21,35 +21,31 @@ package com.kwai.koom.base
 import androidx.annotation.IntDef
 
 object MonitorLogger : Logger {
-  override fun addCustomStatEvent(key: String, value: String?, realtimeReport: Boolean) {
-    MonitorManager.commonConfig.logger.addCustomStatEvent(key, value, realtimeReport)
-  }
-
-  override fun addExceptionEvent(message: String, crashType: Int) {
-    MonitorManager.commonConfig.logger.addExceptionEvent(message, crashType)
-  }
+    override fun addCustomStatEvent(key: String, value: String?, realtimeReport: Boolean) {
+        MonitorManager.commonConfig.logger.addCustomStatEvent(key, value, realtimeReport)
+    }
+    
+    override fun addExceptionEvent(message: String, crashType: Int) {
+        MonitorManager.commonConfig.logger.addExceptionEvent(message, crashType)
+    }
 }
 
 interface Logger {
-  fun addCustomStatEvent(key: String, value: String?, realtimeReport: Boolean = false) = Unit
-
-  fun addExceptionEvent(message: String, @ExceptionType crashType: Int) = Unit
-
-  @IntDef(
-      ExceptionType.UNKNOWN_TYPE,
-      ExceptionType.OOM,
-      ExceptionType.OOM_STACKS,
-      ExceptionType.NATIVE_LEAK,
-      ExceptionType.THREAD_STACKS
-  )
-  @Retention(AnnotationRetention.SOURCE)
-  annotation class ExceptionType {
-    companion object {
-      const val UNKNOWN_TYPE = 0
-      const val OOM = 1
-      const val OOM_STACKS = 2
-      const val NATIVE_LEAK = 3
-      const val THREAD_STACKS = 4
+    fun addCustomStatEvent(key: String, value: String?, realtimeReport: Boolean = false) = Unit
+    
+    fun addExceptionEvent(message: String, @ExceptionType crashType: Int) = Unit
+    
+    @IntDef(
+        ExceptionType.UNKNOWN_TYPE, ExceptionType.OOM, ExceptionType.OOM_STACKS, ExceptionType.NATIVE_LEAK, ExceptionType.THREAD_STACKS
+    )
+    @Retention(AnnotationRetention.SOURCE)
+    annotation class ExceptionType {
+        companion object {
+            const val UNKNOWN_TYPE = 0
+            const val OOM = 1
+            const val OOM_STACKS = 2
+            const val NATIVE_LEAK = 3
+            const val THREAD_STACKS = 4
+        }
     }
-  }
 }

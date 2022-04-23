@@ -26,15 +26,15 @@ namespace android {
 namespace procinfo {
 
 bool ReadMapFileAsyncSafe(const char *map_file, void *buffer, size_t buffer_size,
-                          const std::function<void(uint64_t, uint64_t, uint16_t, uint64_t, ino_t,
-                                                   const char *)> &callback) {
+						  const std::function<void(uint64_t, uint64_t, uint16_t, uint64_t, ino_t,
+												   const char *)> &callback) {
   if (buffer == nullptr || buffer_size == 0) {
-    return false;
+	return false;
   }
 
   int fd = open(map_file, O_RDONLY | O_CLOEXEC);
   if (fd == -1) {
-    return false;
+	return false;
   }
 
   char *char_buffer = reinterpret_cast<char *>(buffer);
@@ -43,53 +43,53 @@ bool ReadMapFileAsyncSafe(const char *map_file, void *buffer, size_t buffer_size
   char *line = nullptr;
   bool read_complete = false;
   while (true) {
-    ssize_t bytes =
-        TEMP_FAILURE_RETRY(read(fd, char_buffer + read_bytes, buffer_size - read_bytes - 1));
-    if (bytes <= 0) {
-      if (read_bytes == 0) {
-        close(fd);
-        return bytes == 0;
-      }
-      // Treat the last piece of data as the last line.
-      char_buffer[start + read_bytes] = '\n';
-      bytes = 1;
-      read_complete = true;
-    }
-    read_bytes += bytes;
+	ssize_t bytes =
+		TEMP_FAILURE_RETRY(read(fd, char_buffer + read_bytes, buffer_size - read_bytes - 1));
+	if (bytes <= 0) {
+	  if (read_bytes == 0) {
+		close(fd);
+		return bytes == 0;
+	  }
+	  // Treat the last piece of data as the last line.
+	  char_buffer[start + read_bytes] = '\n';
+	  bytes = 1;
+	  read_complete = true;
+	}
+	read_bytes += bytes;
 
-    while (read_bytes > 0) {
-      char *newline = reinterpret_cast<char *>(memchr(&char_buffer[start], '\n', read_bytes));
-      if (newline == nullptr) {
-        break;
-      }
-      *newline = '\0';
-      line = &char_buffer[start];
-      start = newline - char_buffer + 1;
-      read_bytes -= newline - line + 1;
+	while (read_bytes > 0) {
+	  char *newline = reinterpret_cast<char *>(memchr(&char_buffer[start], '\n', read_bytes));
+	  if (newline == nullptr) {
+		break;
+	  }
+	  *newline = '\0';
+	  line = &char_buffer[start];
+	  start = newline - char_buffer + 1;
+	  read_bytes -= newline - line + 1;
 
-      // Ignore the return code, errors are okay.
-      ReadMapFileContent(line, callback);
-    }
+	  // Ignore the return code, errors are okay.
+	  ReadMapFileContent(line, callback);
+	}
 
-    if (read_complete) {
-      close(fd);
-      return true;
-    }
+	if (read_complete) {
+	  close(fd);
+	  return true;
+	}
 
-    if (start == 0 && read_bytes == buffer_size - 1) {
-      // The buffer provided is too small to contain this line, give up
-      // and indicate failure.
-      close(fd);
-      return false;
-    }
+	if (start == 0 && read_bytes == buffer_size - 1) {
+	  // The buffer provided is too small to contain this line, give up
+	  // and indicate failure.
+	  close(fd);
+	  return false;
+	}
 
-    // Copy any leftover data to the front  of the buffer.
-    if (start > 0) {
-      if (read_bytes > 0) {
-        memmove(char_buffer, &char_buffer[start], read_bytes);
-      }
-      start = 0;
-    }
+	// Copy any leftover data to the front  of the buffer.
+	if (start > 0) {
+	  if (read_bytes > 0) {
+		memmove(char_buffer, &char_buffer[start], read_bytes);
+	  }
+	  start = 0;
+	}
   }
 }
 

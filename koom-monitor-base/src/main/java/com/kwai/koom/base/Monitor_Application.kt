@@ -31,58 +31,56 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 private var _currentActivity: WeakReference<Activity>? = null
 val Application.currentActivity: Activity?
-  get() = _currentActivity?.get()
+    get() = _currentActivity?.get()
 
 private var _isForeground = false
 val Application.isForeground
-  get() = _isForeground
+    get() = _isForeground
 
 private val _lifecycleEventObservers = CopyOnWriteArrayList<LifecycleEventObserver>()
-fun Application.registerProcessLifecycleObserver(observer: LifecycleEventObserver) =
-    _lifecycleEventObservers.add(observer)
-fun Application.unregisterProcessLifecycleObserver(observer: LifecycleEventObserver) =
-    _lifecycleEventObservers.remove(observer)
+fun Application.registerProcessLifecycleObserver(observer: LifecycleEventObserver) = _lifecycleEventObservers.add(observer)
+fun Application.unregisterProcessLifecycleObserver(observer: LifecycleEventObserver) = _lifecycleEventObservers.remove(observer)
 
 internal fun registerApplicationExtension() {
-  getApplication().registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
-    private fun updateCurrentActivityWeakRef(activity: Activity) {
-      _currentActivity = if (_currentActivity?.get() == activity) {
-        _currentActivity
-      } else {
-        WeakReference(activity)
-      }
-    }
-
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-      updateCurrentActivityWeakRef(activity)
-    }
-
-    override fun onActivityStarted(activity: Activity) {}
-
-    override fun onActivityResumed(activity: Activity) {
-      updateCurrentActivityWeakRef(activity)
-    }
-
-    override fun onActivityPaused(activity: Activity) {}
-
-    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
-
-    override fun onActivityStopped(activity: Activity) {}
-
-    override fun onActivityDestroyed(activity: Activity) {}
-  })
-
-  ProcessLifecycleOwner.get().lifecycle.addObserver(object : LifecycleEventObserver {
-    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-      when (event) {
-        Lifecycle.Event.ON_START -> _isForeground = true
-        Lifecycle.Event.ON_STOP -> _isForeground = false
-        else -> Unit
-      }
-
-      for (lifecycleEventObserver in _lifecycleEventObservers) {
-        lifecycleEventObserver.onStateChanged(source, event)
-      }
-    }
-  })
+    getApplication().registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
+        private fun updateCurrentActivityWeakRef(activity: Activity) {
+            _currentActivity = if(_currentActivity?.get() == activity) {
+                _currentActivity
+            } else {
+                WeakReference(activity)
+            }
+        }
+        
+        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+            updateCurrentActivityWeakRef(activity)
+        }
+        
+        override fun onActivityStarted(activity: Activity) {}
+        
+        override fun onActivityResumed(activity: Activity) {
+            updateCurrentActivityWeakRef(activity)
+        }
+        
+        override fun onActivityPaused(activity: Activity) {}
+        
+        override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+        
+        override fun onActivityStopped(activity: Activity) {}
+        
+        override fun onActivityDestroyed(activity: Activity) {}
+    })
+    
+    ProcessLifecycleOwner.get().lifecycle.addObserver(object : LifecycleEventObserver {
+        override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+            when (event) {
+                Lifecycle.Event.ON_START -> _isForeground = true
+                Lifecycle.Event.ON_STOP -> _isForeground = false
+                else -> Unit
+            }
+            
+            for (lifecycleEventObserver in _lifecycleEventObservers) {
+                lifecycleEventObserver.onStateChanged(source, event)
+            }
+        }
+    })
 }

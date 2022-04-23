@@ -28,44 +28,44 @@ HookLooper::~HookLooper() { delete this->holder; }
 void HookLooper::handle(int what, void *data) {
   looper::handle(what, data);
   switch (what) {
-    case ACTION_ADD_THREAD: {
-      koom::Log::info(looper_tag, "AddThread");
-      auto info = static_cast<HookAddInfo *>(data);
-      holder->AddThread(info->tid, info->pthread, info->is_thread_detached,
-                        info->time, info->create_arg);
-      delete info;
-      break;
-    }
-    case ACTION_JOIN_THREAD: {
-      koom::Log::info(looper_tag, "JoinThread");
-      auto info = static_cast<HookInfo *>(data);
-      holder->JoinThread(info->thread_id);
-      delete info;
-      break;
-    }
-    case ACTION_DETACH_THREAD: {
-      koom::Log::info(looper_tag, "DetachThread");
-      auto info = static_cast<HookInfo *>(data);
-      holder->DetachThread(info->thread_id);
-      delete info;
-      break;
-    }
-    case ACTION_EXIT_THREAD: {
-      koom::Log::info(looper_tag, "ExitThread");
-      auto info = static_cast<HookExitInfo *>(data);
-      holder->ExitThread(info->thread_id, info->threadName, info->time);
-      delete info;
-      break;
-    }
-    case ACTION_REFRESH: {
-      koom::Log::info(looper_tag, "Refresh");
-      auto info = static_cast<SimpleHookInfo *>(data);
-      holder->ReportThreadLeak(info->time);
-      delete info;
-      break;
-    }
-    default: {
-    }
+	case ACTION_ADD_THREAD: {
+	  koom::Log::info(looper_tag, "AddThread");
+	  auto info = static_cast<HookAddInfo *>(data);
+	  holder->AddThread(info->tid, info->pthread, info->is_thread_detached,
+						info->time, info->create_arg);
+	  delete info;
+	  break;
+	}
+	case ACTION_JOIN_THREAD: {
+	  koom::Log::info(looper_tag, "JoinThread");
+	  auto info = static_cast<HookInfo *>(data);
+	  holder->JoinThread(info->thread_id);
+	  delete info;
+	  break;
+	}
+	case ACTION_DETACH_THREAD: {
+	  koom::Log::info(looper_tag, "DetachThread");
+	  auto info = static_cast<HookInfo *>(data);
+	  holder->DetachThread(info->thread_id);
+	  delete info;
+	  break;
+	}
+	case ACTION_EXIT_THREAD: {
+	  koom::Log::info(looper_tag, "ExitThread");
+	  auto info = static_cast<HookExitInfo *>(data);
+	  holder->ExitThread(info->thread_id, info->threadName, info->time);
+	  delete info;
+	  break;
+	}
+	case ACTION_REFRESH: {
+	  koom::Log::info(looper_tag, "Refresh");
+	  auto info = static_cast<SimpleHookInfo *>(data);
+	  holder->ReportThreadLeak(info->time);
+	  delete info;
+	  break;
+	}
+	default: {
+	}
   }
 }
 void HookLooper::post(int what, void *data) { looper::post(what, data); }

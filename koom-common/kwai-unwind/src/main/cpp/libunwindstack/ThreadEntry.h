@@ -35,27 +35,27 @@ enum WaitType : int {
 
 class ThreadEntry {
  public:
-  static ThreadEntry* Get(pid_t tid, bool create = true);
+  static ThreadEntry *Get(pid_t tid, bool create = true);
 
-  static void Remove(ThreadEntry* entry);
+  static void Remove(ThreadEntry *entry);
 
   void Wake();
 
   bool Wait(WaitType type);
 
-  void CopyUcontextFromSigcontext(void* sigcontext);
+  void CopyUcontextFromSigcontext(void *sigcontext);
 
   inline void Lock() {
-    mutex_.lock();
+	mutex_.lock();
 
-    // Always reset the wait value since this could be the first or nth
-    // time this entry is locked.
-    wait_value_ = 0;
+	// Always reset the wait value since this could be the first or nth
+	// time this entry is locked.
+	wait_value_ = 0;
   }
 
   inline void Unlock() { mutex_.unlock(); }
 
-  inline ucontext_t* GetUcontext() { return &ucontext_; }
+  inline ucontext_t *GetUcontext() { return &ucontext_; }
 
  private:
   ThreadEntry(pid_t tid);
@@ -70,7 +70,7 @@ class ThreadEntry {
   ucontext_t ucontext_;
 
   static std::mutex entries_mutex_;
-  static std::map<pid_t, ThreadEntry*> entries_;
+  static std::map<pid_t, ThreadEntry *> entries_;
 };
 
 }  // namespace unwindstack

@@ -81,15 +81,15 @@ typedef android_hdr_t android_hdr;
  */
 
 struct android_ycbcr {
-    void *y;
-    void *cb;
-    void *cr;
-    size_t ystride;
-    size_t cstride;
-    size_t chroma_step;
+  void *y;
+  void *cb;
+  void *cr;
+  size_t ystride;
+  size_t cstride;
+  size_t chroma_step;
 
-    /** reserved for future use, set to 0 by gralloc's (*lock_ycbcr)() */
-    uint32_t reserved[8];
+  /** reserved for future use, set to 0 by gralloc's (*lock_ycbcr)() */
+  uint32_t reserved[8];
 };
 
 /*
@@ -125,67 +125,67 @@ struct android_ycbcr {
  */
 
 typedef enum android_flex_component {
-    /* luma */
-    FLEX_COMPONENT_Y = 1 << 0,
-    /* chroma blue */
-    FLEX_COMPONENT_Cb = 1 << 1,
-    /* chroma red */
-    FLEX_COMPONENT_Cr = 1 << 2,
+  /* luma */
+  FLEX_COMPONENT_Y = 1 << 0,
+  /* chroma blue */
+  FLEX_COMPONENT_Cb = 1 << 1,
+  /* chroma red */
+  FLEX_COMPONENT_Cr = 1 << 2,
 
-    /* red */
-    FLEX_COMPONENT_R = 1 << 10,
-    /* green */
-    FLEX_COMPONENT_G = 1 << 11,
-    /* blue */
-    FLEX_COMPONENT_B = 1 << 12,
+  /* red */
+  FLEX_COMPONENT_R = 1 << 10,
+  /* green */
+  FLEX_COMPONENT_G = 1 << 11,
+  /* blue */
+  FLEX_COMPONENT_B = 1 << 12,
 
-    /* alpha */
-    FLEX_COMPONENT_A = 1 << 30,
+  /* alpha */
+  FLEX_COMPONENT_A = 1 << 30,
 } android_flex_component_t;
 
 typedef struct android_flex_plane {
-    /* pointer to the first byte of the top-left pixel of the plane. */
-    uint8_t *top_left;
+  /* pointer to the first byte of the top-left pixel of the plane. */
+  uint8_t *top_left;
 
-    android_flex_component_t component;
+  android_flex_component_t component;
 
-    /* bits allocated for the component in each pixel. Must be a positive
-       multiple of 8. */
-    int32_t bits_per_component;
-    /* number of the most significant bits used in the format for this
-       component. Must be between 1 and bits_per_component, inclusive. */
-    int32_t bits_used;
+  /* bits allocated for the component in each pixel. Must be a positive
+	 multiple of 8. */
+  int32_t bits_per_component;
+  /* number of the most significant bits used in the format for this
+	 component. Must be between 1 and bits_per_component, inclusive. */
+  int32_t bits_used;
 
-    /* horizontal increment */
-    int32_t h_increment;
-    /* vertical increment */
-    int32_t v_increment;
-    /* horizontal subsampling. Must be a positive power of 2. */
-    int32_t h_subsampling;
-    /* vertical subsampling. Must be a positive power of 2. */
-    int32_t v_subsampling;
+  /* horizontal increment */
+  int32_t h_increment;
+  /* vertical increment */
+  int32_t v_increment;
+  /* horizontal subsampling. Must be a positive power of 2. */
+  int32_t h_subsampling;
+  /* vertical subsampling. Must be a positive power of 2. */
+  int32_t v_subsampling;
 } android_flex_plane_t;
 
 typedef enum android_flex_format {
-    /* not a flexible format */
-    FLEX_FORMAT_INVALID = 0x0,
-    FLEX_FORMAT_Y = FLEX_COMPONENT_Y,
-    FLEX_FORMAT_YCbCr = FLEX_COMPONENT_Y | FLEX_COMPONENT_Cb | FLEX_COMPONENT_Cr,
-    FLEX_FORMAT_YCbCrA = FLEX_FORMAT_YCbCr | FLEX_COMPONENT_A,
-    FLEX_FORMAT_RGB = FLEX_COMPONENT_R | FLEX_COMPONENT_G | FLEX_COMPONENT_B,
-    FLEX_FORMAT_RGBA = FLEX_FORMAT_RGB | FLEX_COMPONENT_A,
+  /* not a flexible format */
+  FLEX_FORMAT_INVALID = 0x0,
+  FLEX_FORMAT_Y = FLEX_COMPONENT_Y,
+  FLEX_FORMAT_YCbCr = FLEX_COMPONENT_Y | FLEX_COMPONENT_Cb | FLEX_COMPONENT_Cr,
+  FLEX_FORMAT_YCbCrA = FLEX_FORMAT_YCbCr | FLEX_COMPONENT_A,
+  FLEX_FORMAT_RGB = FLEX_COMPONENT_R | FLEX_COMPONENT_G | FLEX_COMPONENT_B,
+  FLEX_FORMAT_RGBA = FLEX_FORMAT_RGB | FLEX_COMPONENT_A,
 } android_flex_format_t;
 
 typedef struct android_flex_layout {
-    /* the kind of flexible format */
-    android_flex_format_t format;
+  /* the kind of flexible format */
+  android_flex_format_t format;
 
-    /* number of planes; 0 for FLEX_FORMAT_INVALID */
-    uint32_t num_planes;
-    /* a plane for each component; ordered in increasing component value order.
-       E.g. FLEX_FORMAT_RGBA maps 0 -> R, 1 -> G, etc.
-       Can be NULL for FLEX_FORMAT_INVALID */
-    android_flex_plane_t *planes;
+  /* number of planes; 0 for FLEX_FORMAT_INVALID */
+  uint32_t num_planes;
+  /* a plane for each component; ordered in increasing component value order.
+	 E.g. FLEX_FORMAT_RGBA maps 0 -> R, 1 -> G, etc.
+	 Can be NULL for FLEX_FORMAT_INVALID */
+  android_flex_plane_t *planes;
 } android_flex_layout_t;
 
 /**
@@ -222,16 +222,16 @@ typedef struct android_flex_layout {
  */
 
 struct android_depth_points {
-    uint32_t num_points;
+  uint32_t num_points;
 
-    /** reserved for future use, set to 0 by gralloc's (*lock)() */
-    uint32_t reserved[8];
+  /** reserved for future use, set to 0 by gralloc's (*lock)() */
+  uint32_t reserved[8];
 
 #if defined(__clang__)
-    #pragma clang diagnostic push
+#pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wc99-extensions"
 #endif
-    float xyzc_points[];
+  float xyzc_points[];
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif
@@ -244,22 +244,22 @@ struct android_depth_points {
   * Color is defined in CIE XYZ coordinates
   */
 struct android_xy_color {
-    float x;
-    float y;
+  float x;
+  float y;
 };
 
 struct android_smpte2086_metadata {
-    struct android_xy_color displayPrimaryRed;
-    struct android_xy_color displayPrimaryGreen;
-    struct android_xy_color displayPrimaryBlue;
-    struct android_xy_color whitePoint;
-    float maxLuminance;
-    float minLuminance;
+  struct android_xy_color displayPrimaryRed;
+  struct android_xy_color displayPrimaryGreen;
+  struct android_xy_color displayPrimaryBlue;
+  struct android_xy_color whitePoint;
+  float maxLuminance;
+  float minLuminance;
 };
 
 struct android_cta861_3_metadata {
-    float maxContentLightLevel;
-    float maxFrameAverageLightLevel;
+  float maxContentLightLevel;
+  float maxFrameAverageLightLevel;
 };
 
 #ifdef __cplusplus

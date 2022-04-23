@@ -22,17 +22,17 @@ package com.kwai.koom.javaoom.hprof;
 
 public abstract class HeapDumper {
 
-  protected final boolean soLoaded;
+    protected final boolean soLoaded;
 
-  public HeapDumper() {
-    soLoaded = NativeHandler.load();
-  }
+    public HeapDumper() {
+        soLoaded = NativeHandler.load();
+    }
 
-  /**
-   * dump may cost several seconds, make sure called in a separated thread.
-   *
-   * @param path dump file
-   * @return dump result success or not
-   */
-  public abstract boolean dump(String path);
+    /**
+     * dump may cost several seconds, make sure called in a separated thread.
+     *
+     * @param path dump file
+     * @return dump result success or not
+     */
+    public abstract boolean dump(String path);
 }

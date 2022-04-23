@@ -34,33 +34,33 @@ static const char *kLibMemUnreachableName = "libmemunreachable.so";
 // Just need the symbol in arm64-v8a so
 // API level > Android O
 static const char *kGetUnreachableMemoryStringSymbolAboveO =
-    "_ZN7android26GetUnreachableMemoryStringEbm";
+	"_ZN7android26GetUnreachableMemoryStringEbm";
 // API level <= Android O
 static const char *kGetUnreachableMemoryStringSymbolBelowO =
-    "_Z26GetUnreachableMemoryStringbm";
+	"_Z26GetUnreachableMemoryStringbm";
 
 MemoryAnalyzer::MemoryAnalyzer()
-    : get_unreachable_fn_(nullptr), handle_(nullptr) {
+	: get_unreachable_fn_(nullptr), handle_(nullptr) {
   auto handle = kwai::linker::DlFcn::dlopen(kLibMemUnreachableName, RTLD_NOW);
   if (!handle) {
-    ALOGE("dlopen %s error: %s", kLibMemUnreachableName, dlerror());
-    return;
+	ALOGE("dlopen %s error: %s", kLibMemUnreachableName, dlerror());
+	return;
   }
 
   if (android_get_device_api_level() > __ANDROID_API_O__) {
-    get_unreachable_fn_ =
-        reinterpret_cast<GetUnreachableFn>(kwai::linker::DlFcn::dlsym(
-            handle, kGetUnreachableMemoryStringSymbolAboveO));
+	get_unreachable_fn_ =
+		reinterpret_cast<GetUnreachableFn>(kwai::linker::DlFcn::dlsym(
+			handle, kGetUnreachableMemoryStringSymbolAboveO));
   } else {
-    get_unreachable_fn_ =
-        reinterpret_cast<GetUnreachableFn>(kwai::linker::DlFcn::dlsym(
-            handle, kGetUnreachableMemoryStringSymbolBelowO));
+	get_unreachable_fn_ =
+		reinterpret_cast<GetUnreachableFn>(kwai::linker::DlFcn::dlsym(
+			handle, kGetUnreachableMemoryStringSymbolBelowO));
   }
 }
 
 MemoryAnalyzer::~MemoryAnalyzer() {
   if (handle_) {
-    kwai::linker::DlFcn::dlclose(handle_);
+	kwai::linker::DlFcn::dlclose(handle_);
   }
 }
 
@@ -71,14 +71,14 @@ MemoryAnalyzer::CollectUnreachableMem() {
   std::vector<std::pair<uintptr_t, size_t>> unreachable_mem;
 
   if (!IsValid()) {
-    ALOGE("MemoryAnalyzer NOT valid");
-    return std::move(unreachable_mem);
+	ALOGE("MemoryAnalyzer NOT valid");
+	return std::move(unreachable_mem);
   }
 
   // libmemunreachable NOT work in release apk because it using ptrace
   if (prctl(PR_SET_DUMPABLE, 1, 0, 0, 0) == -1) {
-    ALOGE("Set process dumpable Fail");
-    return std::move(unreachable_mem);
+	ALOGE("Set process dumpable Fail");
+	return std::move(unreachable_mem);
   }
 
   // Note: time consuming
@@ -89,16 +89,16 @@ MemoryAnalyzer::CollectUnreachableMem() {
 
   std::regex filter_regex("[0-9]+ bytes unreachable at [A-Za-z0-9]+");
   std::sregex_iterator unreachable_begin(
-      unreachable_memory.begin(), unreachable_memory.end(), filter_regex);
+	  unreachable_memory.begin(), unreachable_memory.end(), filter_regex);
   std::sregex_iterator unreachable_end;
   for (; unreachable_begin != unreachable_end; ++unreachable_begin) {
-    std::string line = unreachable_begin->str();
-    auto address =
-        std::stoul(line.substr(line.find_last_of(' ') + 1,
-                               line.length() - line.find_last_of(' ') - 1),
-                   0, 16);
-    auto size = std::stoul(line.substr(0, line.find_first_of(' ')));
-    unreachable_mem.push_back(std::pair<uintptr_t, size_t>(address, size));
+	std::string line = unreachable_begin->str();
+	auto address =
+		std::stoul(line.substr(line.find_last_of(' ') + 1,
+							   line.length() - line.find_last_of(' ') - 1),
+				   0, 16);
+	auto size = std::stoul(line.substr(0, line.find_first_of(' ')));
+	unreachable_mem.push_back(std::pair<uintptr_t, size_t>(address, size));
   }
   return std::move(unreachable_mem);
 }

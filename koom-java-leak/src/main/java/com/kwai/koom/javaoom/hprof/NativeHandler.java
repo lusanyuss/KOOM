@@ -24,19 +24,19 @@ package com.kwai.koom.javaoom.hprof;
 import static com.kwai.koom.base.Monitor_SoKt.loadSoQuietly;
 
 public class NativeHandler {
-  private static boolean sSoLoaded;
+    private static boolean sSoLoaded;
 
-  public static native boolean isARM64();
-
-  public static boolean load() {
-    if (!sSoLoaded) {
-      return sSoLoaded = loadSoQuietly("koom-java");
+    static {
+        load();
     }
 
-    return true;
-  }
+    public static native boolean isARM64();
 
-  static {
-    load();
-  }
+    public static boolean load() {
+        if (!sSoLoaded) {
+            return sSoLoaded = loadSoQuietly("koom-java");
+        }
+
+        return true;
+    }
 }

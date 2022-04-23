@@ -26,7 +26,7 @@ boot_clock::time_point boot_clock::now() {
   timespec ts;
   clock_gettime(CLOCK_BOOTTIME, &ts);
   return boot_clock::time_point(std::chrono::seconds(ts.tv_sec) +
-                                std::chrono::nanoseconds(ts.tv_nsec));
+	  std::chrono::nanoseconds(ts.tv_nsec));
 #else
   // Darwin and Windows do not support clock_gettime.
   return boot_clock::time_point();

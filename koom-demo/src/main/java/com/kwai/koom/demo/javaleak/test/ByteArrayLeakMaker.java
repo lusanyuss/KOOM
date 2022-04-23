@@ -22,17 +22,17 @@ import android.content.Context;
 
 public class ByteArrayLeakMaker extends LeakMaker<ByteArrayLeakMaker.ByteArrayHolder> {
 
-  @Override
-  public void startLeak(Context context) {
-    uselessObjectList.add(new ByteArrayHolder());
-  }
-
-  public static class ByteArrayHolder {
-    private byte[] array;
-
-    public ByteArrayHolder() {
-      array = new byte[512 * 1024];
+    @Override
+    public void startLeak(Context context) {
+        uselessObjectList.add(new ByteArrayHolder());
     }
-  }
+
+    public static class ByteArrayHolder {
+        private byte[] array;
+
+        public ByteArrayHolder() {
+            array = new byte[512 * 1024];
+        }
+    }
 
 }

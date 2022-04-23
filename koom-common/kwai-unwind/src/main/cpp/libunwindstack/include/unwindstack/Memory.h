@@ -33,27 +33,27 @@ class Memory {
 
   static std::shared_ptr<Memory> CreateProcessMemory(pid_t pid);
   static std::shared_ptr<Memory> CreateProcessMemoryCached(pid_t pid);
-  static std::shared_ptr<Memory> CreateOfflineMemory(const uint8_t* data, uint64_t start,
-                                                     uint64_t end);
-  static std::unique_ptr<Memory> CreateFileMemory(const std::string& path, uint64_t offset);
+  static std::shared_ptr<Memory> CreateOfflineMemory(const uint8_t *data, uint64_t start,
+													 uint64_t end);
+  static std::unique_ptr<Memory> CreateFileMemory(const std::string &path, uint64_t offset);
 
-  virtual bool ReadString(uint64_t addr, std::string* dst, size_t max_read);
+  virtual bool ReadString(uint64_t addr, std::string *dst, size_t max_read);
 
   virtual void Clear() {}
 
   virtual bool IsLocal() const { return false; }
 
-  virtual size_t Read(uint64_t addr, void* dst, size_t size) = 0;
+  virtual size_t Read(uint64_t addr, void *dst, size_t size) = 0;
   virtual long ReadTag(uint64_t) { return -1; }
 
-  bool ReadFully(uint64_t addr, void* dst, size_t size);
+  bool ReadFully(uint64_t addr, void *dst, size_t size);
 
-  inline bool Read32(uint64_t addr, uint32_t* dst) {
-    return ReadFully(addr, dst, sizeof(uint32_t));
+  inline bool Read32(uint64_t addr, uint32_t *dst) {
+	return ReadFully(addr, dst, sizeof(uint32_t));
   }
 
-  inline bool Read64(uint64_t addr, uint64_t* dst) {
-    return ReadFully(addr, dst, sizeof(uint64_t));
+  inline bool Read64(uint64_t addr, uint64_t *dst) {
+	return ReadFully(addr, dst, sizeof(uint64_t));
   }
 };
 

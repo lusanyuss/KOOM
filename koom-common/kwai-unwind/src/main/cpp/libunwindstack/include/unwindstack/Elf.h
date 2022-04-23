@@ -41,7 +41,7 @@ class Regs;
 
 class Elf {
  public:
-  Elf(Memory* memory) : memory_(memory) {}
+  Elf(Memory *memory) : memory_(memory) {}
   virtual ~Elf() = default;
 
   bool Init();
@@ -52,18 +52,18 @@ class Elf {
 
   std::string GetSoname();
 
-  bool GetFunctionName(uint64_t addr, std::string* name, uint64_t* func_offset);
+  bool GetFunctionName(uint64_t addr, std::string *name, uint64_t *func_offset);
 
-  bool GetGlobalVariableOffset(const std::string& name, uint64_t* memory_offset);
+  bool GetGlobalVariableOffset(const std::string &name, uint64_t *memory_offset);
 
-  uint64_t GetRelPc(uint64_t pc, const MapInfo* map_info);
+  uint64_t GetRelPc(uint64_t pc, const MapInfo *map_info);
 
-  bool StepIfSignalHandler(uint64_t rel_pc, Regs* regs, Memory* process_memory);
+  bool StepIfSignalHandler(uint64_t rel_pc, Regs *regs, Memory *process_memory);
 
-  bool Step(uint64_t rel_pc, Regs* regs, Memory* process_memory, bool* finished,
-            bool* is_signal_frame);
+  bool Step(uint64_t rel_pc, Regs *regs, Memory *process_memory, bool *finished,
+			bool *is_signal_frame);
 
-  ElfInterface* CreateInterfaceFromMemory(Memory* memory);
+  ElfInterface *CreateInterfaceFromMemory(Memory *memory);
 
   std::string GetBuildID();
 
@@ -71,7 +71,7 @@ class Elf {
 
   bool IsValidPc(uint64_t pc);
 
-  void GetLastError(ErrorData* data);
+  void GetLastError(ErrorData *data);
   ErrorCode GetLastErrorCode();
   uint64_t GetLastErrorAddress();
 
@@ -83,28 +83,28 @@ class Elf {
 
   ArchEnum arch() { return arch_; }
 
-  Memory* memory() { return memory_.get(); }
+  Memory *memory() { return memory_.get(); }
 
-  ElfInterface* interface() { return interface_.get(); }
+  ElfInterface *interface() { return interface_.get(); }
 
-  ElfInterface* gnu_debugdata_interface() { return gnu_debugdata_interface_.get(); }
+  ElfInterface *gnu_debugdata_interface() { return gnu_debugdata_interface_.get(); }
 
-  static bool IsValidElf(Memory* memory);
+  static bool IsValidElf(Memory *memory);
 
-  static bool GetInfo(Memory* memory, uint64_t* size);
+  static bool GetInfo(Memory *memory, uint64_t *size);
 
-  static int64_t GetLoadBias(Memory* memory);
+  static int64_t GetLoadBias(Memory *memory);
 
-  static std::string GetBuildID(Memory* memory);
+  static std::string GetBuildID(Memory *memory);
 
   static void SetCachingEnabled(bool enable);
   static bool CachingEnabled() { return cache_enabled_; }
 
   static void CacheLock();
   static void CacheUnlock();
-  static void CacheAdd(MapInfo* info);
-  static bool CacheGet(MapInfo* info);
-  static bool CacheAfterCreateMemory(MapInfo* info);
+  static void CacheAdd(MapInfo *info);
+  static bool CacheGet(MapInfo *info);
+  static bool CacheAfterCreateMemory(MapInfo *info);
 
  protected:
   bool valid_ = false;
@@ -121,8 +121,8 @@ class Elf {
   std::unique_ptr<ElfInterface> gnu_debugdata_interface_;
 
   static bool cache_enabled_;
-  static std::unordered_map<std::string, std::pair<std::shared_ptr<Elf>, bool>>* cache_;
-  static std::mutex* cache_lock_;
+  static std::unordered_map<std::string, std::pair<std::shared_ptr<Elf>, bool>> *cache_;
+  static std::mutex *cache_lock_;
 };
 
 }  // namespace unwindstack

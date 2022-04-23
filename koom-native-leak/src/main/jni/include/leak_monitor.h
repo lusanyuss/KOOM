@@ -46,9 +46,9 @@ struct AllocRecord {
 struct ThreadInfo {
   char name[kMaxThreadNameLen];
   ThreadInfo() {
-    if (prctl(PR_GET_NAME, name)) {
-      memcpy(name, "unknown", kMaxThreadNameLen);
-    }
+	if (prctl(PR_GET_NAME, name)) {
+	  memcpy(name, "unknown", kMaxThreadNameLen);
+	}
   }
 
   ~ThreadInfo() = default;
@@ -58,7 +58,7 @@ class LeakMonitor {
  public:
   static LeakMonitor &GetInstance();
   bool Install(std::vector<std::string> *selected_list,
-               std::vector<std::string> *ignore_list);
+			   std::vector<std::string> *ignore_list);
   void Uninstall();
   void SetMonitorThreshold(size_t threshold);
   std::vector<std::shared_ptr<AllocRecord>> GetLeakAllocs();
@@ -69,11 +69,11 @@ class LeakMonitor {
 
  private:
   LeakMonitor()
-      : alloc_index_(0),
-        has_install_monitor_(false),
-        live_alloc_records_(),
-        alloc_threshold_(kDefaultAllocThreshold),
-        memory_analyzer_() {}
+	  : alloc_index_(0),
+		has_install_monitor_(false),
+		live_alloc_records_(),
+		alloc_threshold_(kDefaultAllocThreshold),
+		memory_analyzer_() {}
   ~LeakMonitor() = default;
   LeakMonitor(const LeakMonitor &);
   LeakMonitor &operator=(const LeakMonitor &);

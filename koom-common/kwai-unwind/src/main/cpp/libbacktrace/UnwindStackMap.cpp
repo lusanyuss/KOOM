@@ -34,10 +34,10 @@ UnwindStackMap::UnwindStackMap(pid_t pid) : BacktraceMap(pid) {}
 
 bool UnwindStackMap::Build() {
   if (pid_ == 0) {
-    pid_ = getpid();
-    stack_maps_.reset(new unwindstack::LocalMaps);
+	pid_ = getpid();
+	stack_maps_.reset(new unwindstack::LocalMaps);
   } else {
-    stack_maps_.reset(new unwindstack::RemoteMaps(pid_));
+	stack_maps_.reset(new unwindstack::RemoteMaps(pid_));
   }
 
   // Create the process memory object.
@@ -51,78 +51,78 @@ bool UnwindStackMap::Build() {
 #endif
 
   if (!stack_maps_->Parse()) {
-    return false;
+	return false;
   }
 
   // Iterate through the maps and fill in the backtrace_map_t structure.
-  for (const auto& map_info : *stack_maps_) {
-    backtrace_map_t map;
-    map.start = map_info->start;
-    map.end = map_info->end;
-    map.offset = map_info->offset;
-    // Set to -1 so that it is demand loaded.
-    map.load_bias = static_cast<uint64_t>(-1);
-    map.flags = map_info->flags;
-    map.name = map_info->name;
+  for (const auto &map_info : *stack_maps_) {
+	backtrace_map_t map;
+	map.start = map_info->start;
+	map.end = map_info->end;
+	map.offset = map_info->offset;
+	// Set to -1 so that it is demand loaded.
+	map.load_bias = static_cast<uint64_t>(-1);
+	map.flags = map_info->flags;
+	map.name = map_info->name;
 
-    maps_.push_back(map);
+	maps_.push_back(map);
   }
 
   return true;
 }
 
-void UnwindStackMap::FillIn(uint64_t addr, backtrace_map_t* map) {
+void UnwindStackMap::FillIn(uint64_t addr, backtrace_map_t *map) {
   BacktraceMap::FillIn(addr, map);
   if (map->load_bias != static_cast<uint64_t>(-1)) {
-    return;
+	return;
   }
 
   // Fill in the load_bias.
-  unwindstack::MapInfo* map_info = stack_maps_->Find(addr);
+  unwindstack::MapInfo *map_info = stack_maps_->Find(addr);
   if (map_info == nullptr) {
-    return;
+	return;
   }
   map->load_bias = map_info->GetLoadBias(process_memory_);
 }
 
 uint64_t UnwindStackMap::GetLoadBias(size_t index) {
   if (index >= stack_maps_->Total()) {
-    return 0;
+	return 0;
   }
 
-  unwindstack::MapInfo* map_info = stack_maps_->Get(index);
+  unwindstack::MapInfo *map_info = stack_maps_->Get(index);
   if (map_info == nullptr) {
-    return 0;
+	return 0;
   }
   return map_info->GetLoadBias(process_memory_);
 }
 
-std::string UnwindStackMap::GetFunctionName(uint64_t pc, uint64_t* offset) {
+std::string UnwindStackMap::GetFunctionName(uint64_t pc, uint64_t *offset) {
   *offset = 0;
-  unwindstack::Maps* maps = stack_maps();
+  unwindstack::Maps *maps = stack_maps();
 
   // Get the map for this
-  unwindstack::MapInfo* map_info = maps->Find(pc);
+  unwindstack::MapInfo *map_info = maps->Find(pc);
   if (map_info == nullptr || map_info->flags & PROT_DEVICE_MAP) {
-    return "";
+	return "";
   }
 
   if (arch_ == unwindstack::ARCH_UNKNOWN) {
-    if (pid_ == getpid()) {
-      arch_ = unwindstack::Regs::CurrentArch();
-    } else {
-      // Create a remote regs, to figure out the architecture.
-      std::unique_ptr<unwindstack::Regs> regs(unwindstack::Regs::RemoteGet(pid_));
-      arch_ = regs->Arch();
-    }
+	if (pid_ == getpid()) {
+	  arch_ = unwindstack::Regs::CurrentArch();
+	} else {
+	  // Create a remote regs, to figure out the architecture.
+	  std::unique_ptr<unwindstack::Regs> regs(unwindstack::Regs::RemoteGet(pid_));
+	  arch_ = regs->Arch();
+	}
   }
 
-  unwindstack::Elf* elf = map_info->GetElf(process_memory(), arch_);
+  unwindstack::Elf *elf = map_info->GetElf(process_memory(), arch_);
 
   std::string name;
   uint64_t func_offset;
   if (!elf->GetFunctionName(elf->GetRelPc(pc, map_info), &name, &func_offset)) {
-    return "";
+	return "";
   }
   *offset = func_offset;
   return name;
@@ -135,20 +135,20 @@ std::shared_ptr<unwindstack::Memory> UnwindStackMap::GetProcessMemory() {
 //-------------------------------------------------------------------------
 // BacktraceMap create function.
 //-------------------------------------------------------------------------
-BacktraceMap* BacktraceMap::Create(pid_t pid, bool uncached) {
-  BacktraceMap* map;
+BacktraceMap *BacktraceMap::Create(pid_t pid, bool uncached) {
+  BacktraceMap *map;
 
   if (uncached) {
-    // Force use of the base class to parse the maps when this call is made.
-    map = new BacktraceMap(pid);
+	// Force use of the base class to parse the maps when this call is made.
+	map = new BacktraceMap(pid);
   } else if (pid == getpid()) {
-    map = new UnwindStackMap(0);
+	map = new UnwindStackMap(0);
   } else {
-    map = new UnwindStackMap(pid);
+	map = new UnwindStackMap(pid);
   }
   if (!map->Build()) {
-    delete map;
-    return nullptr;
+	delete map;
+	return nullptr;
   }
   return map;
 }

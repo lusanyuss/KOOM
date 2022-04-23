@@ -25,83 +25,81 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 internal object OOMFileManager {
-  private const val TIME_FORMAT = "yyyy-MM-dd_HH-mm-ss_SSS"
-
-  private lateinit var mRootDirInvoker: (String) -> File
-  private lateinit var mPrefix: String
-
-  private lateinit var mRootPath: String
-
-  val rootDir by lazy {
-    if (this::mRootDirInvoker.isInitialized)
-      mRootDirInvoker("oom")
-    else
-      File(mRootPath)
-  }
-
-  @JvmStatic
-  val hprofAnalysisDir by lazy { File(rootDir, "memory/hprof-aly").apply { mkdirs() } }
-
-  @JvmStatic
-  val manualDumpDir by lazy { File(rootDir, "memory/hprof-man").apply { mkdirs() } }
-
-  @JvmStatic
-  val threadDumpDir by lazy { File(hprofAnalysisDir, "thread").apply { mkdirs() } }
-
-  @JvmStatic
-  val fdDumpDir by lazy { File(hprofAnalysisDir, "fd").apply { mkdirs() } }
-
-  @JvmStatic
-  fun init(rootDirInvoker: (String) -> File) {
-    mRootDirInvoker = rootDirInvoker
-    mPrefix = "${MonitorBuildConfig.VERSION_NAME}_"
-  }
-
-  @JvmStatic
-  fun init(rootPath: String?) {
-    if (rootPath != null) {
-      mRootPath = rootPath
+    private const val TIME_FORMAT = "yyyy-MM-dd_HH-mm-ss_SSS"
+    
+    private lateinit var mRootDirInvoker: (String) -> File
+    private lateinit var mPrefix: String
+    
+    private lateinit var mRootPath: String
+    
+    val rootDir by lazy {
+        if(this::mRootDirInvoker.isInitialized) mRootDirInvoker("oom")
+        else File(mRootPath)
     }
-    mPrefix = "${MonitorBuildConfig.VERSION_NAME}_"
-  }
-
-  @JvmStatic
-  fun createHprofAnalysisFile(date: Date): File {
-    val time = SimpleDateFormat(TIME_FORMAT, Locale.CHINESE).format(date)
-    return File(hprofAnalysisDir, "$mPrefix$time.hprof").also {
-      hprofAnalysisDir.mkdirs()
+    
+    @JvmStatic
+    val hprofAnalysisDir by lazy { File(rootDir, "memory/hprof-aly").apply { mkdirs() } }
+    
+    @JvmStatic
+    val manualDumpDir by lazy { File(rootDir, "memory/hprof-man").apply { mkdirs() } }
+    
+    @JvmStatic
+    val threadDumpDir by lazy { File(hprofAnalysisDir, "thread").apply { mkdirs() } }
+    
+    @JvmStatic
+    val fdDumpDir by lazy { File(hprofAnalysisDir, "fd").apply { mkdirs() } }
+    
+    @JvmStatic
+    fun init(rootDirInvoker: (String) -> File) {
+        mRootDirInvoker = rootDirInvoker
+        mPrefix = "${MonitorBuildConfig.VERSION_NAME}_"
     }
-  }
-
-  @JvmStatic
-  fun createJsonAnalysisFile(date: Date): File {
-    val time = SimpleDateFormat(TIME_FORMAT, Locale.CHINESE).format(date)
-    return File(hprofAnalysisDir, "$mPrefix$time.json").also {
-      hprofAnalysisDir.mkdirs()
+    
+    @JvmStatic
+    fun init(rootPath: String?) {
+        if(rootPath != null) {
+            mRootPath = rootPath
+        }
+        mPrefix = "${MonitorBuildConfig.VERSION_NAME}_"
     }
-  }
-
-  @JvmStatic
-  fun createHprofOOMDumpFile(date: Date): File {
-    val time = SimpleDateFormat(TIME_FORMAT, Locale.CHINESE).format(date)
-    return File(manualDumpDir, "$mPrefix$time.hprof").also {
-      manualDumpDir.mkdirs()
+    
+    @JvmStatic
+    fun createHprofAnalysisFile(date: Date): File {
+        val time = SimpleDateFormat(TIME_FORMAT, Locale.CHINESE).format(date)
+        return File(hprofAnalysisDir, "$mPrefix$time.hprof").also {
+            hprofAnalysisDir.mkdirs()
+        }
     }
-  }
-
-  @JvmStatic
-  fun createDumpFile(dumpDir: File): File {
-    return File(dumpDir, "dump.txt").also {
-      dumpDir.mkdirs()
+    
+    @JvmStatic
+    fun createJsonAnalysisFile(date: Date): File {
+        val time = SimpleDateFormat(TIME_FORMAT, Locale.CHINESE).format(date)
+        return File(hprofAnalysisDir, "$mPrefix$time.json").also {
+            hprofAnalysisDir.mkdirs()
+        }
     }
-  }
-
-  @JvmStatic
-  fun isSpaceEnough(): Boolean {
-    val statFs = StatFs(hprofAnalysisDir.canonicalPath)
-    val blockSize = statFs.blockSizeLong
-    val availableBlocks = statFs.availableBlocks.toLong()
-
-    return blockSize * availableBlocks > 1.2 * 1024 * 1024
-  }
+    
+    @JvmStatic
+    fun createHprofOOMDumpFile(date: Date): File {
+        val time = SimpleDateFormat(TIME_FORMAT, Locale.CHINESE).format(date)
+        return File(manualDumpDir, "$mPrefix$time.hprof").also {
+            manualDumpDir.mkdirs()
+        }
+    }
+    
+    @JvmStatic
+    fun createDumpFile(dumpDir: File): File {
+        return File(dumpDir, "dump.txt").also {
+            dumpDir.mkdirs()
+        }
+    }
+    
+    @JvmStatic
+    fun isSpaceEnough(): Boolean {
+        val statFs = StatFs(hprofAnalysisDir.canonicalPath)
+        val blockSize = statFs.blockSizeLong
+        val availableBlocks = statFs.availableBlocks.toLong()
+        
+        return blockSize * availableBlocks > 1.2 * 1024 * 1024
+    }
 }

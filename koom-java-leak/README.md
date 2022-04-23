@@ -2,13 +2,17 @@
 
 # OOMMonitor Introduction
 
-OOMMonitor is designed for solving Android Application's Java memory leak problems，and it's core concepts are:
+OOMMonitor is designed for solving Android Application's Java memory leak problems，and it's core
+concepts are:
 
-- By polling Java heap size, running threads and fd size periodic, Hprof dump is triggered when the threshold is exceeded multiple consecutive times.
+- By polling Java heap size, running threads and fd size periodic, Hprof dump is triggered when the
+  threshold is exceeded multiple consecutive times.
 
-- Hprof dump use `Suspend ART VM->fork VM process->Resume ART VM->Dump Hprof` strategy, making the simple dump's 20 seconds process frozen reduced to within 20ms.
+- Hprof dump use `Suspend ART VM->fork VM process->Resume ART VM->Dump Hprof` strategy, making the
+  simple dump's 20 seconds process frozen reduced to within 20ms.
 
-- Using shark to parse hprof file, but some optimization changes are added in shark. Leaking judge and leaking reference chain computing are executed on the device, and give a heap report finally.
+- Using shark to parse hprof file, but some optimization changes are added in shark. Leaking judge
+  and leaking reference chain computing are executed on the device, and give a heap report finally.
 
 # OOMMonitor Compatibility
 
@@ -16,12 +20,12 @@ OOMMonitor is designed for solving Android Application's Java memory leak proble
 
 - Support armeabi-v7a arm64-v8a x86 x86-64
 
-
 # OOMMonitor Quick up
 
 ## dependencies
 
 - Add mavenCentral to the repositories of the project root directory build.gradle
+
 ```groovy
 repositories {
     mavenCentral()
@@ -29,6 +33,7 @@ repositories {
 ```
 
 - Add dependency in project app/build.gradle
+
 ```groovy
 dependencies {
     implementation "com.kuaishou.koom:koom-java-leak:${latest_version}"
@@ -39,7 +44,8 @@ dependencies {
 
 - MonitorManager Initialization
 
-Make sure MonitorManager is initialized for OOMMonitor depends on it, such as Application, App version code is correctly initialized.
+Make sure MonitorManager is initialized for OOMMonitor depends on it, such as Application, App
+version code is correctly initialized.
 
 - OOMMonitor Initialization
 
@@ -76,7 +82,7 @@ MonitorManager.addMonitorConfig(config)
 OOMMonitor.startLoop(5_000L)
 ```
 
--  Stop OOMMonitor
+- Stop OOMMonitor
 
 ```kotlin
 OOMMonitor.stopLoop()
@@ -84,7 +90,8 @@ OOMMonitor.stopLoop()
 
 - Check Running Log
     - start loop，`OOMMonitor: startLoop()`
-    - exceed the threshold，`OOMMonitor_ThreadOOMTracker: [meet condition] overThresholdCount:1, threadCount: 717`
+    - exceed the
+      threshold，`OOMMonitor_ThreadOOMTracker: [meet condition] overThresholdCount:1, threadCount: 717`
     - dump triggered，`OOMMonitor: dumpAndAnalysis`
     - dump ended：`OOMMonitor: end hprof dump`
     - start hprof analyze：`OOMMonitor: start hprof analysis`
@@ -93,14 +100,17 @@ OOMMonitor.stopLoop()
 # OOMMonitor FAQ
 
 - How about OOMMonitor performance overhead？
-    - First, dump hprof will no longer froze the process 
-    - But, dump and analysis in the sub process may compute above 3 minutes which up to heap file size, and this will use one cpu thread and 200m memory maximum
+    - First, dump hprof will no longer froze the process
+    - But, dump and analysis in the sub process may compute above 3 minutes which up to heap file
+      size, and this will use one cpu thread and 200m memory maximum
     - So，a remote switch and a sample rate is suggested
 
 - What object is considered leaked？
-    - For Activity and Fragment, when object is destroyed but a reference chain to gc root still exist, the object is leaked
+    - For Activity and Fragment, when object is destroyed but a reference chain to gc root still
+      exist, the object is leaked
         - Activity destroy judgement rule，mFinished or mDestroyed is true
-        - Fragment destroy judgement rule，mFragmentManager is null and mCalled is true, mCalled is true means the fragment lifecycle callback is done 
+        - Fragment destroy judgement rule，mFragmentManager is null and mCalled is true, mCalled is
+          true means the fragment lifecycle callback is done
 
 - How to strip hprof in the dump process to reduced the hprof file size mostly？
 

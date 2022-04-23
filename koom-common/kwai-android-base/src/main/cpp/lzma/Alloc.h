@@ -34,9 +34,7 @@ extern const ISzAlloc g_BigAlloc;
 extern const ISzAlloc g_MidAlloc;
 extern const ISzAlloc g_AlignedAlloc;
 
-
-typedef struct
-{
+typedef struct {
   ISzAlloc vt;
   ISzAllocPtr baseAlloc;
   unsigned numAlignBits; /* ((1 << numAlignBits) >= sizeof(void *)) */
@@ -44,7 +42,6 @@ typedef struct
 } CAlignOffsetAlloc;
 
 void AlignOffsetAlloc_CreateVTable(CAlignOffsetAlloc *p);
-
 
 EXTERN_C_END
 

@@ -41,10 +41,10 @@ long threadLeakDelay;
 void Init(JavaVM *vm, _JNIEnv *env) {
   java_vm_ = vm;
   auto clazz = env->FindClass(
-      "com/kwai/performance/overhead/thread/monitor/NativeHandler");
+	  "com/kwai/performance/overhead/thread/monitor/NativeHandler");
   native_handler_class = static_cast<jclass>(env->NewGlobalRef(clazz));
   java_callback_method = env->GetStaticMethodID(
-      native_handler_class, "nativeReport", "(Ljava/lang/String;)V");
+	  native_handler_class, "nativeReport", "(Ljava/lang/String;)V");
   Util::Init();
   Log::info("koom", "Init, android api:%d", Util::AndroidApi());
   CallStack::Init();
@@ -52,7 +52,7 @@ void Init(JavaVM *vm, _JNIEnv *env) {
 
 void Start() {
   if (isRunning) {
-    return;
+	return;
   }
   // 初始化数据
   delete sHookLooper;
@@ -76,10 +76,10 @@ JNIEnv *GetEnv(bool doAttach) {
   JNIEnv *env = nullptr;
   int status = java_vm_->GetEnv((void **)&env, JNI_VERSION_1_6);
   if ((status == JNI_EDETACHED || env == nullptr) && doAttach) {
-    status = java_vm_->AttachCurrentThread(&env, nullptr);
-    if (status < 0) {
-      env = nullptr;
-    }
+	status = java_vm_->AttachCurrentThread(&env, nullptr);
+	if (status < 0) {
+	  env = nullptr;
+	}
   }
   return env;
 }
@@ -87,13 +87,13 @@ JNIEnv *GetEnv(bool doAttach) {
 void JavaCallback(const char *value, bool doAttach) {
   JNIEnv *env = GetEnv(doAttach);
   if (env != nullptr && value != nullptr) {
-    Log::error("koom", "JavaCallback %d", strlen(value));
-    jstring string_value = env->NewStringUTF(value);
-    env->CallStaticVoidMethod(native_handler_class, java_callback_method,
-                              string_value);
-    Log::info("koom", "JavaCallback finished");
+	Log::error("koom", "JavaCallback %d", strlen(value));
+	jstring string_value = env->NewStringUTF(value);
+	env->CallStaticVoidMethod(native_handler_class, java_callback_method,
+							  string_value);
+	Log::info("koom", "JavaCallback finished");
   } else {
-    Log::info("koom", "JavaCallback fail no JNIEnv");
+	Log::info("koom", "JavaCallback fail no JNIEnv");
   }
 }
 

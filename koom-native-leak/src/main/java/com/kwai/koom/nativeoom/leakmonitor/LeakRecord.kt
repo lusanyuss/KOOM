@@ -22,50 +22,49 @@ package com.kwai.koom.nativeoom.leakmonitor
 import androidx.annotation.Keep
 
 @Keep
-data class LeakRecord(var index: Long,
-  var size: Int,
-  var threadName: String,
-  var frames: Array<FrameInfo>) {
-  @JvmField
-  var tag: String? = null
-
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (javaClass != other?.javaClass) return false
-
-    other as LeakRecord
-
-    if (index != other.index) return false
-    if (size != other.size) return false
-    if (threadName != other.threadName) return false
-    if (!frames.contentEquals(other.frames)) return false
-    if (tag != other.tag) return false
-
-    return true
-  }
-
-  override fun hashCode(): Int {
-    var result = index.hashCode()
-    result = 31 * result + size
-    result = 31 * result + threadName.hashCode()
-    result = 31 * result + frames.contentHashCode()
-    result = 31 * result + (tag?.hashCode() ?: 0)
-    return result
-  }
-
-  override fun toString(): String = StringBuilder().apply {
-    append("Activity: $tag\n")
-    append("LeakSize: $size Byte\n")
-    append("LeakThread: $threadName\n")
-    append("Backtrace:\n")
-
-    for ((index, line) in frames.withIndex()) {
-      append("#$index pc $line\n")
+data class LeakRecord(
+    var index: Long, var size: Int, var threadName: String, var frames: Array<FrameInfo>
+) {
+    @JvmField
+    var tag: String? = null
+    
+    override fun equals(other: Any?): Boolean {
+        if(this === other) return true
+        if(javaClass != other?.javaClass) return false
+        
+        other as LeakRecord
+        
+        if(index != other.index) return false
+        if(size != other.size) return false
+        if(threadName != other.threadName) return false
+        if(!frames.contentEquals(other.frames)) return false
+        if(tag != other.tag) return false
+        
+        return true
     }
-  }.toString()
+    
+    override fun hashCode(): Int {
+        var result = index.hashCode()
+        result = 31 * result + size
+        result = 31 * result + threadName.hashCode()
+        result = 31 * result + frames.contentHashCode()
+        result = 31 * result + (tag?.hashCode() ?: 0)
+        return result
+    }
+    
+    override fun toString(): String = StringBuilder().apply {
+        append("Activity: $tag\n")
+        append("LeakSize: $size Byte\n")
+        append("LeakThread: $threadName\n")
+        append("Backtrace:\n")
+        
+        for ((index, line) in frames.withIndex()) {
+            append("#$index pc $line\n")
+        }
+    }.toString()
 }
 
 @Keep
 data class FrameInfo(var relPc: Long, var soName: String) {
-  override fun toString(): String = "0x${relPc.toString(16)}  $soName"
+    override fun toString(): String = "0x${relPc.toString(16)}  $soName"
 }

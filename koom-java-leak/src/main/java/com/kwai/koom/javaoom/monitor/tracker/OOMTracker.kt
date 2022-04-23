@@ -22,18 +22,18 @@ import com.kwai.koom.base.Monitor
 import com.kwai.koom.javaoom.monitor.OOMMonitorConfig
 
 abstract class OOMTracker : Monitor<OOMMonitorConfig>() {
-  /**
-   * @return true 表示追踪到oom、 false 表示没有追踪到oom
-   */
-  abstract fun track(): Boolean
-
-  /**
-   * 重置track状态
-   */
-  abstract fun reset()
-
-  /**
-   * @return 追踪到的oom的标识
-   */
-  abstract fun reason(): String
+    /**
+     * @return true 表示追踪到oom、 false 表示没有追踪到oom
+     */
+    abstract fun track(): Boolean
+    
+    /**
+     * 重置track状态
+     */
+    abstract fun reset()
+    
+    /**
+     * @return 追踪到的oom的标识
+     */
+    abstract fun reason(): String
 }

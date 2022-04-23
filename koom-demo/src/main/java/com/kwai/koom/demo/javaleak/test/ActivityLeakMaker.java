@@ -18,38 +18,39 @@
 
 package com.kwai.koom.demo.javaleak.test;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.List;
+
 public class ActivityLeakMaker extends LeakMaker<Activity> {
 
-  @Override
-  public void startLeak(Context context) {
-    LeakedActivity.setUselessObjectList(uselessObjectList);
-    Intent intent = new Intent(context, LeakedActivity.class);
-    context.startActivity(intent);
-  }
-
-  public static class LeakedActivity extends AppCompatActivity {
-
-    static List<Activity> uselessObjectList;
-
-    public static void setUselessObjectList(List<Activity> activities) {
-      uselessObjectList = activities;
-    }
-
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
-      uselessObjectList.add(this);
-      this.finish();
+    public void startLeak(Context context) {
+        LeakedActivity.setUselessObjectList(uselessObjectList);
+        Intent intent = new Intent(context, LeakedActivity.class);
+        context.startActivity(intent);
     }
-  }
+
+    public static class LeakedActivity extends AppCompatActivity {
+
+        static List<Activity> uselessObjectList;
+
+        public static void setUselessObjectList(List<Activity> activities) {
+            uselessObjectList = activities;
+        }
+
+        @Override
+        protected void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            uselessObjectList.add(this);
+            this.finish();
+        }
+    }
 
 }

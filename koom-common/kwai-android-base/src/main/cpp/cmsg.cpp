@@ -30,26 +30,26 @@ namespace android {
 namespace base {
 
 ssize_t SendFileDescriptorVector(borrowed_fd sockfd, const void *data, size_t len,
-                                 const std::vector<int> &fds) {
+								 const std::vector<int> &fds) {
   static const size_t page_size = sysconf(_SC_PAGE_SIZE);
   size_t cmsg_space = CMSG_SPACE(sizeof(int) * fds.size());
   size_t cmsg_len = CMSG_LEN(sizeof(int) * fds.size());
   if (cmsg_space >= page_size) {
-    errno = ENOMEM;
-    return -1;
+	errno = ENOMEM;
+	return -1;
   }
 
   alignas(struct cmsghdr) char cmsg_buf[cmsg_space];
   iovec iov = {.iov_base = const_cast<void *>(data), .iov_len = len};
   msghdr msg = {
-      .msg_name = nullptr,
-      .msg_namelen = 0,
-      .msg_iov = &iov,
-      .msg_iovlen = 1,
-      .msg_control = cmsg_buf,
-      // We can't cast to the actual type of the field, because it's different across platforms.
-      .msg_controllen = static_cast<unsigned int>(cmsg_space),
-      .msg_flags = 0,
+	  .msg_name = nullptr,
+	  .msg_namelen = 0,
+	  .msg_iov = &iov,
+	  .msg_iovlen = 1,
+	  .msg_control = cmsg_buf,
+	  // We can't cast to the actual type of the field, because it's different across platforms.
+	  .msg_controllen = static_cast<unsigned int>(cmsg_space),
+	  .msg_flags = 0,
   };
 
   struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
@@ -59,7 +59,7 @@ ssize_t SendFileDescriptorVector(borrowed_fd sockfd, const void *data, size_t le
 
   int *cmsg_fds = reinterpret_cast<int *>(CMSG_DATA(cmsg));
   for (size_t i = 0; i < fds.size(); ++i) {
-    cmsg_fds[i] = fds[i];
+	cmsg_fds[i] = fds[i];
   }
 
 #if defined(__linux__)
@@ -72,27 +72,27 @@ ssize_t SendFileDescriptorVector(borrowed_fd sockfd, const void *data, size_t le
 }
 
 ssize_t ReceiveFileDescriptorVector(borrowed_fd sockfd, void *data, size_t len, size_t max_fds,
-                                    std::vector<unique_fd> *fds) {
+									std::vector<unique_fd> *fds) {
   fds->clear();
 
   static const size_t page_size = sysconf(_SC_PAGE_SIZE);
   size_t cmsg_space = CMSG_SPACE(sizeof(int) * max_fds);
   if (cmsg_space >= page_size) {
-    errno = ENOMEM;
-    return -1;
+	errno = ENOMEM;
+	return -1;
   }
 
   alignas(struct cmsghdr) char cmsg_buf[cmsg_space];
   iovec iov = {.iov_base = const_cast<void *>(data), .iov_len = len};
   msghdr msg = {
-      .msg_name = nullptr,
-      .msg_namelen = 0,
-      .msg_iov = &iov,
-      .msg_iovlen = 1,
-      .msg_control = cmsg_buf,
-      // We can't cast to the actual type of the field, because it's different across platforms.
-      .msg_controllen = static_cast<unsigned int>(cmsg_space),
-      .msg_flags = 0,
+	  .msg_name = nullptr,
+	  .msg_namelen = 0,
+	  .msg_iov = &iov,
+	  .msg_iovlen = 1,
+	  .msg_control = cmsg_buf,
+	  // We can't cast to the actual type of the field, because it's different across platforms.
+	  .msg_controllen = static_cast<unsigned int>(cmsg_space),
+	  .msg_flags = 0,
   };
 
   int flags = MSG_TRUNC | MSG_CTRUNC;
@@ -103,68 +103,68 @@ ssize_t ReceiveFileDescriptorVector(borrowed_fd sockfd, void *data, size_t len, 
   ssize_t rc = TEMP_FAILURE_RETRY(recvmsg(sockfd.get(), &msg, flags));
 
   if (rc == -1) {
-    return -1;
+	return -1;
   }
 
   int error = 0;
   if ((msg.msg_flags & MSG_TRUNC)) {
-    LOG(ERROR) << "message was truncated when receiving file descriptors";
-    error = EMSGSIZE;
+	LOG(ERROR) << "message was truncated when receiving file descriptors";
+	error = EMSGSIZE;
   } else if ((msg.msg_flags & MSG_CTRUNC)) {
-    LOG(ERROR) << "control message was truncated when receiving file descriptors";
-    error = EMSGSIZE;
+	LOG(ERROR) << "control message was truncated when receiving file descriptors";
+	error = EMSGSIZE;
   }
 
   std::vector<unique_fd> received_fds;
   struct cmsghdr *cmsg;
   for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != nullptr; cmsg = CMSG_NXTHDR(&msg, cmsg)) {
-    if (cmsg->cmsg_level != SOL_SOCKET || cmsg->cmsg_type != SCM_RIGHTS) {
-      LOG(ERROR) << "received unexpected cmsg: [" << cmsg->cmsg_level << ", " << cmsg->cmsg_type
-                 << "]";
-      error = EBADMSG;
-      continue;
-    }
+	if (cmsg->cmsg_level != SOL_SOCKET || cmsg->cmsg_type != SCM_RIGHTS) {
+	  LOG(ERROR) << "received unexpected cmsg: [" << cmsg->cmsg_level << ", " << cmsg->cmsg_type
+				 << "]";
+	  error = EBADMSG;
+	  continue;
+	}
 
-    // There isn't a macro that does the inverse of CMSG_LEN, so hack around it ourselves, with
-    // some asserts to ensure that CMSG_LEN behaves as we expect.
+	  // There isn't a macro that does the inverse of CMSG_LEN, so hack around it ourselves, with
+	  // some asserts to ensure that CMSG_LEN behaves as we expect.
 #if defined(__linux__)
 #define CMSG_ASSERT static_assert
 #else
-// CMSG_LEN is somehow not constexpr on darwin.
+	  // CMSG_LEN is somehow not constexpr on darwin.
 #define CMSG_ASSERT CHECK
 #endif
-    CMSG_ASSERT(CMSG_LEN(0) + 1 * sizeof(int) == CMSG_LEN(1 * sizeof(int)));
-    CMSG_ASSERT(CMSG_LEN(0) + 2 * sizeof(int) == CMSG_LEN(2 * sizeof(int)));
-    CMSG_ASSERT(CMSG_LEN(0) + 3 * sizeof(int) == CMSG_LEN(3 * sizeof(int)));
-    CMSG_ASSERT(CMSG_LEN(0) + 4 * sizeof(int) == CMSG_LEN(4 * sizeof(int)));
+	CMSG_ASSERT(CMSG_LEN(0) + 1 * sizeof(int) == CMSG_LEN(1 * sizeof(int)));
+	CMSG_ASSERT(CMSG_LEN(0) + 2 * sizeof(int) == CMSG_LEN(2 * sizeof(int)));
+	CMSG_ASSERT(CMSG_LEN(0) + 3 * sizeof(int) == CMSG_LEN(3 * sizeof(int)));
+	CMSG_ASSERT(CMSG_LEN(0) + 4 * sizeof(int) == CMSG_LEN(4 * sizeof(int)));
 
-    if (cmsg->cmsg_len % sizeof(int) != 0) {
-      LOG(FATAL) << "cmsg_len(" << cmsg->cmsg_len << ") not aligned to sizeof(int)";
-    } else if (cmsg->cmsg_len <= CMSG_LEN(0)) {
-      LOG(FATAL) << "cmsg_len(" << cmsg->cmsg_len << ") not long enough to hold any data";
-    }
+	if (cmsg->cmsg_len % sizeof(int) != 0) {
+	  LOG(FATAL) << "cmsg_len(" << cmsg->cmsg_len << ") not aligned to sizeof(int)";
+	} else if (cmsg->cmsg_len <= CMSG_LEN(0)) {
+	  LOG(FATAL) << "cmsg_len(" << cmsg->cmsg_len << ") not long enough to hold any data";
+	}
 
-    int *cmsg_fds = reinterpret_cast<int *>(CMSG_DATA(cmsg));
-    size_t cmsg_fdcount = static_cast<size_t>(cmsg->cmsg_len - CMSG_LEN(0)) / sizeof(int);
-    for (size_t i = 0; i < cmsg_fdcount; ++i) {
+	int *cmsg_fds = reinterpret_cast<int *>(CMSG_DATA(cmsg));
+	size_t cmsg_fdcount = static_cast<size_t>(cmsg->cmsg_len - CMSG_LEN(0)) / sizeof(int);
+	for (size_t i = 0; i < cmsg_fdcount; ++i) {
 #if !defined(__linux__)
-      // Linux uses MSG_CMSG_CLOEXEC instead of doing this manually.
-      fcntl(cmsg_fds[i], F_SETFD, FD_CLOEXEC);
+	  // Linux uses MSG_CMSG_CLOEXEC instead of doing this manually.
+	  fcntl(cmsg_fds[i], F_SETFD, FD_CLOEXEC);
 #endif
-      received_fds.emplace_back(cmsg_fds[i]);
-    }
+	  received_fds.emplace_back(cmsg_fds[i]);
+	}
   }
 
   if (error != 0) {
-    errno = error;
-    return -1;
+	errno = error;
+	return -1;
   }
 
   if (received_fds.size() > max_fds) {
-    LOG(ERROR) << "received too many file descriptors, expected " << fds->size() << ", received "
-               << received_fds.size();
-    errno = EMSGSIZE;
-    return -1;
+	LOG(ERROR) << "received too many file descriptors, expected " << fds->size() << ", received "
+			   << received_fds.size();
+	errno = EMSGSIZE;
+	return -1;
   }
 
   *fds = std::move(received_fds);

@@ -43,30 +43,30 @@ class Util {
   static int AndroidApi() { return android_api; }
 
   static timespec CurrentClockTime() {
-    struct timespec now_time {};
-    clock_gettime(CLOCK_MONOTONIC, &now_time);
-    return now_time;
+	struct timespec now_time{};
+	clock_gettime(CLOCK_MONOTONIC, &now_time);
+	return now_time;
   }
 
   static long long CurrentTimeNs() {
-    struct timespec now_time {};
-    clock_gettime(CLOCK_MONOTONIC, &now_time);
-    return now_time.tv_sec * 1000000000LL + now_time.tv_nsec;
+	struct timespec now_time{};
+	clock_gettime(CLOCK_MONOTONIC, &now_time);
+	return now_time.tv_sec * 1000000000LL + now_time.tv_nsec;
   }
 
   static std::vector<std::string> Split(const std::string &s, char seperator) {
-    std::vector<std::string> output;
-    std::string::size_type prev_pos = 0, pos = 0;
+	std::vector<std::string> output;
+	std::string::size_type prev_pos = 0, pos = 0;
 
-    while ((pos = s.find(seperator, pos)) != std::string::npos) {
-      std::string substring(s.substr(prev_pos, pos - prev_pos));
-      output.push_back(substring);
-      prev_pos = ++pos;
-    }
+	while ((pos = s.find(seperator, pos)) != std::string::npos) {
+	  std::string substring(s.substr(prev_pos, pos - prev_pos));
+	  output.push_back(substring);
+	  prev_pos = ++pos;
+	}
 
-    output.push_back(s.substr(prev_pos, pos - prev_pos));  // Last word
+	output.push_back(s.substr(prev_pos, pos - prev_pos));  // Last word
 
-    return output;
+	return output;
   }
 };
 }  // namespace koom

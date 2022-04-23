@@ -28,7 +28,7 @@ namespace unwindstack {
 // Forward declarations.
 class Memory;
 
-template <typename AddressType>
+template<typename AddressType>
 class DwarfEhFrameWithHdr : public DwarfSectionImpl<AddressType> {
  public:
   // Add these so that the protected members of DwarfSectionImpl
@@ -37,36 +37,36 @@ class DwarfEhFrameWithHdr : public DwarfSectionImpl<AddressType> {
   using DwarfSectionImpl<AddressType>::last_error_;
 
   struct FdeInfo {
-    AddressType pc;
-    uint64_t offset;
+	AddressType pc;
+	uint64_t offset;
   };
 
-  DwarfEhFrameWithHdr(Memory* memory) : DwarfSectionImpl<AddressType>(memory) {}
+  DwarfEhFrameWithHdr(Memory *memory) : DwarfSectionImpl<AddressType>(memory) {}
   virtual ~DwarfEhFrameWithHdr() = default;
 
   uint64_t GetCieOffsetFromFde32(uint32_t pointer) override {
-    return memory_.cur_offset() - pointer - 4;
+	return memory_.cur_offset() - pointer - 4;
   }
 
   uint64_t GetCieOffsetFromFde64(uint64_t pointer) override {
-    return memory_.cur_offset() - pointer - 8;
+	return memory_.cur_offset() - pointer - 8;
   }
 
   uint64_t AdjustPcFromFde(uint64_t pc) override {
-    // The eh_frame uses relative pcs.
-    return pc + memory_.cur_offset() - 4;
+	// The eh_frame uses relative pcs.
+	return pc + memory_.cur_offset() - 4;
   }
 
   bool EhFrameInit(uint64_t offset, uint64_t size, int64_t section_bias);
   bool Init(uint64_t offset, uint64_t size, int64_t section_bias) override;
 
-  const DwarfFde* GetFdeFromPc(uint64_t pc) override;
+  const DwarfFde *GetFdeFromPc(uint64_t pc) override;
 
-  bool GetFdeOffsetFromPc(uint64_t pc, uint64_t* fde_offset);
+  bool GetFdeOffsetFromPc(uint64_t pc, uint64_t *fde_offset);
 
-  const FdeInfo* GetFdeInfoFromIndex(size_t index);
+  const FdeInfo *GetFdeInfoFromIndex(size_t index);
 
-  void GetFdes(std::vector<const DwarfFde*>* fdes) override;
+  void GetFdes(std::vector<const DwarfFde *> *fdes) override;
 
  protected:
   uint8_t version_ = 0;
